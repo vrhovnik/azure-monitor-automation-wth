@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Htmx;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using TTA.Core;
 using TTA.Interfaces;
 using TTA.Models;
+using TTA.Web.Base;
 using TTA.Web.Options;
 
 namespace TTA.Web.Pages.User;
 
 //[Authorize]
-public class DashboardPageModel : PageModel
+public class DashboardPageModel : BasePageModel
 {
     private readonly ILogger<DashboardPageModel> logger;
     private readonly IProfileSettingsService profileSettingsService;
@@ -26,9 +28,9 @@ public class DashboardPageModel : PageModel
         this.workTaskRepository = workTaskRepository;
     }
 
-    public async Task OnGetAsync(int? pageNumber, string query)
+    public async Task<IActionResult> OnGetAsync(int? pageNumber, string query)
     {
-        int currentPageNumber = pageNumber ?? 1;
+        var currentPageNumber = pageNumber ?? 1;
         var profileName = User.Identity.Name;
         logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", profileName, DateTime.Now);
         var id = profileName.GetUniqueValue();
@@ -38,6 +40,10 @@ public class DashboardPageModel : PageModel
         UserTasks = await workTaskRepository.WorkTasksForUserAsync(profileName, currentPageNumber,
             webSettings.PageCount, query);
         logger.LogInformation("Loaded {UserTaskNumber} work tasks for user with {Query}", UserTasks.TotalPages, query);
+
+        if (Request.IsHtmx()) return Partial("_WorkTasksList", UserTasks);
+        
+        return Page();
     }
 
     [BindProperty] public TTAUserSettings ProfileSettings { get; set; }
