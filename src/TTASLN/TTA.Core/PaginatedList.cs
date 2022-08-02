@@ -11,13 +11,14 @@ public class PaginatedList<T> : List<T>
     public string Query { get; }
     public string DataBag { get; set; }
 
-    public PaginatedList() : this(new List<T>(), 0, 0, 1, string.Empty)
+    public PaginatedList() : this(new List<T>(), 0, 0, 1, string.Empty, string.Empty)
     {
     }
 
-    public PaginatedList(IEnumerable<T> items, int count, int pageIndex, int pageSize, string query = "")
+    public PaginatedList(IEnumerable<T> items, int count, int pageIndex, int pageSize, string query = "",string dataBag="")
     {
         PageIndex = pageIndex;
+        DataBag = dataBag;
         TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         Query = query;
         AddRange(items);

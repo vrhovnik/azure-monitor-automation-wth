@@ -8,5 +8,5 @@ public class TTAUser
     public string Password { get; set; }
     public string Salt { get; set; }
     public List<WorkTask> Tasks { get; set; } = new();
-    public List<TTARole> Roles { get; set; } = new();
+    public TTAUserSettings UserSettings { get; set; } = new();
 }

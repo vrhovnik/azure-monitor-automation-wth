@@ -1,6 +1,6 @@
 ﻿namespace TTA.Web.Options;
 
-public class WebSettings
+public class GeneralWebOptions
 {
     public string DefaultEmailFrom { get; set; }
     public int PageCount { get; set; }

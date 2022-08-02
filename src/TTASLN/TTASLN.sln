@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.Core", "TTA.Core\TTA.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.Interfaces", "TTA.Interfaces\TTA.Interfaces.csproj", "{7118C74C-4152-4198-8620-9970571B9D0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.SQL", "TTA.SQL\TTA.SQL.csproj", "{6DFEC702-7F27-43E6-B9D4-B91C8C322111}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{7118C74C-4152-4198-8620-9970571B9D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7118C74C-4152-4198-8620-9970571B9D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7118C74C-4152-4198-8620-9970571B9D0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DFEC702-7F27-43E6-B9D4-B91C8C322111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DFEC702-7F27-43E6-B9D4-B91C8C322111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DFEC702-7F27-43E6-B9D4-B91C8C322111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DFEC702-7F27-43E6-B9D4-B91C8C322111}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

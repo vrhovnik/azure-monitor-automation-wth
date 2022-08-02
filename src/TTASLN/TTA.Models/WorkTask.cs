@@ -6,6 +6,7 @@ public class WorkTask
     public string Description { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
+    public bool IsPublic { get; set; } = false;
     public int DurationInMs => End.Millisecond - Start.Millisecond;
     public List<Tag> Tags { get; set; } = new();
     public Category Category { get; set; } = new();

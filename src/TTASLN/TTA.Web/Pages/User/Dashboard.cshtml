@@ -11,13 +11,14 @@
 }
 
 <h1>Dashboard for @identityName</h1>
+
 @if (User.Identity.IsAuthenticated)
 {
     <div class="container">
         <div class="float-right mt-2 mb-2">
-            <a asp-page="/Links/Create"
+            <a asp-page="/Tasks/Create"
                class="btn btn-success">
-                Create new link <i class="fas fa-plus"></i>
+                Create new task <i class="fas fa-plus"></i>
             </a>
         </div>
     </div>
@@ -42,9 +43,4 @@
 @section Scripts
 {
     <script src="https://unpkg.com/htmx.org@1.6.0"></script>
-    <script type="text/javascript">    
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-    </script>
 }

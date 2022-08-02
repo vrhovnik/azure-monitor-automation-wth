@@ -16,14 +16,14 @@ public class DashboardPageModel : BasePageModel
     private readonly ILogger<DashboardPageModel> logger;
     private readonly IProfileSettingsService profileSettingsService;
     private readonly IWorkTaskRepository workTaskRepository;
-    private WebSettings webSettings;
+    private GeneralWebOptions generalWebOptions;
 
     public DashboardPageModel(ILogger<DashboardPageModel> logger,
         IProfileSettingsService profileSettingsService, IWorkTaskRepository workTaskRepository,
-        IOptions<WebSettings> webSettingsValue)
+        IOptions<GeneralWebOptions> webSettingsValue)
     {
         this.logger = logger;
-        webSettings = webSettingsValue.Value;
+        generalWebOptions = webSettingsValue.Value;
         this.profileSettingsService = profileSettingsService;
         this.workTaskRepository = workTaskRepository;
     }
@@ -38,7 +38,7 @@ public class DashboardPageModel : BasePageModel
         logger.LogInformation("Got profile for {UniqueSettingsId} - ended at {DateEnd}", id, DateTime.Now);
 
         UserTasks = await workTaskRepository.WorkTasksForUserAsync(profileName, currentPageNumber,
-            webSettings.PageCount, query);
+            generalWebOptions.PageCount, query);
         logger.LogInformation("Loaded {UserTaskNumber} work tasks for user with {Query}", UserTasks.TotalPages, query);
 
         if (Request.IsHtmx()) return Partial("_WorkTasksList", UserTasks);
