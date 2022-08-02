@@ -1,0 +1,9 @@
+﻿@page  "{pageNumber=1}/{query?}"
+@model TTA.Web.Pages.User.DashboardPageModel
+
+@{
+    var identityName = User.Identity.Name;
+    ViewData["Title"] = "Dashboard " + identityName;
+}
+
+<h1>Dashboard for @identityName</h1>

@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Options" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\TTA.Core\TTA.Core.csproj" />
       <ProjectReference Include="..\TTA.Interfaces\TTA.Interfaces.csproj" />
       <ProjectReference Include="..\TTA.Models\TTA.Models.csproj" />

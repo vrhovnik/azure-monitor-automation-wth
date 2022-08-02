@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TTA.Core\TTA.Core.csproj" />
+      <ProjectReference Include="..\TTA.Models\TTA.Models.csproj" />
+    </ItemGroup>
+
 </Project>
