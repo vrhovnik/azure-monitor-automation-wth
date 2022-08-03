@@ -80,10 +80,10 @@ public class PasswordHash
     /// <param name="a">The first byte array.</param>
     /// <param name="b">The second byte array.</param>
     /// <returns>True if both byte arrays are equal. False otherwise.</returns>
-    private static bool SlowEquals(byte[] a, byte[] b)
+    private static bool SlowEquals(IReadOnlyList<byte> a, IReadOnlyList<byte> b)
     {
-        var diff = (uint)a.Length ^ (uint)b.Length;
-        for (var i = 0; i < a.Length && i < b.Length; i++)
+        var diff = (uint)a.Count ^ (uint)b.Count;
+        for (var i = 0; i < a.Count && i < b.Count; i++)
             diff |= (uint)(a[i] ^ b[i]);
         return diff == 0;
     }

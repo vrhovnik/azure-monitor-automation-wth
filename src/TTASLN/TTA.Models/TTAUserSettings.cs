@@ -2,5 +2,5 @@
 
 public class TTAUserSettings : ContentModel
 {
-    public bool EmailNotifications { get; set; }
+    public bool EmailNotification { get; set; }
 }

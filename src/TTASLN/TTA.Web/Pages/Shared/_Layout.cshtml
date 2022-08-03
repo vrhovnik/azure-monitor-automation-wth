@@ -42,28 +42,29 @@
                     </li>
                 </ul>
             </div>
+            <form class="form-inline my-2 my-lg-0">
+                <div class="mr-2"
+                     id="alertDiv">
+                </div>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <span class="font-weight-bolder mr-2">Welcome</span>
+                    <a asp-page="/Users/Dashboard"
+                       class="font-weight-bolder mr-1">
+                        @User.Identity.Name
+                    </a>
+                    <a asp-page="/User/Logout"
+                       class="text-dark ml-1 btn btn-light">
+                        Log me out!
+                    </a>
+                }
+                else
+                {
+                    <a asp-page="/User/Login">Login</a>
+                }
+            </form>
         </div>
-        <form class="form-inline my-2 my-lg-0">
-            <div class="mr-2"
-                 id="alertDiv">
-            </div>
-            @if (User.Identity.IsAuthenticated)
-            {
-                <span class="font-weight-bolder mr-2">Welcome</span>
-                <a asp-page="/Users/Dashboard"
-                   class="font-weight-bolder mr-1">
-                    @User.Identity.Name
-                </a>
-                <a asp-page="/Account/Logout"
-                   class="text-dark ml-1 btn btn-light">
-                    Log me out!
-                </a>
-            }
-            else
-            {
-                <a asp-page="/Account/Login">Login</a>
-            }
-        </form>
+
     </nav>
 </header>
 <div class="container">

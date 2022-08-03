@@ -19,7 +19,4 @@
         <ProjectReference Include="..\TTA.Models\TTA.Models.csproj" />
         <ProjectReference Include="..\TTA.SQL\TTA.SQL.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Pages\Tasks" />
-    </ItemGroup>
 </Project>

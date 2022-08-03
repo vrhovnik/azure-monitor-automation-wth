@@ -1,6 +1,5 @@
 ﻿using Htmx;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Options;
 using TTA.Core;
 using TTA.Interfaces;
@@ -19,7 +18,8 @@ public class DashboardPageModel : BasePageModel
     private GeneralWebOptions generalWebOptions;
 
     public DashboardPageModel(ILogger<DashboardPageModel> logger,
-        IProfileSettingsService profileSettingsService, IWorkTaskRepository workTaskRepository,
+        IProfileSettingsService profileSettingsService, 
+        IWorkTaskRepository workTaskRepository,
         IOptions<GeneralWebOptions> webSettingsValue)
     {
         this.logger = logger;

@@ -1,5 +1,9 @@
-﻿@model TTA.Core.PaginatedList<TTA.Models.WorkTask>
-
+﻿@using TTA.Web.Base
+@model TTA.Core.PaginatedList<TTA.Models.WorkTask>
+@inject  IUserDataContext UserDataContext
+@{
+    var userViewModel = UserDataContext.GetCurrentUser();
+}
 @if (Model.Any())
 {
     <div id="grid">
@@ -37,17 +41,20 @@
                     </td>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <td>
-                            <a asp-page="/Tasks/Edit"
-                               asp-route-id="@workTask.WorkTaskId">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            &nbsp;
-                            <a asp-page="/Tasks/Delete"
-                               asp-route-id="@workTask.WorkTaskId">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </td>
+                        if (userViewModel.UserId == workTask.User.TTAUserId)
+                        {
+                            <td>
+                                <a asp-page="/Tasks/Edit"
+                                   asp-route-id="@workTask.WorkTaskId">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                &nbsp;
+                                <a asp-page="/Tasks/Delete"
+                                   asp-route-id="@workTask.WorkTaskId">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        }
                     }
                 </tr>
             }

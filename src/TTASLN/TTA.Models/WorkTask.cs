@@ -3,6 +3,7 @@
 public class WorkTask
 {
     public string WorkTaskId { get; set; }
+    public TTAUser User { get; set; } = new();
     public string Description { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }

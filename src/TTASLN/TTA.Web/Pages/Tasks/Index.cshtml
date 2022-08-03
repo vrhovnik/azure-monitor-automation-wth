@@ -1,0 +1,44 @@
+﻿@page  "{pageNumber=1}/{query?}"
+@model TTA.Web.Pages.Tasks.IndexPageModel
+
+@{
+    ViewData["Title"] = "Task search engine";
+}
+
+@if (string.IsNullOrEmpty(Model.Message))
+{
+    <p class="text-warning">@Model.Message</p>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="container">
+        <div class="float-right mt-2 mb-2">
+            <a asp-page="/Tasks/Create"
+               class="btn btn-success">
+                Create new task <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+}
+<div class="container">
+    <input aria-label="search term"
+           class="form-control"
+           hx-get
+           hx-indicator="#indicator"
+           hx-swap="outerHtml"
+           hx-target="#grid"
+           hx-trigger="keyup changed delay:300ms"
+           id="tbQuery"
+           name="query"
+           placeholder="enter search term"
+           type="text">
+</div>
+<div class="container mt-2">
+    @await Html.PartialAsync("_WorkTasksList", Model.WorkTasks)
+</div>
+
+@section Scripts
+{
+    <script src="https://unpkg.com/htmx.org@1.6.0"></script>
+}

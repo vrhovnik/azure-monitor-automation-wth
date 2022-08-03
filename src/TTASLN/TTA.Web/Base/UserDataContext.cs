@@ -21,12 +21,10 @@ public class UserDataContext : IUserDataContext
         var claimId = httpContextUser.FindFirst(ClaimTypes.NameIdentifier);
         currentUser.UserId = claimId.Value;
 
-        var claimAdmin = httpContextUser.FindFirst("IsAdmin");
-        currentUser.IsAdmin = Convert.ToBoolean(claimAdmin.Value);
-
-        var claimImageUrl = httpContextUser.FindFirst("ImageName");
-        currentUser.ImageUrl = claimImageUrl.Value;
+        var claimEmail = httpContextUser.FindFirst(ClaimTypes.Email);
+        currentUser.Email = claimEmail.Value;
 
         return currentUser;
     }
 }
+
