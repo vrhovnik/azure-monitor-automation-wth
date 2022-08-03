@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.ResponseCompression;
 using TTA.Interfaces;
@@ -21,6 +22,8 @@ builder.Services.AddTransient<ITagRepository, TagRepository>(_ =>
     new TagRepository(sqlOptions.ConnectionString));
 builder.Services.AddTransient<IWorkTaskRepository, WorkTaskRepository>(_ =>
     new WorkTaskRepository(sqlOptions.ConnectionString));
+builder.Services.AddTransient<IProfileSettingsService, ProfileSettingsService>(_ =>
+    new ProfileSettingsService(sqlOptions.ConnectionString));
 
 //core system settings
 builder.Services.AddScoped<IUserDataContext, UserDataContext>();
@@ -30,8 +33,8 @@ builder.Services.AddResponseCompression(options => options.Providers.Add<GzipCom
 builder.Services.Configure<GzipCompressionProviderOptions>(compressionOptions =>
     compressionOptions.Level = CompressionLevel.Optimal);
 builder.Services.AddHealthChecks();
-builder.Services.AddRazorPages()
-    .AddRazorPagesOptions(options =>
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
         options.Conventions.AddPageRoute("/Info/Index", ""));
 
 var app = builder.Build();
@@ -40,6 +43,7 @@ if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Error");
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {

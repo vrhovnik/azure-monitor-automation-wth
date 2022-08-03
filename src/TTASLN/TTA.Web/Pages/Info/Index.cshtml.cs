@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TTA.Web.Pages;
 
+[AllowAnonymous]
 public class IndexPageModel : PageModel
 {
     private readonly ILogger<IndexPageModel> logger;

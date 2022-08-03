@@ -29,7 +29,7 @@ public class LoginPageModel : BasePageModel
         if (string.IsNullOrEmpty(LoginData.Email) || string.IsNullOrEmpty(LoginData.Password))
         {
             Message = "Username or password is mandatory";
-            logger.LogError("Username or password is mandatory - data was empty at {DateLoaded}", DateTime.Now);
+            logger.LogWarning("Username or password is mandatory - data was empty at {DateLoaded}", DateTime.Now);
             return Page();
         }
 

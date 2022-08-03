@@ -25,7 +25,7 @@ public class TTAUserRepository : BaseRepository<TTAUser>, IUserRepository
         //add profile data
         await connection.ExecuteAsync(
             $"INSERT INTO UserSetting(EmailNotification, UserId)VALUES(@{nameof(entity.UserSettings.EmailNotification)},@userId)",
-            new { EmailNotifications = entity.UserSettings.EmailNotification, userId });
+            new { EmailNotification = entity.UserSettings.EmailNotification, userId });
 
         return entity;
     }
@@ -33,9 +33,9 @@ public class TTAUserRepository : BaseRepository<TTAUser>, IUserRepository
     public override async Task<TTAUser> DetailsAsync(string entityId)
     {
         await using var connection = new SqlConnection(connectionString);
-        var query = "SELECT C.* FROM Users C WHERE C.UserId=@entityId;" +
-                    "SELECT F.* FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId WHERE T.UserId=@entityId;" +
-                    "SELECT F.* FROM UserSetting T WHERE T.UserId=@entityId;";
+        var query = "SELECT U.UserId as TTAUserId, U.FullName, U.Email, U.Password FROM Users U WHERE U.UserId=@entityId;" +
+                    "SELECT T.* FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId WHERE T.UserId=@entityId;" +
+                    "SELECT F.* FROM UserSetting F WHERE F.UserId=@entityId;";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
         var ttaUser = await result.ReadSingleAsync<TTAUser>();
@@ -48,7 +48,7 @@ public class TTAUserRepository : BaseRepository<TTAUser>, IUserRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var item = await connection.QuerySingleOrDefaultAsync<TTAUser>(
-            "SELECT U.* FROM Users U WHERE U.Email=@username", new { username });
+            "SELECT U.UserId as TTAUserId, U.FullName, U.Email FROM Users U WHERE U.Email=@username", new { username });
 
         if (item == null) return null;
 
@@ -60,9 +60,9 @@ public class TTAUserRepository : BaseRepository<TTAUser>, IUserRepository
     public async Task<TTAUser> FindAsync(string email)
     {
         await using var connection = new SqlConnection(connectionString);
-        var virtuUsers = await connection.QueryAsync<TTAUser>(
-            "SELECT U.* " +
+        var ttaUsers = await connection.QueryAsync<TTAUser>(
+            "SELECT U.UserId as TTAUserId, U.FullName, U.Email " +
             "FROM Users U WHERE U.Email=@email", new { email });
-        return virtuUsers.Any() ? virtuUsers.ElementAt(0) : null;
+        return ttaUsers.Any() ? ttaUsers.ElementAt(0) : null;
     }
 }
