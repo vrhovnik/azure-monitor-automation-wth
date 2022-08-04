@@ -46,3 +46,10 @@
     </dd>
 </dl>
 
+@Html.PartialAsync("_WorkTaskComments", Model.WorkTask.Comments)
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h6>Add new comment</h6>
+    
+}

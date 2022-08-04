@@ -1,8 +1,11 @@
 ﻿@page  "{pageNumber=1}/{query?}"
+@using TTA.Web.Base
 @model TTA.Web.Pages.User.DashboardPageModel
+@inject IUserDataContext userDataContext
 
 @{
-    var identityName = User.Identity.Name;
+    var currentUser = userDataContext.GetCurrentUser();
+    var identityName = currentUser.Fullname;
     ViewData["Title"] = "Dashboard " + identityName;
 }
 @if (string.IsNullOrEmpty(Model.Message))
@@ -16,6 +19,9 @@
 {
     <div class="container">
         <div class="float-end mb-2 mt-2">
+            <a class="btn btn-light" hx-get="/tasks-api/download-pdf-for-user/@currentUser.UserId" >
+                Download PDF <i class="fa-solid fa-file-pdf"></i>
+            </a>
             <a asp-page="/Tasks/Create"
                class="btn btn-success">
                 Create new task <i class="fas fa-plus"></i>
