@@ -11,4 +11,5 @@ public class WorkTask
     public int DurationInMs => End.Millisecond - Start.Millisecond;
     public List<Tag> Tags { get; set; } = new();
     public Category Category { get; set; } = new();
+    public List<WorkTaskComment> Comments { get; set; } = new();
 }

@@ -12,6 +12,26 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
     }
 
+    public override async Task<WorkTask> DetailsAsync(string entityId)
+    {
+        await using var connection = new SqlConnection(connectionString);
+
+        var query = "SELECT W.* FROM WorkTasks W WHERE W.WorkTaskId=@entityId;" +
+                    "SELECT U.* FROM Users U JOIN WorkTasks FFT on FFT.CategoryId=T.CategoryId WHERE FFT.WorkTaskId=@entityId;" +
+                    "SELECT C.* FROM Category C JOIN WorkTasks FF on FF.CategoryId=C.CategoryId WHERE FF.WorkTaskId=@entityId;" +
+                    "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;"+
+                    "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId;";
+
+        var result = await connection.QueryMultipleAsync(query, new { entityId });
+        var workTask = await result.ReadSingleAsync<WorkTask>();
+        workTask.User = await result.ReadSingleAsync<TTAUser>();
+        workTask.Category = await result.ReadSingleAsync<Category>();
+        workTask.Tags = (await result.ReadAsync<Tag>()).ToList();
+        workTask.Comments = (await result.ReadAsync<WorkTaskComment>()).ToList();
+        
+        return workTask;
+    }
+
     public override async Task<WorkTask> InsertAsync(WorkTask entity)
     {
         await using var connection = new SqlConnection(connectionString);
@@ -69,7 +89,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
 
         await connection.ExecuteAsync("DELETE FROM WorkTask2Tags WHERE WHERE WorkTaskId=@workTaskId",
             new { entityId });
-        
+
         await connection.ExecuteAsync("DELETE FROM WorkTaskComments WHERE WHERE WorkTaskId=@workTaskId",
             new { entityId });
 

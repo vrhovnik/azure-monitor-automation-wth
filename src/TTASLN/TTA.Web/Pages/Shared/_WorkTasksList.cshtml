@@ -29,7 +29,11 @@
             @foreach (var workTask in Model)
             {
                 <tr>
-                    <td>@workTask.Description</td>
+                    <td>
+                        <a asp-page="/Task/Details">
+                            @workTask.Description
+                        </a>
+                    </td>
                     <td>@workTask.DurationInMs</td>
                     <td>@workTask.Category</td>
                     <td>
@@ -44,15 +48,17 @@
                         if (userViewModel.UserId == workTask.User.TTAUserId)
                         {
                             <td>
-                                <a>
+                                <a hx-confirm="Are you sure you wish to complete the task?"
+                                   hx-include="[name='workTaskId']"
+                                   hx-post="/task-api/complete-task">
+                                    <input name="workTaskId"
+                                           type="hidden">
                                     <i class="fa-solid fa-check"></i>
                                 </a>
-
                                 <a asp-page="/Tasks/Edit"
                                    asp-route-id="@workTask.WorkTaskId">
                                     <i class="fas fa-edit"></i>
-                                </a>
-                                &nbsp;
+                                </a>&nbsp;
                                 <a asp-page="/Tasks/Delete"
                                    asp-route-id="@workTask.WorkTaskId">
                                     <i class="fas fa-trash-alt"></i>

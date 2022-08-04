@@ -24,6 +24,8 @@ builder.Services.AddTransient<IWorkTaskRepository, WorkTaskRepository>(_ =>
     new WorkTaskRepository(sqlOptions.ConnectionString));
 builder.Services.AddTransient<IProfileSettingsService, ProfileSettingsService>(_ =>
     new ProfileSettingsService(sqlOptions.ConnectionString));
+builder.Services.AddTransient<IWorkTaskCommentRepository, WorkTaskCommentRepository>(_ =>
+    new WorkTaskCommentRepository(sqlOptions.ConnectionString));
 
 //core system settings
 builder.Services.AddScoped<IUserDataContext, UserDataContext>();

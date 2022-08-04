@@ -1,0 +1,48 @@
+﻿@page "{workTaskId}"
+@model TTA.Web.Pages.Tasks.DetailsPageModel
+
+@{
+    ViewData["Title"] = "Details for task";
+}
+
+@if (string.IsNullOrEmpty(Model.Message))
+{
+    <p class="text-warning">@Model.Message</p>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Task/Index">Tasks search page</a>
+        </li>
+        <li aria-current="page"
+            class="breadcrumb-item active">
+            Work task overview
+        </li>
+    </ol>
+}
+
+<h1>Work task in category @Model.WorkTask.Category.Name</h1>
+<p class="fs-6">@Model.WorkTask.Description</p>
+<dl class="row">
+    <dt class="col-sm-3">Created</dt>
+    <dd class="col-sm-9">@Model.WorkTask.Start.ToShortDateString()</dd>
+    <dt class="col-sm-3">Number of comments</dt>
+    <dd class="col-sm-9">@Model.WorkTask.Comments.Count</dd>
+    <dt class="col-sm-3">Is publically available</dt>
+    <dd class="col-sm-9">
+        @if (Model.WorkTask.IsPublic)
+        {
+            <i class="fa-solid fa-check"></i>
+        }
+        else
+        {
+            <i class="fa-solid fa-xmark"></i>
+        }
+    </dd>
+</dl>
+
