@@ -39,7 +39,23 @@
                            class="nav-link text-dark">
                             Home
                         </a>
+                    </li><li class="nav-item">
+                        <a asp-area=""
+                           asp-page="/Task/Index"
+                           class="nav-link text-dark">
+                            Tasks
+                        </a>
                     </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a asp-area=""
+                               asp-page="/Task/Create"
+                               class="nav-link text-dark">
+                                Add new
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
             <form class="form-inline my-2 my-lg-0">

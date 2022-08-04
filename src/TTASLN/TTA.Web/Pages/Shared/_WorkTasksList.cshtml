@@ -44,6 +44,10 @@
                         if (userViewModel.UserId == workTask.User.TTAUserId)
                         {
                             <td>
+                                <a>
+                                    <i class="fa-solid fa-check"></i>
+                                </a>
+
                                 <a asp-page="/Tasks/Edit"
                                    asp-route-id="@workTask.WorkTaskId">
                                     <i class="fas fa-edit"></i>

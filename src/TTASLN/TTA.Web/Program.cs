@@ -49,5 +49,6 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHealthChecks("/health").AllowAnonymous();
     endpoints.MapRazorPages();
+    endpoints.MapControllers();
 });
 app.Run();

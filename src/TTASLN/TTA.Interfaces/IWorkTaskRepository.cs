@@ -9,4 +9,6 @@ public interface IWorkTaskRepository : IDataRepository<WorkTask>
         int pageIndex = 1, 
         int pageSize = 10,
         string query = "");
+
+    public Task<bool> CompleteTaskAsync(string workTaskId);
 }

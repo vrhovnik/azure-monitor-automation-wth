@@ -1,0 +1,38 @@
+﻿@page "{workTaskId}"
+@model TTA.Web.Pages.Tasks.DeletePageModel
+
+@{
+    ViewData["Title"] = "Delete task ";
+}
+
+section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-page="/User/Dashboard">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-page="/Task/Index">Tasks search page</a>
+        </li>
+        <li aria-current="page"
+            class="breadcrumb-item active">
+            Delete task
+        </li>
+    </ol>
+}
+
+@if (string.IsNullOrEmpty(Model.Message))
+{
+    <p class="text-warning">@Model.Message</p>
+}
+
+<h1>Deleting worktask with description</h1>
+
+<p>@Model.WorkTask.Description</p>
+
+<form method="post">
+    <button class="btn btn-danger btn-lg"
+            type="submit">
+        Delete worktask and all associated connections?
+    </button>
+</form>

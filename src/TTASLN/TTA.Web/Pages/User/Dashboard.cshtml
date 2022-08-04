@@ -15,7 +15,7 @@
 @if (User.Identity.IsAuthenticated)
 {
     <div class="container">
-        <div class="float-right mt-2 mb-2">
+        <div class="float-end mb-2 mt-2">
             <a asp-page="/Tasks/Create"
                class="btn btn-success">
                 Create new task <i class="fas fa-plus"></i>
@@ -27,7 +27,6 @@
     <input aria-label="search term"
            class="form-control"
            hx-get
-           hx-indicator="#indicator"
            hx-swap="outerHtml"
            hx-target="#grid"
            hx-trigger="keyup changed delay:300ms"
@@ -37,7 +36,7 @@
            type="text">
 </div>
 <div class="container mt-2">
-    @await Html.PartialAsync("_WorkTasksList",Model.UserTasks)
+    @await Html.PartialAsync("_WorkTasksList", Model.UserTasks)
 </div>
 
 @section Scripts
