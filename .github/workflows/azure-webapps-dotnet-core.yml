@@ -2,7 +2,7 @@ name: Deploy to prod
 env:
   AZURE_WEBAPP_NAME: ttaweb    # set this to the name of your Azure Web App
   AZURE_WEBAPP_PACKAGE_PATH: 'src/TTASLN/TTA.Web'      # set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '6'                 # set this to the .NET Core version to use
+  DOTNET_VERSION: '6.0.x'                 # set this to the .NET Core version to use
 on:
   push:
     branches:
