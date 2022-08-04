@@ -1,7 +1,7 @@
 name: Deploy to prod
 env:
   AZURE_WEBAPP_NAME: ttaweb    # set this to the name of your Azure Web App
-  AZURE_WEBAPP_PACKAGE_PATH: './src/TTASLN/TTA.Web/TTA.Web.csproj'      # set this to the path to your web app project, defaults to the repository root
+  WEB_APP_CSPROJ: './src/TTASLN/TTA.Web/TTA.Web.csproj'      # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '6.0.x'                 # set this to the .NET Core version to use
 on:
   push:
@@ -11,47 +11,23 @@ on:
 permissions:
   contents: read
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v2
+  build-deploy-to-azure:
+   runs-on: ubuntu-latest
+   steps:         
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK ${{env.DOTNET_VERSION}}
+        uses: actions/setup-dotnet@v1.8.0
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: Set up dependency caching for faster builds
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+          dotnet-version: ${{env.DOTNET_VERSION}}          
+      - name: Build with dotnet on ${{env.WEB_APP_CSPROJ}}
+        run: dotnet build --configuration Release ${{env.WEB_APP_CSPROJ}}    
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
-        with:
-          name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
-  deploy:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Development'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: .net-app
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/webapp ${{env.WEB_APP_CSPROJ}}
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+         app-name: ${{ env.AZURE_WEBAPP_NAME }}  
+         slot-name: 'production'
+         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+         package:  ${{env.DOTNET_ROOT}}/webapp
