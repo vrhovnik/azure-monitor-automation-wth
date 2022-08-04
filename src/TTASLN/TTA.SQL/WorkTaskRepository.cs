@@ -59,6 +59,23 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         return true;
     }
 
+    public override async Task<bool> DeleteAsync(string entityId)
+    {
+        await using var connection = new SqlConnection(connectionString);
+        var item = await connection.ExecuteAsync(
+            $"DELETE FROM WorkTasks WHERE WorkTaskId=@entityId", new { entityId });
+
+        if (item < 0) return false;
+
+        await connection.ExecuteAsync("DELETE FROM WorkTask2Tags WHERE WHERE WorkTaskId=@workTaskId",
+            new { entityId });
+        
+        await connection.ExecuteAsync("DELETE FROM WorkTaskComments WHERE WHERE WorkTaskId=@workTaskId",
+            new { entityId });
+
+        return true;
+    }
+
     public async Task<PaginatedList<WorkTask>> WorkTasksForUserAsync(string userIdentificator,
         int pageIndex = 1, int pageSize = 10, string query = "")
     {

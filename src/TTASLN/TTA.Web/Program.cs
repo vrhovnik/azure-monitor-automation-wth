@@ -33,9 +33,11 @@ builder.Services.AddResponseCompression(options => options.Providers.Add<GzipCom
 builder.Services.Configure<GzipCompressionProviderOptions>(compressionOptions =>
     compressionOptions.Level = CompressionLevel.Optimal);
 builder.Services.AddHealthChecks();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.LoginPath = new PathString("/User/Login"));
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
-        options.Conventions.AddPageRoute("/Info/Index", ""));
+    options.Conventions.AddPageRoute("/Info/Index", ""));
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

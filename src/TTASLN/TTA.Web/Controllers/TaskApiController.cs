@@ -4,6 +4,7 @@ using TTA.Interfaces;
 namespace TTA.Web.Controllers;
 
 [Route("tasks-api")]
+[ApiController]
 public class TaskApiController : ControllerBase
 {
     private readonly ILogger<TaskApiController> logger;
@@ -15,7 +16,7 @@ public class TaskApiController : ControllerBase
         this.workTaskRepository = workTaskRepository;
     }
 
-    [Route("complete}")]
+    [Route("complete-task")]
     [HttpPost]
     public async Task<bool> CompleteTaskAsync([FromBody] string workTaskId)
     {
