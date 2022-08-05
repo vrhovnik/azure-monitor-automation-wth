@@ -54,8 +54,9 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
 
         foreach (var tag in entity.Tags)
         {
-            await connection.ExecuteAsync("INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@tag)",
-                new { workTaskId, tag });
+            await connection.ExecuteAsync(
+                "INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@currentTag)",
+                new { workTaskId, currentTag = tag.TagName });
         }
 
         return entity;
@@ -79,8 +80,9 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         {
             foreach (var tag in entity.Tags)
             {
-                await connection.ExecuteAsync("INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@tag)",
-                    new { workTaskId, tag.TagName });
+                await connection.ExecuteAsync(
+                    "INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@currentTag)",
+                    new { workTaskId, currentTag = tag.TagName });
             }
         }
 
@@ -117,6 +119,25 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         if (!string.IsNullOrEmpty(query)) sqlQuery += $" AND T.Description LIKE '%{query}%'";
 
         var result = await connection.QueryAsync<WorkTask>(sqlQuery, new { userIdentificator });
+        return new PaginatedList<WorkTask>(result, result.Count(), pageIndex, pageSize, query);
+    }
+
+    public async Task<PaginatedList<WorkTask>> SearchAsync(int pageIndex = 1,
+        int pageSize = 10,
+        bool isPublic = true,
+        string query = "")
+    {
+        await using var connection = new SqlConnection(connectionString);
+        var sqlQuery =
+            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, T.IsPublic, T.CategoryId, C.Name  " +
+            " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
+            " JOIN Category C on C.CategoryId=T.CategoryId ";
+
+        if (!string.IsNullOrEmpty(query)) sqlQuery += $" AND T.Description LIKE '%{query}%'";
+
+        if (isPublic) sqlQuery += " AND IsPublic=1";
+
+        var result = await connection.QueryAsync<WorkTask>(sqlQuery);
         return new PaginatedList<WorkTask>(result, result.Count(), pageIndex, pageSize, query);
     }
 

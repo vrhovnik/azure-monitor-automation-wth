@@ -1,5 +1,4 @@
 ﻿using Htmx;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -11,7 +10,7 @@ using TTA.Web.Options;
 
 namespace TTA.Web.Pages.User;
 
-[Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+[Authorize]
 public class DashboardPageModel : BasePageModel
 {
     private readonly ILogger<DashboardPageModel> logger;
@@ -37,7 +36,8 @@ public class DashboardPageModel : BasePageModel
     {
         var currentPageNumber = pageNumber ?? 1;
         var userViewModel = userDataContext.GetCurrentUser();
-        logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname, DateTime.Now);
+        logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname,
+            DateTime.Now);
 
         var userId = userViewModel.UserId;
         ProfileSettings = await profileSettingsService.GetAsync(userId);

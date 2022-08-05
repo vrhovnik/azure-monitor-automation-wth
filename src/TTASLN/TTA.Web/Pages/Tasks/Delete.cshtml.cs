@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TTA.Interfaces;
 using TTA.Models;
 using TTA.Web.Base;
 
 namespace TTA.Web.Pages.Tasks;
 
+[Authorize]
 public class DeletePageModel : BasePageModel
 {
     private readonly ILogger<DeletePageModel> logger;
