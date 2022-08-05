@@ -68,8 +68,8 @@ public class TaskApiController : ControllerBase
                             foreach (var item in workTasks)
                             {
                                 table.Cell().Element(CellStyle).Text(item.Description);
-                                table.Cell().Element(CellStyle).AlignRight().Text(item.Start);
-                                table.Cell().Element(CellStyle).AlignRight().Text(item.End);
+                                table.Cell().Element(CellStyle).AlignRight().Text(item.Start.ToShortDateString());
+                                table.Cell().Element(CellStyle).AlignRight().Text(item.End.ToShortDateString());
                                 table.Cell().Element(CellStyle).AlignRight().Text(item.Category.Name);
 
                                 static IContainer CellStyle(IContainer container) =>

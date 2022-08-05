@@ -34,8 +34,8 @@
                             @workTask.Description
                         </a>
                     </td>
-                    <td>@workTask.DurationInMs</td>
-                    <td>@workTask.Category</td>
+                    <td class="text-center">@workTask.DurationInMs</td>
+                    <td>@workTask.Category.Name</td>
                     <td>
                         @foreach (var modelTag in workTask.Tags)
                         {
