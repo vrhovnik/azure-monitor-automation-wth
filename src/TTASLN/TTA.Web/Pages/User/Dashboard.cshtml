@@ -19,7 +19,11 @@
 {
     <div class="container">
         <div class="float-end mb-2 mt-2">
-            <a class="btn btn-light" hx-get="/tasks-api/download-pdf-for-user/@currentUser.UserId" >
+            <a asp-action="DownloadPdf"
+               asp-controller="TaskApi"
+               asp-route-userId="@currentUser.UserId"
+               class="btn btn-light"
+               target="_blank">
                 Download PDF <i class="fa-solid fa-file-pdf"></i>
             </a>
             <a asp-page="/Tasks/Create"

@@ -40,6 +40,7 @@
         <label asp-for="NewTask.Start">Enter start date</label>
         <input asp-for="NewTask.Start"
                class="form-control"
+               value="@DateTime.Now"
                required="required"
                type="date">
     </div>

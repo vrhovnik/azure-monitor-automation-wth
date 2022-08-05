@@ -50,7 +50,8 @@ public class CreatePageModel : BasePageModel
 
         var currentUser = userDataContext.GetCurrentUser();
         NewTask.User = new TTAUser { TTAUserId = currentUser.UserId, Email = currentUser.Email };
-
+        NewTask.End = NewTask.Start;
+        
         try
         {
             await workTaskRepository.InsertAsync(NewTask);
@@ -59,6 +60,8 @@ public class CreatePageModel : BasePageModel
         {
             logger.LogError(e.Message);
             Message = "Error with inserting new task, check logs.";
+            Categories = await categoryRepository.GetAllAsync();
+            Tags = await tagRepository.GetAllAsync();
             return Page();
         }
 

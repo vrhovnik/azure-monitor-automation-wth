@@ -19,7 +19,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         var query = "SELECT W.* FROM WorkTasks W WHERE W.WorkTaskId=@entityId;" +
                     "SELECT U.* FROM Users U JOIN WorkTasks FFT on FFT.CategoryId=T.CategoryId WHERE FFT.WorkTaskId=@entityId;" +
                     "SELECT C.* FROM Category C JOIN WorkTasks FF on FF.CategoryId=C.CategoryId WHERE FF.WorkTaskId=@entityId;" +
-                    "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;"+
+                    "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;" +
                     "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId;";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
@@ -28,7 +28,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         workTask.Category = await result.ReadSingleAsync<Category>();
         workTask.Tags = (await result.ReadAsync<Tag>()).ToList();
         workTask.Comments = (await result.ReadAsync<WorkTaskComment>()).ToList();
-        
+
         return workTask;
     }
 
@@ -37,9 +37,17 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         await using var connection = new SqlConnection(connectionString);
         var item = await connection.ExecuteScalarAsync(
             $"INSERT INTO WorkTasks(Description,CategoryId,StartDate, EndDate,UserId,IsPublic)VALUES" +
-            $"(@{nameof(entity.Description)},@{nameof(entity.Category.CategoryId)},@{nameof(entity.Start)},@{nameof(entity.End)},@{nameof(entity.User.TTAUserId)},@{nameof(entity.IsPublic)});" +
+            $"(@description,@categoryId,@startDate,@endDate,@userId,@isPublic);" +
             "SELECT CAST(SCOPE_IDENTITY() as bigint)",
-            entity);
+            new
+            {
+                description = entity.Description,
+                categoryId = entity.Category.CategoryId,
+                startDate = entity.Start,
+                endDate = entity.End,
+                userId = entity.User.TTAUserId,
+                isPublic = entity.IsPublic
+            });
 
         var workTaskId = Convert.ToInt64(item);
         entity.WorkTaskId = workTaskId.ToString();
@@ -57,7 +65,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var item = await connection.ExecuteAsync(
-            $"UPDATE WorkTasks SET Description=@{nameof(entity.Description)},CategoryId=@{nameof(entity.Description)},StartDate=@{nameof(entity.Start)}," +
+            $"UPDATE WorkTasks SET Description=@{nameof(entity.Description)},CategoryId=@{nameof(entity.Category.CategoryId)},StartDate=@{nameof(entity.Start)}," +
             $"EndDate=@{nameof(entity.End)},UserId=@{nameof(entity.User.TTAUserId)},IsPublic=@{nameof(entity.IsPublic)}) WHERE WorkTaskId=@{nameof(entity.WorkTaskId)}",
             entity);
 
@@ -72,7 +80,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
             foreach (var tag in entity.Tags)
             {
                 await connection.ExecuteAsync("INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@tag)",
-                    new { workTaskId, tag });
+                    new { workTaskId, tag.TagName });
             }
         }
 

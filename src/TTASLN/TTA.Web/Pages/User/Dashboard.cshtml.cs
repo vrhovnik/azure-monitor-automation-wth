@@ -36,10 +36,10 @@ public class DashboardPageModel : BasePageModel
     public async Task<IActionResult> OnGetAsync(int? pageNumber, string query)
     {
         var currentPageNumber = pageNumber ?? 1;
-        var profileName = User.Identity?.Name;
-        logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", profileName, DateTime.Now);
+        var userViewModel = userDataContext.GetCurrentUser();
+        logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname, DateTime.Now);
 
-        var userId = userDataContext.GetCurrentUser().UserId;
+        var userId = userViewModel.UserId;
         ProfileSettings = await profileSettingsService.GetAsync(userId);
         logger.LogInformation("Got profile for {UniqueSettingsId} - ended at {DateEnd}", userId, DateTime.Now);
 

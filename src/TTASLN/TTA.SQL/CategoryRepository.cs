@@ -11,6 +11,14 @@ namespace TTA.SQL
         {
         }
 
+        public override async Task<Category> DetailsAsync(string entityId)
+        {
+            await using var connection = new SqlConnection(connectionString);
+            var foundCategory = await connection.QuerySingleOrDefaultAsync<Category>(
+                "SELECT C.CategoryId, C.Name FROM Category C WHERE C.CategoryId=@entityId", new {entityId});
+            return foundCategory;
+        }
+
         public async Task<List<Category>> GetAllAsync()
         {
             await using var connection = new SqlConnection(connectionString);
