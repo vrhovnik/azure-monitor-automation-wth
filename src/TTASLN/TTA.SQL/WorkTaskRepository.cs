@@ -129,7 +129,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
             workTask.User = user;
             workTask.Category = category;
 
-            if (!lookup.TryGetValue(workTask.WorkTaskId, out WorkTask currentWorkTask))
+            if (!lookup.TryGetValue(workTask.WorkTaskId, out _))
                 lookup.Add(workTask.WorkTaskId, workTask);
 
             lookup[workTask.WorkTaskId].Tags.Add(currentTag);
@@ -146,16 +146,32 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
-            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, T.UserId, T.IsPublic, T.CategoryId, C.Name  " +
+            "SELECT T.WorkTaskId, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
+            "T.UserId as TTAUserId, T.IsPublic, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId ";
 
-        if (!string.IsNullOrEmpty(query)) sqlQuery += $" AND T.Description LIKE '%{query}%'";
+        if (isPublic) sqlQuery += " WHERE T.IsPublic=1";
 
-        if (isPublic) sqlQuery += " AND IsPublic=1";
+        if (!string.IsNullOrEmpty(query) && isPublic) sqlQuery += $" AND T.Description LIKE '%{query}%'";
+        if (!string.IsNullOrEmpty(query) && !isPublic) sqlQuery += $" WHERE T.Description LIKE '%{query}%'";
 
-        var result = await connection.QueryAsync<WorkTask>(sqlQuery);
-        return new PaginatedList<WorkTask>(result, result.Count(), pageIndex, pageSize, query);
+        var grid = await connection.QueryMultipleAsync(sqlQuery);
+        var lookup = new Dictionary<string, WorkTask>();
+
+        grid.Read<WorkTask, Category, Tag, TTAUser, WorkTask>((workTask, category, currentTag, user) =>
+        {
+            workTask.User = user;
+            workTask.Category = category;
+
+            if (!lookup.TryGetValue(workTask.WorkTaskId, out _))
+                lookup.Add(workTask.WorkTaskId, workTask);
+
+            lookup[workTask.WorkTaskId].Tags.Add(currentTag);
+            return workTask;
+        }, splitOn: "CategoryId,TagName,TTAUserId");
+
+        return new PaginatedList<WorkTask>(lookup.Values, lookup.Values.Count, pageIndex, pageSize, query);
     }
 
     public async Task<bool> CompleteTaskAsync(string workTaskId)
