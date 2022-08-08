@@ -30,7 +30,7 @@
             {
                 <tr>
                     <td>
-                        <a asp-page="/Task/Details">
+                        <a asp-page="/Task/Details" asp-route-workTaskId="@workTask.WorkTaskId">
                             @workTask.Description
                         </a>
                     </td>
@@ -55,15 +55,23 @@
                                            type="hidden">
                                     <i class="fa-solid fa-check"></i>
                                 </a>
+                                &nbsp;
                                 <a asp-page="/Tasks/Edit"
                                    asp-route-id="@workTask.WorkTaskId">
                                     <i class="fas fa-edit"></i>
                                 </a>&nbsp;
+                                &nbsp;
                                 <a asp-page="/Tasks/Delete"
                                    asp-route-id="@workTask.WorkTaskId">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>
+                        }
+                        else
+                        {
+                            <a asp-page="/Task/Details" asp-route-workTaskId="@workTask.WorkTaskId">
+                                <i class="fa-solid fa-circle-arrow-right"></i>
+                            </a>
                         }
                     }
                 </tr>

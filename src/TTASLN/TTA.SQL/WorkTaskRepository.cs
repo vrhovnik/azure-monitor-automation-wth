@@ -112,8 +112,8 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
             "SELECT U.UserId as TTAUserId, U.UserId as TTAUserId, U.FullName, U.Email FROM Users U WHERE U.UserId=@userIdentificator;" +
-            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, " +
-            "T.UserId as TTAUserId, T.IsPublic, T.CategoryId, C.Name, FF.TagName  " +
+            "SELECT T.WorkTaskId, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
+            "T.UserId as TTAUserId, T.IsPublic, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId " +
             " WHERE T.UserId=@userIdentificator";
@@ -124,14 +124,17 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         var user = await grid.ReadSingleAsync<TTAUser>();
         var lookup = new Dictionary<string, WorkTask>();
 
-        grid.Read<WorkTask, Tag, WorkTask>((workTask, tag) =>
+        grid.Read<WorkTask, Category, Tag, WorkTask>((workTask, category, currentTag) =>
         {
-            if (!lookup.TryGetValue(workTask.WorkTaskId, out _))
-                lookup.Add(workTask.WorkTaskId, workTask);
             workTask.User = user;
-            workTask.Tags.Add(tag);
+            workTask.Category = category;
+
+            if (!lookup.TryGetValue(workTask.WorkTaskId, out WorkTask currentWorkTask))
+                lookup.Add(workTask.WorkTaskId, workTask);
+
+            lookup[workTask.WorkTaskId].Tags.Add(currentTag);
             return workTask;
-        }, splitOn:"TTAUserId");
+        }, splitOn: "CategoryId,TagName");
 
         return new PaginatedList<WorkTask>(lookup.Values, lookup.Values.Count, pageIndex, pageSize, query);
     }
