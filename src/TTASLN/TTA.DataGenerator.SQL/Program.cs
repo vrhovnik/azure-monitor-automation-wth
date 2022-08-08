@@ -7,7 +7,7 @@ using TTA.Models;
 AnsiConsole.Write(new FigletText("Data generator for TTA demo app").Centered().Color(Color.Red));
 var sqlConn = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
 if (string.IsNullOrEmpty(sqlConn))
-    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=TTADB;Integrated Security=SSPI";
+    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=SSPI";
 
 var sqlConnection = new SqlConnection(sqlConn);
 try
@@ -27,7 +27,7 @@ var dropIt =
     AnsiConsole.Confirm("Database will be recreated. Create backup before continuing. Are you sure to continue?");
 if (!dropIt)
 {
-    AnsiConsole.WriteLine("Shutting down - run the app when backup is finished.");
+    AnsiConsole.WriteLine("Shutting down - run the app when backup is finished to be able to work with your data.");
     return;
 }
 
@@ -51,6 +51,37 @@ var path = new TextPath(folderRoot)
     LeafStyle = new Style(foreground: Color.Yellow)
 };
 AnsiConsole.Write(path);
+
+var dbExistsCount = await sqlConnection.QuerySingleOrDefaultAsync<int>("SELECT count(*) FROM master.dbo.sysdatabases WHERE name = 'TTADB'");
+if (dbExistsCount > 0)
+{
+    AnsiConsole.Write(
+        new Markup("[bold yellow]Database [/] [red]TTADB[/] [bold yellow] will be dropped."));
+    try
+    {
+        var affectedRows = await sqlConnection.ExecuteAsync("DROP DATABASE TTADB");
+        if (affectedRows == 0) throw new Exception("DROP was not successful, check logs");
+    }
+    catch (Exception dropException)
+    {
+        AnsiConsole.WriteException(dropException);
+        return;
+    }
+}
+
+//read script
+var initSqlDataScript = await File.ReadAllTextAsync(Path.Combine(folderRoot, "/scripts/SQL/0-init-database.sql"));
+
+try
+{
+    var affectedRows = await sqlConnection.ExecuteAsync(initSqlDataScript);
+    if (affectedRows == 0) throw new Exception("Creation of database and tables was not successful, check logs");
+}
+catch (Exception initException)
+{
+    AnsiConsole.WriteException(initException);
+    return;
+}
 
 await AnsiConsole.Status()
     .AutoRefresh(false)
