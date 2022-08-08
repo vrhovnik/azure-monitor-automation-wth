@@ -111,15 +111,29 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
-            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, T.IsPublic, T.CategoryId, C.Name  " +
+            "SELECT U.UserId as TTAUserId, U.UserId as TTAUserId, U.FullName, U.Email FROM Users U WHERE U.UserId=@userIdentificator;" +
+            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, " +
+            "T.UserId as TTAUserId, T.IsPublic, T.CategoryId, C.Name, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId " +
             " WHERE T.UserId=@userIdentificator";
 
         if (!string.IsNullOrEmpty(query)) sqlQuery += $" AND T.Description LIKE '%{query}%'";
 
-        var result = await connection.QueryAsync<WorkTask>(sqlQuery, new { userIdentificator });
-        return new PaginatedList<WorkTask>(result, result.Count(), pageIndex, pageSize, query);
+        var grid = await connection.QueryMultipleAsync(sqlQuery, new { userIdentificator });
+        var user = await grid.ReadSingleAsync<TTAUser>();
+        var lookup = new Dictionary<string, WorkTask>();
+
+        grid.Read<WorkTask, Tag, WorkTask>((workTask, tag) =>
+        {
+            if (!lookup.TryGetValue(workTask.WorkTaskId, out _))
+                lookup.Add(workTask.WorkTaskId, workTask);
+            workTask.User = user;
+            workTask.Tags.Add(tag);
+            return workTask;
+        }, splitOn:"TTAUserId");
+
+        return new PaginatedList<WorkTask>(lookup.Values, lookup.Values.Count, pageIndex, pageSize, query);
     }
 
     public async Task<PaginatedList<WorkTask>> SearchAsync(int pageIndex = 1,
@@ -129,7 +143,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
-            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, T.IsPublic, T.CategoryId, C.Name  " +
+            "SELECT T.WorkTaskId,T.StartDate as [Start], T.EndDate as [End], T.Description, T.UserId, T.IsPublic, T.CategoryId, C.Name  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId ";
 

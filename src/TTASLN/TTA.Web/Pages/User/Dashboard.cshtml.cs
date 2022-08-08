@@ -1,5 +1,6 @@
 ﻿using Htmx;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TTA.Core;
@@ -47,9 +48,10 @@ public class DashboardPageModel : BasePageModel
             generalWebOptions.PageCount, query);
         logger.LogInformation("Loaded {UserTaskNumber} work tasks for user with {Query}", UserTasks.TotalPages, query);
 
-        if (Request.IsHtmx()) return Partial("_WorkTasksList", UserTasks);
-
-        return Page();
+        if (!Request.IsHtmx()) return Page();
+        
+        Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
+        return Partial("_WorkTasksList", UserTasks);
     }
 
     [BindProperty] public TTAUserSettings ProfileSettings { get; set; }

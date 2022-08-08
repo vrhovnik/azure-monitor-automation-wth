@@ -1,4 +1,5 @@
 ﻿using Htmx;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TTA.Core;
@@ -36,9 +37,10 @@ public class IndexPageModel : BasePageModel
         logger.LogInformation("Loaded {ItemCount} out of {AllCount} with {Query}", WorkTasks.Count,
             WorkTasks.TotalPages, query);
 
-        if (Request.IsHtmx()) return Partial("_WorkTasksList", WorkTasks);
-
-        return Page();
+        if (!Request.IsHtmx()) return Page();
+        
+        Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
+        return Partial("_WorkTasksList", WorkTasks);
     }
 
     [BindProperty] public PaginatedList<WorkTask> WorkTasks { get; set; }

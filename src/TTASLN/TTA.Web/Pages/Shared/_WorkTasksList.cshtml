@@ -7,7 +7,7 @@
 @if (Model.Any())
 {
     <div id="grid">
-        <table class="table table-hover"
+        <table class="table table-light table-hover"
                id="tbData">
             <caption>Task list for query <b>@Model.Query</b></caption>
             <thead class="thead-dark">
@@ -39,7 +39,7 @@
                     <td>
                         @foreach (var modelTag in workTask.Tags)
                         {
-                            <span class="badge badge-info">@modelTag</span>
+                            <span class="badge bg-info">@modelTag.TagName</span>
                             @:&nbsp;
                         }
                     </td>
