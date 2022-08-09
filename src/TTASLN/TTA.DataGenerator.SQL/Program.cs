@@ -9,7 +9,7 @@ using TTA.Models;
 AnsiConsole.Write(new FigletText("Data generator for TTA demo app").Centered().Color(Color.Red));
 var sqlConn = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
 if (string.IsNullOrEmpty(sqlConn))
-    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=SSPI;";
+    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB";
 
 AnsiConsole.Write(
     new Markup($"[bold yellow]SQL connection to database[/] [red]{sqlConn}[/]"));
@@ -48,7 +48,7 @@ if (!await DropAndRecreateDatabaseAsync(sqlConn))
     return;
 }
 
-sqlConn += ";Initial Catalog=TTDAB";
+sqlConn += ";Initial Catalog=TTADB";
 if (!await CreateTablesInDatabaseAsync(Path.Join(folderRoot, "/scripts/SQL/"), sqlConn))
 {
     AnsiConsole.WriteLine("Not all objects were created in database TTADB, check logs");
@@ -296,18 +296,17 @@ async Task<bool> CreateTablesInDatabaseAsync(string folderPath, string connectio
                 {
                     stopWatch.Start();
 
-                    var fileFullPath = Path.Join(folderPath, file);
-                    var fileContent = await File.ReadAllTextAsync(fileFullPath)
+                    var fileContent = await File.ReadAllTextAsync(file)
                         .ConfigureAwait(false);
 
-                    ctx.Status($"Reading file {fileFullPath} and executing script.");
+                    ctx.Status($"Reading file {file} and executing script.");
                     ctx.Refresh();
 
                     await connection.ExecuteAsync(fileContent)
                         .ConfigureAwait(false);
 
                     stopWatch.Stop();
-                    ctx.Status($"Script from file {fileFullPath} was executed in {stopWatch.ElapsedMilliseconds} ms.");
+                    ctx.Status($"Script from file {file} was executed in {stopWatch.ElapsedMilliseconds} ms.");
                     ctx.Refresh();
                 }
             }
