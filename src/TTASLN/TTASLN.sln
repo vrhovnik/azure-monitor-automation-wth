@@ -14,7 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.DataGenerator.SQL", "TT
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{AF98B66A-AB60-4567-A6F7-1704E3CEA545}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\scripts\SQL\0-create-tables.sql = ..\..\scripts\SQL\0-create-tables.sql
 		..\..\docs\tag.data = ..\..\docs\tag.data
 		..\..\docs\categories.data = ..\..\docs\categories.data
 	EndProjectSection

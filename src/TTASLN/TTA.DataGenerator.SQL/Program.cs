@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using Bogus;
 using Dapper;
 using Spectre.Console;
@@ -8,22 +9,10 @@ using TTA.Models;
 AnsiConsole.Write(new FigletText("Data generator for TTA demo app").Centered().Color(Color.Red));
 var sqlConn = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
 if (string.IsNullOrEmpty(sqlConn))
-    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=SSPI";
+    sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB;Integrated Security=SSPI;";
 
-var sqlConnection = new SqlConnection(sqlConn);
-try
-{
-    sqlConnection.Open();
-    AnsiConsole.Write(
-        new Markup($"[bold yellow]SQL connection to database[/] [red]{sqlConn}[/] [bold yellow]is opened.[/]"));
-    AnsiConsole.WriteLine();
-}
-catch (Exception sqlCouldNotOpenException)
-{
-    AnsiConsole.WriteException(sqlCouldNotOpenException);
-    return;
-}
-
+AnsiConsole.Write(
+    new Markup($"[bold yellow]SQL connection to database[/] [red]{sqlConn}[/]"));
 var dropIt =
     AnsiConsole.Confirm("Database will be recreated. Create backup before continuing. Are you sure to continue?");
 if (!dropIt)
@@ -39,11 +28,11 @@ if (string.IsNullOrEmpty(folderRoot))
         new TextPrompt<string>("Enter [green]folder root[/]")
             .PromptStyle("green")
             .ValidationErrorMessage(
-                "[red]That's not a valid folder - check https://https://github.com/vrhovnik/azure-monitor-automation-wth[/]")
+                "[red]That's not a valid folder - check https://https://github.com/vrhovnik/azure-monitor-automation-wth[/] for more information")
             .Validate(Directory.Exists));
 }
 
-AnsiConsole.WriteLine("You have entered the following:");
+AnsiConsole.WriteLine("You have defined the following path:");
 var path = new TextPath(folderRoot)
 {
     RootStyle = new Style(foreground: Color.Red),
@@ -53,36 +42,16 @@ var path = new TextPath(folderRoot)
 };
 AnsiConsole.Write(path);
 
-var dbExistsCount =
-    await sqlConnection.QuerySingleOrDefaultAsync<int>(
-        "SELECT count(*) FROM master.dbo.sysdatabases WHERE name = 'TTADB'");
-if (dbExistsCount > 0)
+if (!await DropAndRecreateDatabaseAsync(sqlConn))
 {
-    AnsiConsole.Write(
-        new Markup("[bold yellow]Database [/] [red]TTADB[/] [bold yellow] will be dropped."));
-    try
-    {
-        var affectedRows = await sqlConnection.ExecuteAsync("DROP DATABASE TTADB");
-        if (affectedRows == 0) throw new Exception("DROP was not successful, check logs");
-    }
-    catch (Exception dropException)
-    {
-        AnsiConsole.WriteException(dropException);
-        return;
-    }
+    AnsiConsole.WriteLine("We couldn't drop and recreate database, check logs.");
+    return;
 }
 
-//read script for init database
-var initSqlDataScript = await File.ReadAllTextAsync(Path.Combine(folderRoot, "/scripts/SQL/0-init-database.sql"));
-
-try
+sqlConn += ";Initial Catalog=TTDAB";
+if (!await CreateTablesInDatabaseAsync(Path.Join(folderRoot, "/scripts/SQL/"), sqlConn))
 {
-    var affectedRows = await sqlConnection.ExecuteAsync(initSqlDataScript);
-    if (affectedRows == 0) throw new Exception("Creation of database and tables was not successful, check logs");
-}
-catch (Exception initException)
-{
-    AnsiConsole.WriteException(initException);
+    AnsiConsole.WriteLine("Not all objects were created in database TTADB, check logs");
     return;
 }
 
@@ -107,6 +76,9 @@ await AnsiConsole.Status()
         ctx.Status("Reading from file docs/tag.data");
         ctx.Refresh();
 
+        var sqlConnection = new SqlConnection(sqlConn);
+        sqlConnection.Open();
+
         var dtTags = new DataTable();
         dtTags.TableName = "Tags";
         dtTags.Columns.Add("TagName", typeof(string));
@@ -120,7 +92,7 @@ await AnsiConsole.Status()
             ctx.Refresh();
         }
 
-        if (await WriteBulkToDatabaseAsync(dtTags))
+        if (await WriteBulkToDatabaseAsync(sqlConnection, dtTags))
             ctx.Status("Inserted data to tags, continuting to categories");
         else
             ctx.Status("Check error log, tags were not inserted!");
@@ -145,7 +117,7 @@ await AnsiConsole.Status()
             ctx.Refresh();
         }
 
-        await WriteBulkToDatabaseAsync(dtCategories);
+        await WriteBulkToDatabaseAsync(sqlConnection, dtCategories);
 
         //3. Users
         var users = new Faker<TTAUser>()
@@ -174,15 +146,13 @@ await AnsiConsole.Status()
             ctx.Refresh();
         }
 
-        await WriteBulkToDatabaseAsync(dtUsers);
-
-        
+        await WriteBulkToDatabaseAsync(sqlConnection, dtUsers);
 
         var usersInDatabase =
             await sqlConnection.QueryAsync<TTAUser>("SELECT UserId as TTAUserId,FullName, Email FROM Users");
         ctx.Status($"and received {usersInDatabase.Count()} users.");
         ctx.Refresh();
-        
+
         var dtUserSettings = new DataTable();
         dtUserSettings.TableName = "UserSetting";
         dtUserSettings.Columns.Add("UserId", typeof(int));
@@ -191,21 +161,22 @@ await AnsiConsole.Status()
         foreach (var user in usersInDatabase)
         {
             ctx.Status($"Adding settings for user {user.FullName}");
-            
+
             var row = dtUserSettings.NewRow();
             row["UserId"] = user.TTAUserId;
             row["EmailNotification"] = new Faker().Random.Bool();
             dtUserSettings.Rows.Add(row);
             ctx.Refresh();
         }
-        
-        await WriteBulkToDatabaseAsync(dtUserSettings);
+
+        await WriteBulkToDatabaseAsync(sqlConnection, dtUserSettings);
 
         //4. WorkTasks
         var categoriesInDatabase = await sqlConnection.QueryAsync<Category>("SELECT CategoryId,Name FROM Categories");
-        ctx.Status($"Added users and settings for that user. Continuing to insert work tasks. Received {categoriesInDatabase.Count()} categories");
+        ctx.Status(
+            $"Added users and settings for that user. Continuing to insert work tasks. Received {categoriesInDatabase.Count()} categories");
         ctx.Refresh();
-        
+
         var workTasks = new Faker<WorkTask>()
             .RuleFor(workTask => workTask.Description,
                 (faker, _) => faker.Lorem.Paragraph(new Random().Next(3, 10)))
@@ -239,7 +210,7 @@ await AnsiConsole.Status()
             ctx.Refresh();
         }
 
-        await WriteBulkToDatabaseAsync(dtWorkTasks);
+        await WriteBulkToDatabaseAsync(sqlConnection, dtWorkTasks);
 
         var dtWorkTasksTags = new DataTable();
         dtWorkTasksTags.TableName = "WorkTask2Tags";
@@ -262,7 +233,7 @@ await AnsiConsole.Status()
         {
             ctx.Status($"Adding tags to tasks");
             ctx.Refresh();
-           
+
             for (var currentCounter = 0; currentCounter < new Random().Next(2, 6); currentCounter++)
             {
                 var row = dtWorkTasksTags.NewRow();
@@ -274,7 +245,7 @@ await AnsiConsole.Status()
                 dtWorkTasksTags.Rows.Add(row);
                 ctx.Status($"Adding tag {currentTag} to task {workTask.WorkTaskId}");
                 ctx.Refresh();
-                
+
                 var currentRow = dtWorkTasksComments.NewRow();
                 currentRow["WorkTaskId"] = workTask.WorkTaskId;
                 currentRow["StartDate"] = new Faker().Date.Recent(new Random().Next(3, 24));
@@ -286,16 +257,16 @@ await AnsiConsole.Status()
             }
         }
 
-        await WriteBulkToDatabaseAsync(dtWorkTasksTags);
+        await WriteBulkToDatabaseAsync(sqlConnection, dtWorkTasksTags);
         ctx.Status("Work tasks with tags added, adding random comments as well.");
-        await WriteBulkToDatabaseAsync(dtWorkTasksComments);
+        await WriteBulkToDatabaseAsync(sqlConnection, dtWorkTasksComments);
     });
 
-async Task<bool> WriteBulkToDatabaseAsync(DataTable dt)
+async Task<bool> WriteBulkToDatabaseAsync(SqlConnection connection, DataTable dt)
 {
     try
     {
-        using var tagBulkInsert = new SqlBulkCopy(sqlConn);
+        using var tagBulkInsert = new SqlBulkCopy(connection);
         tagBulkInsert.DestinationTableName = dt.TableName;
         await tagBulkInsert.WriteToServerAsync(dt);
     }
@@ -308,11 +279,94 @@ async Task<bool> WriteBulkToDatabaseAsync(DataTable dt)
     return true;
 }
 
+async Task<bool> CreateTablesInDatabaseAsync(string folderPath, string connectionString)
+{
+    await using var connection = new SqlConnection(connectionString);
+    if (connection.State == ConnectionState.Closed) connection.Open();
+    await AnsiConsole.Status()
+        .AutoRefresh(false)
+        .Spinner(Spinner.Known.Bounce)
+        .SpinnerStyle(Style.Parse("green bold"))
+        .StartAsync("Creating database objects...", async ctx =>
+        {
+            var stopWatch = new Stopwatch();
+            try
+            {
+                foreach (var file in Directory.GetFiles(folderPath, "*.sql", SearchOption.TopDirectoryOnly))
+                {
+                    stopWatch.Start();
+
+                    var fileFullPath = Path.Join(folderPath, file);
+                    var fileContent = await File.ReadAllTextAsync(fileFullPath)
+                        .ConfigureAwait(false);
+
+                    ctx.Status($"Reading file {fileFullPath} and executing script.");
+                    ctx.Refresh();
+
+                    await connection.ExecuteAsync(fileContent)
+                        .ConfigureAwait(false);
+
+                    stopWatch.Stop();
+                    ctx.Status($"Script from file {fileFullPath} was executed in {stopWatch.ElapsedMilliseconds} ms.");
+                    ctx.Refresh();
+                }
+            }
+            catch (Exception e)
+            {
+                AnsiConsole.WriteException(e);
+                return false;
+            }
+
+            return true;
+        });
+
+    return true;
+}
+
 async Task<string[]> GetDataFromFileAsync(string filename, char delimiter = ',')
 {
     var filePath = Path.Join(folderRoot, filename);
     var currentFile = await File.ReadAllTextAsync(filePath);
     return currentFile.Split(delimiter);
+}
+
+async Task<bool> DropAndRecreateDatabaseAsync(string connectionString)
+{
+    var sqlConnection = new SqlConnection(connectionString);
+    var dbExistsCount =
+        await sqlConnection.QuerySingleOrDefaultAsync<int>(
+            "SELECT count(*) FROM master.dbo.sysdatabases WHERE name = 'TTADB'");
+    if (dbExistsCount > 0)
+    {
+        AnsiConsole.Write(
+            new Markup("[bold yellow]Database [/] [red]TTADB[/] [bold yellow] will be dropped.[/]"));
+        try
+        {
+            await sqlConnection.ExecuteAsync("DROP DATABASE TTADB");
+        }
+        catch (Exception dropException)
+        {
+            AnsiConsole.WriteException(dropException);
+            return false;
+        }
+    }
+
+    try
+    {
+        await sqlConnection.ExecuteAsync(
+            "CREATE DATABASE TTADB collate SQL_Latin1_General_CP1_CI_AS");
+        AnsiConsole.Write(
+            new Markup(
+                "[bold yellow]Database [/] [red]TTADB[/] [bold yellow] has been created, connection string will be modified.[/]"));
+        ;
+    }
+    catch (Exception dropException)
+    {
+        AnsiConsole.WriteException(dropException);
+        return false;
+    }
+
+    return true;
 }
 
 // public async Task SafeInsertMany(IEnumerable<string> userNames)
