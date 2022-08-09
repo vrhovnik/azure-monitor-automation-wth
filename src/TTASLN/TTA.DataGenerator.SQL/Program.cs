@@ -106,11 +106,12 @@ await AnsiConsole.Status()
 
         //2. Categories
         var categories = await GetDataFromFileAsync("docs/categories.data");
-        ctx.Status("Reading from file docs/categories.data");
+        ctx.Status($"Reading from file docs/categories.data - found {categories.Length} categories.");
         ctx.Refresh();
 
         var dtCategories = new DataTable();
         dtCategories.TableName = "Category";
+        dtCategories.Columns.Add("CategoryId", typeof(int));
         dtCategories.Columns.Add("Name", typeof(string));
 
         foreach (var currentCategoryName in categories)
@@ -139,6 +140,7 @@ await AnsiConsole.Status()
 
         var dtUsers = new DataTable();
         dtUsers.TableName = "Users";
+        dtUsers.Columns.Add("UserId", typeof(int));
         dtUsers.Columns.Add("FullName", typeof(string));
         dtUsers.Columns.Add("Email", typeof(string));
         dtUsers.Columns.Add("Password", typeof(string));
@@ -163,6 +165,7 @@ await AnsiConsole.Status()
 
         var dtUserSettings = new DataTable();
         dtUserSettings.TableName = "UserSetting";
+        dtUserSettings.Columns.Add("UserSettingId", typeof(int));
         dtUserSettings.Columns.Add("UserId", typeof(int));
         dtUserSettings.Columns.Add("EmailNotification", typeof(bool));
 
@@ -197,12 +200,13 @@ await AnsiConsole.Status()
 
         var dtWorkTasks = new DataTable();
         dtWorkTasks.TableName = "WorkTasks";
+        dtWorkTasks.Columns.Add("WorkTaskId", typeof(int));
         dtWorkTasks.Columns.Add("Description", typeof(string));
+        dtWorkTasks.Columns.Add("CategoryId", typeof(int));
         dtWorkTasks.Columns.Add("StartDate", typeof(DateTime));
         dtWorkTasks.Columns.Add("EndDate", typeof(DateTime));
-        dtWorkTasks.Columns.Add("IsPublic", typeof(bool));
-        dtWorkTasks.Columns.Add("CategoryId", typeof(int));
         dtWorkTasks.Columns.Add("UserId", typeof(int));
+        dtWorkTasks.Columns.Add("IsPublic", typeof(bool));
 
         var taskCounter = 0;
         foreach (var workTask in workTasks)
@@ -210,8 +214,8 @@ await AnsiConsole.Status()
             ctx.Status($"Traversing through - current work task #{taskCounter++} and preparing sql");
             var row = dtWorkTasks.NewRow();
             row["Description"] = workTask.Description;
-            row["StartDate"] = workTask.Start;
-            row["EndDate"] = workTask.End;
+            row["StartDate"] = workTask.Start.ToShortDateString();
+            row["EndDate"] = workTask.End.ToShortDateString();
             row["IsPublic"] = workTask.IsPublic;
             row["CategoryId"] = workTask.Category.CategoryId;
             row["UserId"] = workTask.User.TTAUserId;
@@ -228,29 +232,41 @@ await AnsiConsole.Status()
 
         var dtWorkTasksComments = new DataTable();
         dtWorkTasksComments.TableName = "WorkTaskComments";
-        dtWorkTasksComments.Columns.Add("WorkTaskId", typeof(int));
+        dtWorkTasksComments.Columns.Add("WorkTaskCommentId", typeof(int));
         dtWorkTasksComments.Columns.Add("UserId", typeof(int));
+        dtWorkTasksComments.Columns.Add("WorkTaskId", typeof(int));
         dtWorkTasksComments.Columns.Add("Comment", typeof(string));
         dtWorkTasksComments.Columns.Add("StartDate", typeof(DateTime));
+        dtWorkTasksComments.Columns.Add("PreviousWorkTaskCommentId", typeof(int));
 
         var worktTasksInDatabase =
-            await sqlConnection.QueryAsync<WorkTask>("SELECT WorkTaskId, Description FROM WorkTasks");
+            await sqlConnection.QueryAsync<WorkTask>("SELECT WorkTaskId FROM WorkTasks");
         ctx.Status($"Received {worktTasksInDatabase.Count()} work tasks.");
         ctx.Refresh();
 
+        string GetUniqueTagForTask(DataRowCollection rowCollection, string workTaskId, string tagName)
+        {
+            //TODO: change items
+            if (rowCollection["WorkTaskId"] == workTaskId && rowCollection["TagName"] == tagName)
+            {
+                tagName = new Faker().PickRandom(tags);
+                return GetUniqueTagForTask(rowCollection, workTaskId, tagName);
+            }
+
+            return tagName;
+        }
+
         foreach (var workTask in worktTasksInDatabase)
         {
-            ctx.Status($"Adding tags to tasks");
+            ctx.Status($"Adding tags to each of the tasks");
             ctx.Refresh();
 
             for (var currentCounter = 0; currentCounter < new Random().Next(2, 6); currentCounter++)
             {
                 var row = dtWorkTasksTags.NewRow();
                 row["WorkTaskId"] = workTask.WorkTaskId;
-                var currentTag = new Faker<string>()
-                    .Rules((faker, _) => faker.PickRandom(tags))
-                    .Generate();
-                row["TagName"] = currentTag;
+                var currentTag = new Faker().PickRandom(tags);
+                row["TagName"] = GetUniqueTagForTask(dtWorkTasksTags.Rows, workTask.WorkTaskId, currentTag);
                 dtWorkTasksTags.Rows.Add(row);
                 ctx.Status($"Adding tag {currentTag} to task {workTask.WorkTaskId}");
                 ctx.Refresh();
