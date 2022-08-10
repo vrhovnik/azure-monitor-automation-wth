@@ -8,6 +8,7 @@ public class PaginatedList<T> : List<T>
 {
     public int PageIndex { get; }
     public int TotalPages { get; }
+    public int TotalItems { get; }
     public string Query { get; }
     public string DataBag { get; set; }
 
@@ -20,6 +21,7 @@ public class PaginatedList<T> : List<T>
         PageIndex = pageIndex;
         DataBag = dataBag;
         TotalPages = (int)Math.Ceiling(count / (double)pageSize);
+        TotalItems = count;
         Query = query;
         AddRange(items);
     }

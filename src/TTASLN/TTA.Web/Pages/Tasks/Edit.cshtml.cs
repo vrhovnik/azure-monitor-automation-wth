@@ -64,10 +64,12 @@ public class EditPageModel : BasePageModel
         {
             logger.LogError(e.Message);
             Message = "Error with inserting new task, check logs.";
+            Categories = await categoryRepository.GetAllAsync();
+            Tags = await tagRepository.GetAllAsync();
             return Page();
         }
 
-        return RedirectToPage("/Task/Index");
+        return RedirectToPage("/User/Dashboard");
     }
     
     [BindProperty(SupportsGet = true)] public string WorkTaskId { get; set; }

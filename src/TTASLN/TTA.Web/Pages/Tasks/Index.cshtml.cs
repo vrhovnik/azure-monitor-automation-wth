@@ -28,20 +28,21 @@ public class IndexPageModel : BasePageModel
         this.userDataContext = userDataContext;
     }
 
-    public async Task<IActionResult> OnGetAsync(int? page, string query)
+    public async Task<IActionResult> OnGetAsync(int? pageNumber)
     {
-        int pageCount = page ?? 1;
+        var pageCount = pageNumber ?? 1;
         logger.LogInformation("Task search page loaded {DateStarted}", DateTime.Now);
-        bool isPublic = User.Identity is { IsAuthenticated: false };
-        WorkTasks = await workTaskRepository.SearchAsync(pageCount, webOptions.PageCount, isPublic, query);
+        WorkTasks = await workTaskRepository.SearchAsync(pageCount, webOptions.PageCount, true, Query);
         logger.LogInformation("Loaded {ItemCount} out of {AllCount} with {Query}", WorkTasks.Count,
-            WorkTasks.TotalPages, query);
+            WorkTasks.TotalPages, Query);
 
         if (!Request.IsHtmx()) return Page();
         
-        Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
+        //Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
         return Partial("_WorkTasksList", WorkTasks);
     }
-
+    
+    [BindProperty(SupportsGet = true)]
+    public string Query { get; set; }
     [BindProperty] public PaginatedList<WorkTask> WorkTasks { get; set; }
 }

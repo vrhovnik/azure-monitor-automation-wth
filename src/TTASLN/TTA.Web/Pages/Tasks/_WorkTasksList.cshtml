@@ -1,41 +1,35 @@
-﻿@using TTA.Web.Base
-@using TTA.Core
+﻿@using TTA.Core
 @model TTA.Core.PaginatedList<TTA.Models.WorkTask>
-@inject  IUserDataContext UserDataContext
-@{
-    var userViewModel = UserDataContext.GetCurrentUser();
-}
 @if (Model.Any())
 {
     <div id="grid">
         <table class="table table-light table-hover"
                id="tbData">
-            <caption>Task list for query <b>@Model.Query</b></caption>
+            <caption>
+                Task list for query <b>@Model.Query</b> out of @Model.TotalItems
+            </caption>
             <thead class="thead-dark">
             <tr>
                 <th>
                     Description
                 </th>
                 <th>
-                    Duration (in ms)
+                    Duration
                 </th>
                 <th>Category</th>
                 <th>Tags</th>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <th>...</th>
-                }
             </tr>
             </thead>
             @foreach (var workTask in Model)
             {
                 <tr>
                     <td>
-                        <a asp-page="/Tasks/Details" asp-route-workTaskId="@workTask.WorkTaskId">
-                            @workTask.Description.Truncate(25)
+                        <a asp-page="/Tasks/Details"
+                           asp-route-workTaskId="@workTask.WorkTaskId">
+                            @workTask.Description.Truncate(50)
                         </a>
                     </td>
-                    <td class="text-center">@workTask.DurationInMs</td>
+                    <td class="text-center">@workTask.Duration</td>
                     <td>@workTask.Category.Name</td>
                     <td>
                         @foreach (var modelTag in workTask.Tags)
@@ -44,37 +38,6 @@
                             @:&nbsp;
                         }
                     </td>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        if (userViewModel.UserId == workTask.User.TTAUserId)
-                        {
-                            <td>
-                                <a hx-confirm="Are you sure you wish to complete the task?"
-                                   hx-include="[name='workTaskId']"
-                                   hx-post="/task-api/complete-task">
-                                    <input name="workTaskId"
-                                           type="hidden">
-                                    <i class="fa-solid fa-check"></i>
-                                </a>
-                                &nbsp;
-                                <a asp-page="/Tasks/Edit"
-                                   asp-route-workTaskId="@workTask.WorkTaskId">
-                                    <i class="fas fa-edit"></i>
-                                </a>&nbsp;
-                                &nbsp;
-                                <a asp-page="/Tasks/Delete"
-                                   asp-route-workTaskId="@workTask.WorkTaskId">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </td>
-                        }
-                        else
-                        {
-                            <a asp-page="/Tasks/Details" asp-route-workTaskId="@workTask.WorkTaskId">
-                                <i class="fa-solid fa-circle-arrow-right"></i>
-                            </a>
-                        }
-                    }
                 </tr>
             }
         </table>
@@ -133,10 +96,10 @@
 else
 {
     <p class="text-info">
-        No data present based on selected filter.
+        No data present based on selected filter. Check filter.
         @if (User.Identity.IsAuthenticated)
         {
-            @:Check filter or <a asp-page="/Tasks/Create"> Create new task</a>.
+            @:Or <a asp-page="/Tasks/Create"> Create new task</a>.
         }
     </p>
 }

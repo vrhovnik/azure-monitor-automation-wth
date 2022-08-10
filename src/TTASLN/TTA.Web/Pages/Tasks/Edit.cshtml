@@ -25,10 +25,12 @@
 {
     <p class="text-warning">@Model.Message</p>
 }
-<h1>Add new task</h1>
+<h1>Edit task @Model.EditTask.WorkTaskId</h1>
 
 <form enctype="multipart/form-data"
       method="post">
+    <input asp-for="EditTask.WorkTaskId"
+           type="hidden" />
     <div class="mb-3">
         <label asp-for="EditTask.Description">Enter description</label>
         <input asp-for="EditTask.Description"
@@ -44,16 +46,15 @@
                type="date">
     </div>
     <div class="mb-3">
-        <label asp-for="EditTask.Start">Enter end date</label>
-        <input asp-for="EditTask.Start"
+        <label asp-for="EditTask.End">Enter end date</label>
+        <input asp-for="EditTask.End"
                class="form-control"
                type="date">
     </div>
     <div class="form-check mb-2">
         <input asp-for="EditTask.IsPublic"
                class="form-check-input"
-               type="checkbox"
-               value="">
+               type="checkbox">
         <label asp-for="EditTask.IsPublic"
                class="form-check-label">
             Is publicly available
@@ -109,7 +110,7 @@
             type="submit">
         Save <i class="fas fa-save"></i>
     </button>
-    <a asp-page="/Task/Index">Cancel</a>
+    <a asp-page="/User/Dashboard">Cancel</a>
 
 </form>
 

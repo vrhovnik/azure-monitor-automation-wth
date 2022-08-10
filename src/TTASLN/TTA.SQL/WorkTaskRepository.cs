@@ -16,11 +16,13 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
 
-        var query = "SELECT W.* FROM WorkTasks W WHERE W.WorkTaskId=@entityId;" +
-                    "SELECT U.* FROM Users U JOIN WorkTasks FFT on FFT.CategoryId=T.CategoryId WHERE FFT.WorkTaskId=@entityId;" +
-                    "SELECT C.* FROM Category C JOIN WorkTasks FF on FF.CategoryId=C.CategoryId WHERE FF.WorkTaskId=@entityId;" +
-                    "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;" +
-                    "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId;";
+        var query =
+            "SELECT W.WorkTaskId, W.StartDate as [Start], W.EndDate as [End],W.IsPublic, W.Description, W.CategoryId," +
+            "W.UserId as TTAUserId FROM WorkTasks W WHERE W.WorkTaskId=@entityId;" +
+            "SELECT U.* FROM Users U JOIN WorkTasks FFT on FFT.UserId=U.UserId WHERE FFT.WorkTaskId=@entityId;" +
+            "SELECT C.* FROM Category C JOIN WorkTasks FF on FF.CategoryId=C.CategoryId WHERE FF.WorkTaskId=@entityId;" +
+            "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;" +
+            "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId;";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
         var workTask = await result.ReadSingleAsync<WorkTask>();
@@ -65,25 +67,33 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     public override async Task<bool> UpdateAsync(WorkTask entity)
     {
         await using var connection = new SqlConnection(connectionString);
+        var workTaskId = entity.WorkTaskId;
         var item = await connection.ExecuteAsync(
-            $"UPDATE WorkTasks SET Description=@{nameof(entity.Description)},CategoryId=@{nameof(entity.Category.CategoryId)},StartDate=@{nameof(entity.Start)}," +
-            $"EndDate=@{nameof(entity.End)},UserId=@{nameof(entity.User.TTAUserId)},IsPublic=@{nameof(entity.IsPublic)}) WHERE WorkTaskId=@{nameof(entity.WorkTaskId)}",
-            entity);
+            "UPDATE WorkTasks SET Description=@description,CategoryId=@categoryId,StartDate=@startDate," +
+            "EndDate=@endDate,UserId=@userId,IsPublic=@isPublic WHERE WorkTaskId=@workTaskId",
+            new
+            {
+                description = entity.Description,
+                categoryId = entity.Category.CategoryId,
+                startDate = entity.Start,
+                endDate = entity.End,
+                userId = entity.User.TTAUserId,
+                isPublic = entity.IsPublic,
+                workTaskId
+            });
 
         if (item < 0) return false;
 
-        string workTaskId = entity.WorkTaskId;
-        item = await connection.ExecuteAsync("DELETE FROM WorkTask2Tags WHERE WHERE WorkTaskId=@workTaskId",
+        item = await connection.ExecuteAsync("DELETE FROM WorkTask2Tags WHERE WorkTaskId=@workTaskId",
             new { workTaskId });
 
-        if (item > 0)
+        if (item <= 0) return true;
+
+        foreach (var tag in entity.Tags)
         {
-            foreach (var tag in entity.Tags)
-            {
-                await connection.ExecuteAsync(
-                    "INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@currentTag)",
-                    new { workTaskId, currentTag = tag.TagName });
-            }
+            await connection.ExecuteAsync(
+                "INSERT INTO WorkTask2Tags(WorkTaskId,TagName)VALUES(@workTaskId,@currentTag)",
+                new { workTaskId, currentTag = tag.TagName });
         }
 
         return true;
@@ -112,8 +122,8 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
             "SELECT U.UserId as TTAUserId, U.UserId as TTAUserId, U.FullName, U.Email FROM Users U WHERE U.UserId=@userIdentificator;" +
-            "SELECT T.WorkTaskId, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
-            "T.UserId as TTAUserId, T.IsPublic, FF.TagName  " +
+            "SELECT T.WorkTaskId, T.IsPublic, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
+            "T.UserId as TTAUserId, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId " +
             " WHERE T.UserId=@userIdentificator";
@@ -136,7 +146,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
             return workTask;
         }, splitOn: "CategoryId,TagName");
 
-        return new PaginatedList<WorkTask>(lookup.Values, lookup.Values.Count, pageIndex, pageSize, query);
+        return PaginatedList<WorkTask>.Create(lookup.Values.ToList(), pageIndex, pageSize, query);
     }
 
     public async Task<PaginatedList<WorkTask>> SearchAsync(int pageIndex = 1,
@@ -156,10 +166,12 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         if (!string.IsNullOrEmpty(query) && isPublic) sqlQuery += $" AND T.Description LIKE '%{query}%'";
         if (!string.IsNullOrEmpty(query) && !isPublic) sqlQuery += $" WHERE T.Description LIKE '%{query}%'";
 
+        sqlQuery += " ORDER BY T.UserId";
+
         var grid = await connection.QueryMultipleAsync(sqlQuery);
         var lookup = new Dictionary<string, WorkTask>();
 
-        grid.Read<WorkTask, Category, Tag, TTAUser, WorkTask>((workTask, category, currentTag, user) =>
+        grid.Read<WorkTask, Category, TTAUser, Tag, WorkTask>((workTask, category, user, currentTag) =>
         {
             workTask.User = user;
             workTask.Category = category;
@@ -169,9 +181,9 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
 
             lookup[workTask.WorkTaskId].Tags.Add(currentTag);
             return workTask;
-        }, splitOn: "CategoryId,TagName,TTAUserId");
+        }, splitOn: "CategoryId,TTAUserId,TagName");
 
-        return new PaginatedList<WorkTask>(lookup.Values, lookup.Values.Count, pageIndex, pageSize, query);
+        return PaginatedList<WorkTask>.Create(lookup.Values.ToList(), pageIndex, pageSize, query);
     }
 
     public async Task<bool> CompleteTaskAsync(string workTaskId)

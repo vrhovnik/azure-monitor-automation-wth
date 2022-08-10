@@ -39,7 +39,7 @@ public class DeletePageModel : BasePageModel
             return Page();
         }
 
-        return RedirectToPage("/Task/Index");
+        return RedirectToPage("/User/Dashboard");
     }
 
     [BindProperty(SupportsGet = true)] public string WorkTaskId { get; set; }
