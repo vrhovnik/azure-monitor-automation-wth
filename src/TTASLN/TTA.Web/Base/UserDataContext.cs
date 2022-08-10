@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using TTA.Web.ViewModels;
 
 namespace TTA.Web.Base;
@@ -26,5 +27,7 @@ public class UserDataContext : IUserDataContext
 
         return currentUser;
     }
+
+    public Task LogOut() => httpContextAccessor.HttpContext.SignOutAsync();
 }
 

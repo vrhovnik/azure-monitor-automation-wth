@@ -1,4 +1,5 @@
 ﻿@using TTA.Web.Base
+@using TTA.Core
 @model TTA.Core.PaginatedList<TTA.Models.WorkTask>
 @inject  IUserDataContext UserDataContext
 @{
@@ -30,8 +31,8 @@
             {
                 <tr>
                     <td>
-                        <a asp-page="/Task/Details" asp-route-workTaskId="@workTask.WorkTaskId">
-                            @workTask.Description
+                        <a asp-page="/Tasks/Details" asp-route-workTaskId="@workTask.WorkTaskId">
+                            @workTask.Description.Truncate(25)
                         </a>
                     </td>
                     <td class="text-center">@workTask.DurationInMs</td>
@@ -57,19 +58,19 @@
                                 </a>
                                 &nbsp;
                                 <a asp-page="/Tasks/Edit"
-                                   asp-route-id="@workTask.WorkTaskId">
+                                   asp-route-workTaskId="@workTask.WorkTaskId">
                                     <i class="fas fa-edit"></i>
                                 </a>&nbsp;
                                 &nbsp;
                                 <a asp-page="/Tasks/Delete"
-                                   asp-route-id="@workTask.WorkTaskId">
+                                   asp-route-workTaskId="@workTask.WorkTaskId">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </td>
                         }
                         else
                         {
-                            <a asp-page="/Task/Details" asp-route-workTaskId="@workTask.WorkTaskId">
+                            <a asp-page="/Tasks/Details" asp-route-workTaskId="@workTask.WorkTaskId">
                                 <i class="fa-solid fa-circle-arrow-right"></i>
                             </a>
                         }

@@ -67,7 +67,7 @@ public class CreatePageModel : BasePageModel
             return Page();
         }
 
-        return RedirectToPage("/Task/Index");
+        return RedirectToPage("/Tasks/Index");
     }
 
     [BindProperty] public List<Category> Categories { get; set; }

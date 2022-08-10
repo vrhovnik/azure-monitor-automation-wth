@@ -5,4 +5,5 @@ namespace TTA.Web.Base;
 public interface IUserDataContext
 {
     UserViewModel GetCurrentUser();
+    Task LogOut();
 }
