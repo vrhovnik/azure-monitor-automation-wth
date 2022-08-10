@@ -12,16 +12,8 @@ var sqlConn = Environment.GetEnvironmentVariable("SQL_CONNECTION_STRING");
 if (string.IsNullOrEmpty(sqlConn))
     sqlConn = @"Data Source=(LocalDb)\MSSQLLocalDB";
 
-AnsiConsole.Write(
-    new Markup($"Current [bold yellow]SQL connection to database[/] [red]{sqlConn}[/]"));
+AnsiConsole.Write(new Markup($"Current [bold yellow]SQL connection[/] to database [red]{sqlConn}[/]"));
 AnsiConsole.WriteLine();
-var dropIt =
-    AnsiConsole.Confirm("Database will be recreated. Create backup before continuing. Are you sure to continue?");
-if (!dropIt)
-{
-    AnsiConsole.WriteLine("Shutting down - run the app when backup is finished to be able to work with your data.");
-    return;
-}
 
 var folderRoot = Environment.GetEnvironmentVariable("FOLDER_ROOT");
 if (string.IsNullOrEmpty(folderRoot))
@@ -43,27 +35,50 @@ var path = new TextPath(folderRoot)
     LeafStyle = new Style(foreground: Color.Yellow)
 };
 AnsiConsole.Write(path);
-if (!await DropAndRecreateDatabaseAsync(sqlConn))
+
+var dropIt = Environment.GetEnvironmentVariable("DROP_DATABASE") is not null &&
+             Convert.ToBoolean(Environment.GetEnvironmentVariable("DROP_DATABASE"));
+if (Environment.GetEnvironmentVariable("DROP_DATABASE") is null)
+    dropIt = AnsiConsole.Confirm(
+        "Do you wish to recreate database? Create backup before continuing. If there is an existing TTADB, it will be dropped. Are you sure to continue with recreation?");
+
+if (dropIt)
 {
-    AnsiConsole.WriteLine("We couldn't drop and recreate database, check logs.");
-    return;
+    if (!await DropAndRecreateDatabaseAsync(sqlConn))
+    {
+        AnsiConsole.WriteLine("We couldn't drop and recreate database, check logs and retry again.");
+        return;
+    }
+
+    sqlConn += ";Initial Catalog=TTADB";
+    AnsiConsole.Write(
+        new Markup(
+            $"New [bold yellow]SQL connection[/] to database changed to [red]{sqlConn}[/]. Continue with data insertion."));
+    AnsiConsole.WriteLine();
+    if (!await CreateTablesInDatabaseAsync(Path.Join(folderRoot, "/scripts/SQL/"), sqlConn))
+    {
+        AnsiConsole.WriteLine("Not all objects were created in database TTADB, check logs");
+        return;
+    }
 }
 
-sqlConn += ";Initial Catalog=TTADB";
-AnsiConsole.Write(
-    new Markup(
-        $"New [bold yellow]SQL connection[/] to database changed to [red]{sqlConn}[/]. Continue with data insertion."));
+var defaultPassword = Environment.GetEnvironmentVariable("DEFAULT_PASSWORD");
+if (string.IsNullOrEmpty(defaultPassword))
+    defaultPassword = AnsiConsole.Prompt(
+        new TextPrompt<string>("Enter DEFAULT [green]password[/]?")
+            .PromptStyle("red")
+            .Secret());
+
+var passwdHash = PasswordHash.CreateHash(defaultPassword);
+
+var numberOfRecords = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RECORD_NUMBER"))
+    ? AnsiConsole.Prompt(
+        new TextPrompt<int>("Enter [green]record number[/] to generate")
+            .PromptStyle("green"))
+    : int.Parse(Environment.GetEnvironmentVariable("RECORD_NUMBER"));
+
+AnsiConsole.Write(new Markup($"Defined [bold yellow]{numberOfRecords}[/] record to be generated."));
 AnsiConsole.WriteLine();
-if (!await CreateTablesInDatabaseAsync(Path.Join(folderRoot, "/scripts/SQL/"), sqlConn))
-{
-    AnsiConsole.WriteLine("Not all objects were created in database TTADB, check logs");
-    return;
-}
-
-var defaultPassword = AnsiConsole.Prompt(
-    new TextPrompt<string>("Enter DEFAULT [green]password[/]?")
-        .PromptStyle("red")
-        .Secret());
 
 await AnsiConsole.Status()
     .AutoRefresh(false)
@@ -75,7 +90,6 @@ await AnsiConsole.Status()
         ctx.Status("Getting tags and inserting tags ...");
         ctx.Refresh();
 
-        //generate data with Bogus library
         //1. Tags
         var tags = await GetDataFromFileAsync("docs/tag.data");
         ctx.Status("Reading from file docs/tag.data");
@@ -88,12 +102,16 @@ await AnsiConsole.Status()
         dtTags.TableName = "Tags";
         dtTags.Columns.Add("TagName", typeof(string));
 
+        var tagsInDatabase =
+            await GetDataFromDatabaseAsync<Tag>(sqlConnection, "SELECT TagName FROM Tags");
+
         foreach (var currentTag in tags)
         {
             ctx.Status($"Traversing through - current tag {currentTag} and preparing sql");
             var row = dtTags.NewRow();
             row["TagName"] = currentTag;
-            dtTags.Rows.Add(row);
+            if (tagsInDatabase.FirstOrDefault(tag => tag.TagName == currentTag) == null)
+                dtTags.Rows.Add(row);
             ctx.Refresh();
         }
 
@@ -114,28 +132,30 @@ await AnsiConsole.Status()
         dtCategories.Columns.Add("CategoryId", typeof(int));
         dtCategories.Columns.Add("Name", typeof(string));
 
+        var categoriesInDatabase =
+            await GetDataFromDatabaseAsync<Category>(sqlConnection, "SELECT CategoryId,Name FROM Category");
+
         foreach (var currentCategoryName in categories)
         {
             ctx.Status($"Traversing through - current category name {currentCategoryName} and preparing sql");
             var row = dtCategories.NewRow();
             row["Name"] = currentCategoryName;
-            dtCategories.Rows.Add(row);
+            if (categoriesInDatabase.FirstOrDefault(cat => cat.Name == currentCategoryName) == null)
+                dtCategories.Rows.Add(row);
             ctx.Refresh();
         }
 
         await WriteBulkToDatabaseAsync(sqlConnection, dtCategories);
 
         //3. Users
-        var passwdHash = PasswordHash.CreateHash(defaultPassword);
-
         var users = new Faker<TTAUser>()
             .RuleFor(currentUser => currentUser.FullName,
                 (faker, _) => faker.Name.FirstName() + " " + faker.Name.LastName()
             ).RuleFor(u => u.Email, (f, u) => f.Internet.Email(u.FullName))
             .RuleFor(u => u.Password, (_, _) => passwdHash)
-            .GenerateLazy(100);
+            .GenerateLazy(numberOfRecords);
 
-        ctx.Status("Generated 100 users, adding to database");
+        ctx.Status($"Generated {numberOfRecords} users, adding to database");
         ctx.Refresh();
 
         var dtUsers = new DataTable();
@@ -159,7 +179,8 @@ await AnsiConsole.Status()
         await WriteBulkToDatabaseAsync(sqlConnection, dtUsers);
 
         var usersInDatabase =
-            await sqlConnection.QueryAsync<TTAUser>("SELECT UserId as TTAUserId,FullName, Email FROM Users");
+            await GetDataFromDatabaseAsync<TTAUser>(sqlConnection,
+                "SELECT UserId as TTAUserId,FullName, Email FROM Users");
         ctx.Status($"and received {usersInDatabase.Count()} users.");
         ctx.Refresh();
 
@@ -183,7 +204,8 @@ await AnsiConsole.Status()
         await WriteBulkToDatabaseAsync(sqlConnection, dtUserSettings);
 
         //4. WorkTasks
-        var categoriesInDatabase = await sqlConnection.QueryAsync<Category>("SELECT CategoryId,Name FROM Category");
+        categoriesInDatabase =
+            await GetDataFromDatabaseAsync<Category>(sqlConnection, "SELECT CategoryId,Name FROM Category");
         ctx.Status(
             $"Added users and settings for that user. Continuing to insert work tasks. Received {categoriesInDatabase.Count()} categories");
         ctx.Refresh();
@@ -196,7 +218,7 @@ await AnsiConsole.Status()
             .RuleFor(u => u.IsPublic, (f, _) => f.Random.Bool())
             .RuleFor(u => u.Category, (f, _) => f.PickRandom(categoriesInDatabase))
             .RuleFor(u => u.User, (f, _) => f.PickRandom(usersInDatabase))
-            .GenerateLazy(100);
+            .GenerateLazy(numberOfRecords);
 
         var dtWorkTasks = new DataTable();
         dtWorkTasks.TableName = "WorkTasks";
@@ -227,8 +249,15 @@ await AnsiConsole.Status()
 
         var dtWorkTasksTags = new DataTable();
         dtWorkTasksTags.TableName = "WorkTask2Tags";
-        dtWorkTasksTags.Columns.Add("WorkTaskId", typeof(int));
-        dtWorkTasksTags.Columns.Add("TagName", typeof(string));
+        var dtWorkTaskIdColumn = new DataColumn();
+        dtWorkTaskIdColumn.ColumnName = "WorkTaskId";
+        dtWorkTaskIdColumn.DataType = typeof(int);
+        var dtTagNameColumn = new DataColumn();
+        dtTagNameColumn.ColumnName = "TagName";
+        dtTagNameColumn.DataType = typeof(string);
+        dtWorkTasksTags.Columns.Add(dtWorkTaskIdColumn);
+        dtWorkTasksTags.Columns.Add(dtTagNameColumn);
+        dtWorkTasksTags.PrimaryKey = new[] { dtWorkTaskIdColumn, dtTagNameColumn };
 
         var dtWorkTasksComments = new DataTable();
         dtWorkTasksComments.TableName = "WorkTaskComments";
@@ -240,20 +269,19 @@ await AnsiConsole.Status()
         dtWorkTasksComments.Columns.Add("PreviousWorkTaskCommentId", typeof(int));
 
         var worktTasksInDatabase =
-            await sqlConnection.QueryAsync<WorkTask>("SELECT WorkTaskId FROM WorkTasks");
+            await GetDataFromDatabaseAsync<WorkTask>(sqlConnection, "SELECT WorkTaskId FROM WorkTasks");
         ctx.Status($"Received {worktTasksInDatabase.Count()} work tasks.");
         ctx.Refresh();
 
-        string GetUniqueTagForTask(DataRowCollection rowCollection, string workTaskId, string tagName)
+        string GetUniqueTagForTask(DataRowCollection rowCollection, string workTaskId, string tagName,
+            int count, int maxCount)
         {
-            //TODO: change items
-            if (rowCollection["WorkTaskId"] == workTaskId && rowCollection["TagName"] == tagName)
-            {
-                tagName = new Faker().PickRandom(tags);
-                return GetUniqueTagForTask(rowCollection, workTaskId, tagName);
-            }
+            if (count >= maxCount) return string.Empty;
 
-            return tagName;
+            if (rowCollection.Find(new[] { workTaskId, tagName }) == null) return tagName;
+
+            tagName = new Faker().PickRandom(tags);
+            return GetUniqueTagForTask(rowCollection, workTaskId, tagName, ++count, maxCount);
         }
 
         foreach (var workTask in worktTasksInDatabase)
@@ -266,8 +294,13 @@ await AnsiConsole.Status()
                 var row = dtWorkTasksTags.NewRow();
                 row["WorkTaskId"] = workTask.WorkTaskId;
                 var currentTag = new Faker().PickRandom(tags);
-                row["TagName"] = GetUniqueTagForTask(dtWorkTasksTags.Rows, workTask.WorkTaskId, currentTag);
-                dtWorkTasksTags.Rows.Add(row);
+                var uniqueTagForTask = GetUniqueTagForTask(dtWorkTasksTags.Rows,
+                    workTask.WorkTaskId, currentTag, 0, tags.Length);
+                row["TagName"] =
+                    uniqueTagForTask;
+                if (!string.IsNullOrEmpty(uniqueTagForTask))
+                    dtWorkTasksTags.Rows.Add(row);
+
                 ctx.Status($"Adding tag {currentTag} to task {workTask.WorkTaskId}");
                 ctx.Refresh();
 
@@ -289,6 +322,12 @@ await AnsiConsole.Status()
 
 AnsiConsole.Write(new Markup(
     $"SQL data objects were [bold red]created[/] and data was [bold red]inserted[/]  - check it via SQL tools created"));
+
+async Task<IEnumerable<T>> GetDataFromDatabaseAsync<T>(IDbConnection connection, string query)
+{
+    if (connection.State == ConnectionState.Closed) connection.Open();
+    return await connection.QueryAsync<T>(query);
+}
 
 async Task<bool> WriteBulkToDatabaseAsync(SqlConnection connection, DataTable dt)
 {
@@ -372,7 +411,7 @@ async Task<bool> DropAndRecreateDatabaseAsync(string connectionString)
     if (dbExistsCount > 0)
     {
         AnsiConsole.Write(
-            new Markup("[bold yellow]Database [/] [red]TTADB[/] [bold yellow] will be dropped.[/]"));
+            new Markup("Database [red]TTADB[/] will be dropped."));
         AnsiConsole.WriteLine();
         try
         {
@@ -391,7 +430,7 @@ async Task<bool> DropAndRecreateDatabaseAsync(string connectionString)
             "CREATE DATABASE TTADB collate SQL_Latin1_General_CP1_CI_AS");
         AnsiConsole.Write(
             new Markup(
-                "[bold yellow]Database [/] [red]TTADB[/] [bold yellow] has been created, connection string will be modified.[/]"));
+                "Database [red]TTADB[/] has been created, connection string will be modified."));
     }
     catch (Exception dropException)
     {
