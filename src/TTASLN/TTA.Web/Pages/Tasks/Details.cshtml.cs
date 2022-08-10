@@ -34,19 +34,17 @@ public class DetailsPageModel : BasePageModel
         try
         {
             WorkTask = await workTaskRepository.DetailsAsync(WorkTaskId);
-            if (WorkTask.Comments.Any())
-            {
-                logger.LogInformation("Adding parent comment for worktask {WorkTaskId}", WorkTaskId);
-                NewComment.ParentComment = WorkTask.Comments[^1];
-            }
-
+            NewComment.AssignedTask = WorkTask;
+            
             var user = userDataContext.GetCurrentUser();
             logger.LogInformation("Adding user {FullName} to comment for worktask {WorkTaskId}", user.Fullname,
                 WorkTaskId);
             WorkTask.User = new TTAUser { TTAUserId = user.UserId };
+            
             await workTaskCommentRepository.InsertAsync(NewComment);
+            
             logger.LogInformation("Comment was added for worktask {WorkTaskId}", WorkTaskId);
-            Message = "Worktask comment was added";
+            Message = $"Worktask comment was added at {DateTime.Now}";
         }
         catch (Exception e)
         {
@@ -55,7 +53,7 @@ public class DetailsPageModel : BasePageModel
             return Page();
         }
 
-        return RedirectToPage("/Task/Details", new { WorkTaskId });
+        return RedirectToPage("/Tasks/Details", new { WorkTaskId });
     }
 
     [BindProperty(SupportsGet = true)] public string WorkTaskId { get; set; }

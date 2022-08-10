@@ -22,7 +22,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
             "SELECT U.* FROM Users U JOIN WorkTasks FFT on FFT.UserId=U.UserId WHERE FFT.WorkTaskId=@entityId;" +
             "SELECT C.* FROM Category C JOIN WorkTasks FF on FF.CategoryId=C.CategoryId WHERE FF.WorkTaskId=@entityId;" +
             "SELECT F.* FROM Tags F JOIN WorkTask2Tags WT on WT.TagName=F.TagName WHERE WT.WorkTaskId=@entityId;" +
-            "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId;";
+            "SELECT WTC.* FROM WorkTaskComments WTC WHERE WTC.WorkTaskId=@entityId ORDER BY WTC.DateStarted DESC;";
 
         var result = await connection.QueryMultipleAsync(query, new { entityId });
         var workTask = await result.ReadSingleAsync<WorkTask>();
