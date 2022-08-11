@@ -37,7 +37,7 @@ public class DashboardPageModel : BasePageModel
     {
         var currentPageNumber = pageNumber ?? 1;
         var userViewModel = userDataContext.GetCurrentUser();
-        PdfDownloadUrl = $"{generalWebOptions.ClientApiUrl}/download-pdf/{userViewModel.UserId}";
+        PdfDownloadUrl = $"{generalWebOptions.ClientApiUrl}/task-api/download-pdf/{userViewModel.UserId}";
         logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname,
             DateTime.Now);
 
@@ -51,7 +51,7 @@ public class DashboardPageModel : BasePageModel
 
         if (!Request.IsHtmx()) return Page();
         
-        Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
+        //Response.Htmx(h => h.Push(Request.GetEncodedUrl()));
         return Partial("_WorkTasksList", UserTasks);
     }
 

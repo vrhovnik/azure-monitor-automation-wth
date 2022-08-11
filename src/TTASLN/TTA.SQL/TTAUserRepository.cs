@@ -12,6 +12,14 @@ public class TTAUserRepository : BaseRepository<TTAUser>, IUserRepository
     {
     }
 
+    public override async Task<List<TTAUser>> GetAsync()
+    {
+        await using var connection = new SqlConnection(connectionString);
+        var sql = "SELECT U.UserId as TTAUserId, U.FullName, U.Email, U.Password FROM Users U";
+        var ttaUsers = await connection.QueryAsync<TTAUser>(sql);
+        return ttaUsers.ToList();
+    }
+
     public override async Task<TTAUser> InsertAsync(TTAUser entity)
     {
         await using var connection = new SqlConnection(connectionString);

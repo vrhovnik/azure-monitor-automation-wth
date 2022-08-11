@@ -12,6 +12,11 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MahApps.Metro" Version="2.4.8" />
-        <PackageReference Include="MahApps.Metro.IconPacks" Version="4.10.0" />        
+        <PackageReference Include="MahApps.Metro.IconPacks" Version="4.10.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />        
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\TTA.Core\TTA.Core.csproj" />
+      <ProjectReference Include="..\TTA.Models\TTA.Models.csproj" />
     </ItemGroup>
 </Project>

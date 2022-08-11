@@ -230,6 +230,7 @@ await AnsiConsole.Status()
         dtWorkTasks.Columns.Add("EndDate", typeof(DateTime));
         dtWorkTasks.Columns.Add("UserId", typeof(int));
         dtWorkTasks.Columns.Add("IsPublic", typeof(bool));
+        dtWorkTasks.Columns.Add("IsCompleted", typeof(bool));
 
         var taskCounter = 0;
         foreach (var workTask in workTasks)
@@ -242,6 +243,7 @@ await AnsiConsole.Status()
             row["IsPublic"] = workTask.IsPublic;
             row["CategoryId"] = workTask.Category.CategoryId;
             row["UserId"] = workTask.User.TTAUserId;
+            row["IsCompleted"] = workTask.IsCompleted;
             dtWorkTasks.Rows.Add(row);
             ctx.Refresh();
         }
@@ -267,7 +269,6 @@ await AnsiConsole.Status()
         dtWorkTasksComments.Columns.Add("WorkTaskId", typeof(int));
         dtWorkTasksComments.Columns.Add("Comment", typeof(string));
         dtWorkTasksComments.Columns.Add("StartDate", typeof(DateTime));
-        dtWorkTasksComments.Columns.Add("PreviousWorkTaskCommentId", typeof(int));
 
         var worktTasksInDatabase =
             await GetDataFromDatabaseAsync<WorkTask>(sqlConnection, "SELECT WorkTaskId FROM WorkTasks");

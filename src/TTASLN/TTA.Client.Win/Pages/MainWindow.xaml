@@ -25,6 +25,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -54,6 +55,7 @@
                           mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
                           Background="DodgerBlue"
                           Count="{Binding UserCount}"
+                          Command="{Binding SimulateUserApiConnectivityToTasksCommand}"
                           VerticalContentAlignment="Center"
                           Width="200"
                           HorizontalTitleAlignment="Center" />
@@ -71,9 +73,10 @@
                                               Kind="Heart" />
                 </mah:Tile>
         </WrapPanel>
-        <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,3" VerticalAlignment="Bottom"
+        <TextBlock Text="{Binding SimulationData}" Grid.Row="2" Grid.ColumnSpan="2"></TextBlock>
+        <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,3" VerticalAlignment="Bottom"
                    Text="{Binding Message}" />
-        <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" Margin="5,0,5,3" VerticalAlignment="Bottom"
+        <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" Margin="5,0,5,3" VerticalAlignment="Bottom"
                    Text="{Binding Version}"
                    FontSize="12" />
     </Grid>

@@ -1,9 +1,11 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Xaml.Behaviors.Core;
 using TTA.Client.Win.Helpers;
+using TTA.Client.Win.Services;
 
 namespace TTA.Client.Win.ViewModels;
 
@@ -12,8 +14,14 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel()
     {
         OpenGithubPageCommand = new ActionCommand(OpenGithubAction);
+        SimulateUserApiConnectivityToTasksCommand = new ActionCommand(StartSimulationAction);
         CheckWebApiClientHealthCommand = new ActionCommand(CheckWebApiClientHealthAction);
         UserCount = 1;
+    }
+
+    private void StartSimulationAction()
+    {
+        throw new NotImplementedException();
     }
 
     private void CheckWebApiClientHealthAction()
@@ -45,28 +53,33 @@ public class MainPageViewModel : BaseViewModel
         }
     }
 
+    public string SimulationData
+    {
+        get => simulationData;
+        set
+        {
+            if (value == simulationData) return;
+            simulationData = value;
+            OnPropertyChanged();
+        }
+    }
+
     public async Task LoadInitialDataAsync()
     {
         IsWorking = true;
         Message = "Loading data from web api for users and for active tasks";
-        await Task.Delay(2000);
-        UserCount = 100;
+        
+        var userApiHelper = new UserTaskApiHelper();
+        var users = await userApiHelper.GetUsersAsync();
+        Message = $"Received {users.Count} users from web api";
+        UserCount = users.Count;
+        // UserCount = 100;
+        // await Task.Delay(2000);
         IsWorking = false;
     }
 
-    private string query;
     private int userCount;
-
-    public string Query
-    {
-        get => query;
-        set
-        {
-            if (value == query) return;
-            query = value;
-            OnPropertyChanged();
-        }
-    }
+    private string simulationData;
 
     private void OpenGithubAction()
     {
@@ -79,4 +92,5 @@ public class MainPageViewModel : BaseViewModel
 
     public ICommand OpenGithubPageCommand { get; }
     public ICommand CheckWebApiClientHealthCommand { get; }
+    public ICommand SimulateUserApiConnectivityToTasksCommand { get; }
 }

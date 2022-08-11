@@ -19,20 +19,20 @@ builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: allowOrigins,
-        policy =>
-        {
-            // policy.WithOrigins("https://projectstardustwebapi.azurewebsites.net",
-            //     "https://localhost:")
-            //     .AllowAnyMethod();
-            policy.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .WithExposedHeaders("x-project-stardust")
-                .AllowCredentials();
-        });
-});
+// builder.Services.AddCors(options =>
+// {
+//     options.AddPolicy(name: allowOrigins,
+//         policy =>
+//         {
+//             // policy.WithOrigins("https://projectstardustwebapi.azurewebsites.net",
+//             //     "https://localhost:")
+//             //     .AllowAnyMethod();
+//             policy.AllowAnyOrigin()
+//                 .AllowAnyMethod()
+//                 .WithExposedHeaders("x-project-stardust")
+//                 .AllowCredentials();
+//         });
+// });
 
 var app = builder.Build();
 
@@ -44,7 +44,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 app.UseAuthorization();
-app.UseCors(allowOrigins);
+//app.UseCors(allowOrigins);
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHealthChecks("/health").AllowAnonymous();
