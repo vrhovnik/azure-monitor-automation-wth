@@ -14,6 +14,10 @@ public interface IWorkTaskRepository : IDataRepository<WorkTask>
         int pageSize = 10,
         bool isPublic = true,
         string query = "");
+    
+    public Task<PaginatedList<WorkTask>> SearchCompletedAsync(int pageIndex = 1,
+        int pageSize = 10,
+        string query = "");
 
     public Task<bool> CompleteTaskAsync(string workTaskId);
 }

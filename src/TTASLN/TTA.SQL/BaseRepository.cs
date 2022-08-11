@@ -9,12 +9,11 @@ namespace TTA.SQL;
 public abstract class BaseRepository<TEntity> : IDataRepository<TEntity> where TEntity : class
 {
     internal readonly string connectionString;
-    IDbConnection connection;
 
     protected BaseRepository(string connectionString) => this.connectionString = connectionString;
 
-    protected IDbConnection Connection => connection ?? new SqlConnection(connectionString);
-        
+    protected IDbConnection Connection { get; }
+
     public async Task<PaginatedList<TEntity>> SearchAsync(int page, int pageSize, string query = "") => throw new NotImplementedException();
 
     public virtual Task<PaginatedList<TEntity>> GetAsync(int page, int pageSize) => throw new NotImplementedException();

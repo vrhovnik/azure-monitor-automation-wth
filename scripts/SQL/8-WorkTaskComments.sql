@@ -10,6 +10,5 @@
         constraint WorkTaskComments_WorkTasks_WorkTaskId_fk
             references WorkTasks,
     Comment                   nvarchar(max),
-    StartDate                 datetime not null,
-    PreviousWorkTaskCommentId int
+    StartDate                 datetime not null
 )

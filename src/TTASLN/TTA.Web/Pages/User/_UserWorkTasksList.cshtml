@@ -1,5 +1,4 @@
-﻿@using TTA.Web.Base
-@using TTA.Core
+﻿@using TTA.Core
 @model TTA.Core.PaginatedList<TTA.Models.WorkTask>
 @if (Model.Any())
 {
@@ -9,7 +8,9 @@
             <caption>
                 <p>Task list for query <b>@Model.Query</b></p>
                 <b>Public</b>: <i class="fa-solid fa-check"></i><br>
-                <b>Private</b>: <i class="fa-solid fa-xmark"></i>
+                <b>Private</b>: <i class="fa-solid fa-xmark"></i><br>
+                <b>Completed</b>:  <i class="fa-solid fa-thumbs-up"></i><br>
+                <b>Not completed</b>: <i class="fa-solid fa-thumbs-down"></i>
             </caption>
             <thead class="thead-dark">
             <tr>
@@ -17,10 +18,11 @@
                     Description
                 </th>
                 <th>
-                    Duration 
+                    Duration
                 </th>
                 <th>Category</th>
                 <th>Tags</th>
+                <th>Completed</th>
                 <th>...</th>
             </tr>
             </thead>
@@ -50,7 +52,16 @@
                             @:&nbsp;
                         }
                     </td>
-
+                    <td>
+                        @if (workTask.IsCompleted)
+                        {
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-thumbs-down"></i>
+                        }
+                    </td>
                     <td>
                         <a hx-confirm="Are you sure you wish to complete the task?"
                            hx-include="[name='workTaskId']"

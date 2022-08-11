@@ -22,7 +22,7 @@ if (string.IsNullOrEmpty(folderRoot))
         new TextPrompt<string>("Enter [green]folder root[/]")
             .PromptStyle("green")
             .ValidationErrorMessage(
-                "[red]That's not a valid folder - check https://https://github.com/vrhovnik/azure-monitor-automation-wth[/] for more information")
+                "[red]That's not a valid folder.[/] - check [link=https://https://github.com/vrhovnik/azure-monitor-automation-wth]for more information[/].")
             .Validate(Directory.Exists));
 }
 
@@ -216,6 +216,7 @@ await AnsiConsole.Status()
             .RuleFor(u => u.Start, (f, _) => f.Date.Recent(new Random().Next(3, 40)))
             .RuleFor(u => u.End, (f, _) => f.Date.Future(new Random().Next(3, 20)))
             .RuleFor(u => u.IsPublic, (f, _) => f.Random.Bool())
+            .RuleFor(u => u.IsCompleted, (f, _) => f.Random.Bool())
             .RuleFor(u => u.Category, (f, _) => f.PickRandom(categoriesInDatabase))
             .RuleFor(u => u.User, (f, _) => f.PickRandom(usersInDatabase))
             .GenerateLazy(numberOfRecords);
@@ -322,6 +323,10 @@ await AnsiConsole.Status()
 
 AnsiConsole.Write(new Markup(
     $"SQL data objects were [bold red]created[/] and data was [bold red]inserted[/]  - check it via SQL tools created"));
+
+if (AnsiConsole.Profile.Capabilities.Links)
+    AnsiConsole.MarkupLine(
+        "Check [link=https://https://github.com/vrhovnik/azure-monitor-automation-wth]for more information[/]");
 
 async Task<IEnumerable<T>> GetDataFromDatabaseAsync<T>(IDbConnection connection, string query)
 {

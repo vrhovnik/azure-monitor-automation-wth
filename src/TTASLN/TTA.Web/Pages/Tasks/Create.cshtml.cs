@@ -53,6 +53,7 @@ public class CreatePageModel : BasePageModel
         var currentUser = userDataContext.GetCurrentUser();
         NewTask.User = new TTAUser { TTAUserId = currentUser.UserId, Email = currentUser.Email };
         NewTask.End = NewTask.Start;
+        NewTask.IsCompleted = false;
         
         try
         {

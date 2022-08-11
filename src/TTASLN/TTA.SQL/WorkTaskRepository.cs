@@ -70,7 +70,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         var workTaskId = entity.WorkTaskId;
         var item = await connection.ExecuteAsync(
             "UPDATE WorkTasks SET Description=@description,CategoryId=@categoryId,StartDate=@startDate," +
-            "EndDate=@endDate,UserId=@userId,IsPublic=@isPublic WHERE WorkTaskId=@workTaskId",
+            "EndDate=@endDate,UserId=@userId,IsPublic=@isPublic, IsCompleted=@isCompleted WHERE WorkTaskId=@workTaskId",
             new
             {
                 description = entity.Description,
@@ -79,6 +79,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
                 endDate = entity.End,
                 userId = entity.User.TTAUserId,
                 isPublic = entity.IsPublic,
+                isCompleted = entity.IsCompleted,
                 workTaskId
             });
 
@@ -122,7 +123,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
             "SELECT U.UserId as TTAUserId, U.UserId as TTAUserId, U.FullName, U.Email FROM Users U WHERE U.UserId=@userIdentificator;" +
-            "SELECT T.WorkTaskId, T.IsPublic, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
+            "SELECT T.WorkTaskId, T.IsPublic,T.IsCompleted, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
             "T.UserId as TTAUserId, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId " +
@@ -156,8 +157,8 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
     {
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
-            "SELECT T.WorkTaskId, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
-            "T.UserId as TTAUserId, T.IsPublic, FF.TagName  " +
+            "SELECT T.WorkTaskId, T.IsCompleted,T.IsPublic, T.StartDate as [Start], T.EndDate as [End], T.Description, C.CategoryId, C.Name, " +
+            "T.UserId as TTAUserId, FF.TagName  " +
             " FROM WorkTasks T JOIN WorkTask2Tags FF on FF.WorkTaskId=T.WorkTaskId " +
             " JOIN Category C on C.CategoryId=T.CategoryId ";
 
@@ -186,11 +187,19 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         return PaginatedList<WorkTask>.Create(lookup.Values.ToList(), pageIndex, pageSize, query);
     }
 
+    public async Task<PaginatedList<WorkTask>> SearchCompletedAsync(int pageIndex = 1, int pageSize = 10,
+        string query = "")
+    {
+        var results = await SearchAsync(pageIndex, pageSize, false, query);
+        var workTasks = results.Where(d => d.IsCompleted).ToList();
+        return PaginatedList<WorkTask>.Create(workTasks, pageIndex, pageSize, query);
+    }
+
     public async Task<bool> CompleteTaskAsync(string workTaskId)
     {
         await using var connection = new SqlConnection(connectionString);
         var sqlQuery =
-            "UPDATE WorkTasks SET EndDate=@CURRENT_DATE WHERE WorkTaskId=@workTaskId";
+            "UPDATE WorkTasks SET IsCompleted=1 WHERE WorkTaskId=@workTaskId";
         return await connection.ExecuteAsync(sqlQuery, new { workTaskId }) > 0;
     }
 }

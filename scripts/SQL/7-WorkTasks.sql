@@ -12,5 +12,6 @@ create table WorkTasks
     UserId      int
         constraint WorkTasks_Users_UserId_fk
             references Users,
-    IsPublic    bit
+    IsPublic    bit,
+    IsCompleted    bit
 )

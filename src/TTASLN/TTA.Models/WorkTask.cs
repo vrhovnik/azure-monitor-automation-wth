@@ -8,6 +8,7 @@ public class WorkTask
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
     public bool IsPublic { get; set; }
+    public bool IsCompleted { get; set; }
     public string Duration
     {
         get
