@@ -12,6 +12,7 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel()
     {
         OpenGithubPageCommand = new ActionCommand(OpenGithubAction);
+        UserCount = 1;
     }
 
     public void RegisterKeyHandler(Window window)
@@ -23,13 +24,28 @@ public class MainPageViewModel : BaseViewModel
         hotKeyHandler.OnHotKeyPressed += (_, _) => window.Show();
     }
 
+    public int UserCount
+    {
+        get => userCount;
+        set
+        {
+            if (value == userCount) return;
+            userCount = value;
+            OnPropertyChanged();
+        }
+    }
+
     public async Task LoadInitialDataAsync()
     {
         IsWorking = true;
-        Message = "Loading data from web api";
+        Message = "Loading data from web api for users and for active tasks";
+        await Task.Delay(5000);
+        UserCount = 100;
+        IsWorking = false;
     }
 
     private string query;
+    private int userCount;
 
     public string Query
     {
