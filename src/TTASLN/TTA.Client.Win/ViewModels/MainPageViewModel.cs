@@ -12,16 +12,26 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel()
     {
         OpenGithubPageCommand = new ActionCommand(OpenGithubAction);
+        CheckWebApiClientHealthCommand = new ActionCommand(CheckWebApiClientHealthAction);
         UserCount = 1;
+    }
+
+    private void CheckWebApiClientHealthAction()
+    {
+        //check http call and notify user if API call was successful
     }
 
     public void RegisterKeyHandler(Window window)
     {
         var hotKeyHandler = new HotKeyHandler();
+        hotKeyHandler.OnHotKeyPressed += (_, _) =>
+        {
+            if (window.WindowState == WindowState.Minimized)
+                window.WindowState = WindowState.Normal;
+        };
         hotKeyHandler.RegisterHotKey(window,
             (int)InteropAndHelpers.Modifiers.Win,
-            (int)Keys.F12);
-        hotKeyHandler.OnHotKeyPressed += (_, _) => window.Show();
+            (int)Keys.PageUp);
     }
 
     public int UserCount
@@ -39,7 +49,7 @@ public class MainPageViewModel : BaseViewModel
     {
         IsWorking = true;
         Message = "Loading data from web api for users and for active tasks";
-        await Task.Delay(5000);
+        await Task.Delay(2000);
         UserCount = 100;
         IsWorking = false;
     }
@@ -57,7 +67,7 @@ public class MainPageViewModel : BaseViewModel
             OnPropertyChanged();
         }
     }
-    
+
     private void OpenGithubAction()
     {
         var processStartInfo = new ProcessStartInfo("https://github.com/vrhovnik/wndforme")
@@ -68,4 +78,5 @@ public class MainPageViewModel : BaseViewModel
     }
 
     public ICommand OpenGithubPageCommand { get; }
+    public ICommand CheckWebApiClientHealthCommand { get; }
 }

@@ -7,6 +7,7 @@
                   xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                   xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                   mc:Ignorable="d"
+                  WindowStartupLocation="CenterScreen"
                   TitleAlignment="Center"
                   ShowMaxRestoreButton="False"
                   Title="Tech tasks for user" Height="450" Width="800">
@@ -56,6 +57,19 @@
                           VerticalContentAlignment="Center"
                           Width="200"
                           HorizontalTitleAlignment="Center" />
+                <mah:Tile Title="Check client API health"
+                          TitleFontSize="12"
+                          Margin="4"
+                          mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
+                          Background="ForestGreen"
+                          VerticalContentAlignment="Center"
+                          Width="200"
+                          Command="{Binding CheckWebApiClientHealthCommand}"
+                          HorizontalTitleAlignment="Center">
+                    <iconPacks:PackIconModern Width="40"
+                                              Height="40"
+                                              Kind="Heart" />
+                </mah:Tile>
         </WrapPanel>
         <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,3" VerticalAlignment="Bottom"
                    Text="{Binding Message}" />
