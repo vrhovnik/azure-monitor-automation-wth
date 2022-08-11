@@ -37,6 +37,7 @@ public class DashboardPageModel : BasePageModel
     {
         var currentPageNumber = pageNumber ?? 1;
         var userViewModel = userDataContext.GetCurrentUser();
+        PdfDownloadUrl = $"{generalWebOptions.ClientApiUrl}/download-pdf/{userViewModel.UserId}";
         logger.LogInformation("Loading dashboard for user {User} - starting at {DateStart}", userViewModel.Fullname,
             DateTime.Now);
 
@@ -54,6 +55,7 @@ public class DashboardPageModel : BasePageModel
         return Partial("_WorkTasksList", UserTasks);
     }
 
+    [BindProperty] public string PdfDownloadUrl { get; set; }
     [BindProperty] public TTAUserSettings ProfileSettings { get; set; }
     [BindProperty] public PaginatedList<WorkTask> UserTasks { get; set; }
 }

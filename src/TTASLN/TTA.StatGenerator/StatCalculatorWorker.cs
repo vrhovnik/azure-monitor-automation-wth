@@ -11,6 +11,7 @@ public class StatCalculatorWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        //TODO:Use CRON expressions and PeriodTaskTimer to leverage async ticks
         while (!stoppingToken.IsCancellationRequested)
         {
             logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);

@@ -1,35 +1,93 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using TTA.Interfaces;
+using TTA.Models;
+using TTA.Web.ClientApi.Options;
 
-namespace TTA.Web.Controllers;
+namespace TTA.Web.ClientApi.Controllers;
 
 [Route("tasks-api")]
+[Produces(MediaTypeNames.Application.Json)]
 [ApiController]
 public class TaskApiController : ControllerBase
 {
     private readonly ILogger<TaskApiController> logger;
     private readonly IWorkTaskRepository workTaskRepository;
     private readonly IUserRepository userRepository;
+    private readonly GeneralWebOptions webOptions;
 
     public TaskApiController(ILogger<TaskApiController> logger,
         IWorkTaskRepository workTaskRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IOptions<GeneralWebOptions> webOptionsValue)
     {
         this.logger = logger;
+        webOptions = webOptionsValue.Value;
         this.workTaskRepository = workTaskRepository;
         this.userRepository = userRepository;
     }
 
-    [Route("download-pdf-for-user/{userId}")]
     [HttpGet]
+    [Route("active-tasks/{userId}")]
+    [Produces(typeof(IEnumerable<WorkTask>))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetActiveTasksForUser(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.LogWarning("User is not specified, returning bad request at {DateCreated}", DateTime.Now);
+            return BadRequest("Specify user identification in order to get items");
+        }
+
+        var workTasks = await workTaskRepository.SearchCompletedAsync(1, webOptions.PageCount, string.Empty);
+        var userWorkTasks = workTasks.Where(currentWorkTask => currentWorkTask.User.TTAUserId == userId);
+        logger.LogInformation("Received {NumberOfActiveTasks} active tasks for user {UserId}", userWorkTasks.Count(),
+            userId);
+
+        return Ok(userWorkTasks);
+    }
+
+    [HttpGet]
+    [Route("search-tasks/{userId}/{query}")]
+    [Produces(typeof(IEnumerable<WorkTask>))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetTasksForUser(string userId, string query)
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.LogWarning("User is not specified, returning bad request at {DateCreated}", DateTime.Now);
+            return BadRequest("Specify user identification in order to get items");
+        }
+
+        var workTasks = await workTaskRepository.WorkTasksForUserAsync(userId, 1, webOptions.PageCount, query);
+        logger.LogInformation("Received {NumberOfActiveTasks} tasks for user {UserId}", workTasks.Count,
+            userId);
+        return Ok(workTasks.ToList());
+    }
+
+    [Route("download-pdf/{userId}")]
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DownloadPdfAsync(string userId)
     {
+        if (string.IsNullOrEmpty(userId))
+        {
+            logger.LogWarning("User is not specified, returning bad request at {DateCreated}", DateTime.Now);
+            return BadRequest("Specify user identification in order to get PDF");
+        }
+
         logger.LogInformation("Download PDF for user {UserId} called at {DateLoaded}", userId, DateTime.Now);
         var workTasks = await workTaskRepository.WorkTasksForUserAsync(userId);
         var user = await userRepository.DetailsAsync(userId);
+        logger.LogInformation("Received {NumberOfActiveTasks} tasks for user {UserId}", workTasks.Count,
+            user.FullName);
         var generatePdf = Document.Create(container =>
             {
                 container.Page(page =>
@@ -67,13 +125,20 @@ public class TaskApiController : ControllerBase
                             });
                             foreach (var item in workTasks)
                             {
-                                table.Cell().Element(CellStyle).Text(item.Description);
-                                table.Cell().Element(CellStyle).AlignRight().Text(item.Start.ToShortDateString());
-                                table.Cell().Element(CellStyle).AlignRight().Text(item.End.ToShortDateString());
-                                table.Cell().Element(CellStyle).AlignRight().Text(item.Category.Name);
+                                table.Cell().Element(CellStyle)
+                                    .Text(item.Description)
+                                    .WrapAnywhere();
+                                table.Cell().Element(CellStyle)
+                                    .AlignCenter()
+                                    .Text(item.Start.ToShortDateString());
+                                table.Cell().Element(CellStyle)
+                                    .Text(item.End.ToShortDateString());
+                                table.Cell().Element(CellStyle).AlignCenter()
+                                    .Text(item.Category.Name);
 
                                 static IContainer CellStyle(IContainer container) =>
-                                    container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                                    container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2)
+                                        .PaddingVertical(5);
                             }
                         });
                     page.Footer()

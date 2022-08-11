@@ -131,6 +131,8 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
 
         if (!string.IsNullOrEmpty(query)) sqlQuery += $" AND T.Description LIKE '%{query}%'";
 
+        sqlQuery += " ORDER BY T.IsCompleted DESC";
+        
         var grid = await connection.QueryMultipleAsync(sqlQuery, new { userIdentificator });
         var user = await grid.ReadSingleAsync<TTAUser>();
         var lookup = new Dictionary<string, WorkTask>();
@@ -167,7 +169,7 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         if (!string.IsNullOrEmpty(query) && isPublic) sqlQuery += $" AND T.Description LIKE '%{query}%'";
         if (!string.IsNullOrEmpty(query) && !isPublic) sqlQuery += $" WHERE T.Description LIKE '%{query}%'";
 
-        sqlQuery += " ORDER BY T.UserId";
+        sqlQuery += " ORDER BY T.UserId, T.IsCompleted DESC";
 
         var grid = await connection.QueryMultipleAsync(sqlQuery);
         var lookup = new Dictionary<string, WorkTask>();

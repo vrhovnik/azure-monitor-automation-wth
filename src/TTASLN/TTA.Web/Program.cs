@@ -39,7 +39,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options => options.LoginPath = new PathString("/User/Login"));
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
     options.Conventions.AddPageRoute("/Info/Index", ""));
-builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -53,6 +52,5 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHealthChecks("/health").AllowAnonymous();
     endpoints.MapRazorPages();
-    endpoints.MapControllers();
 });
 app.Run();
