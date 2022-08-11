@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.StatGenerator", "TTA.St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.Web.ClientApi", "TTA.Web.ClientApi\TTA.Web.ClientApi.csproj", "{ED9BD1BF-B5FA-4C11-839B-7A6A2E9403F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.Client.Win", "TTA.Client.Win\TTA.Client.Win.csproj", "{1208B41E-6A48-4611-84CD-FE09A3EB8B8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{ED9BD1BF-B5FA-4C11-839B-7A6A2E9403F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED9BD1BF-B5FA-4C11-839B-7A6A2E9403F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED9BD1BF-B5FA-4C11-839B-7A6A2E9403F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1208B41E-6A48-4611-84CD-FE09A3EB8B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1208B41E-6A48-4611-84CD-FE09A3EB8B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1208B41E-6A48-4611-84CD-FE09A3EB8B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1208B41E-6A48-4611-84CD-FE09A3EB8B8B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

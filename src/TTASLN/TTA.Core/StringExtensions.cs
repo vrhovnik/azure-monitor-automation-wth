@@ -6,6 +6,26 @@ namespace TTA.Core;
 
 public static class StringExtensions
 {
+    private const string AllowableCharacters = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    /// <summary>
+    /// generate random string based on provided parameter for length
+    /// </summary>
+    /// <param name="length">word length</param>
+    /// <returns>generated string with allowable charachters or exception</returns>
+    /// <remarks>
+    ///        AllowableCharacters = "abcdefghijklmnopqrstuvwxyz0123456789" 
+    /// </remarks>
+    public static string GenerateString(int length)
+    {
+        var bytes = new byte[length];
+
+        using (var random = RandomNumberGenerator.Create()) random.GetBytes(bytes);
+
+        return new string(bytes.Select(x => AllowableCharacters[x % AllowableCharacters.Length])
+            .ToArray());
+    }
+    
     /// <summary>
     /// truncating string with number of chars by endchar
     /// </summary>
