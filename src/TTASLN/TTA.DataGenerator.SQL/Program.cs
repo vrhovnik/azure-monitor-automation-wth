@@ -51,9 +51,16 @@ if (dropIt)
     }
 
     sqlConn += ";Initial Catalog=TTADB";
-    AnsiConsole.Write(
-        new Markup(
-            $"New [bold yellow]SQL connection[/] to database changed to [red]{sqlConn}[/]. Continue with data insertion."));
+}
+
+dropIt = Environment.GetEnvironmentVariable("CREATE_TABLES") is not null &&
+         Convert.ToBoolean(Environment.GetEnvironmentVariable("CREATE_TABLES"));
+if (Environment.GetEnvironmentVariable("CREATE_TABLES") is null)
+    dropIt = AnsiConsole.Confirm("Do you wish to create tables in database?");
+
+if (dropIt)
+{
+    AnsiConsole.Write(new Markup("Recreating data table objects in database."));
     AnsiConsole.WriteLine();
     if (!await CreateTablesInDatabaseAsync(Path.Join(folderRoot, "/scripts/SQL/"), sqlConn))
     {
