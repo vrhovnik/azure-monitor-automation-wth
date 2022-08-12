@@ -1,14 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Serilog;
 using TTA.Client.Win.Helpers;
 
 namespace TTA.Client.Win.ViewModels;
 
 public abstract class BaseViewModel : INotifyPropertyChanged
 {
+    protected readonly ILogger logger;
     private bool isWorking;
     private string message;
+
+    protected BaseViewModel(ILogger logger)
+    {
+        this.logger = logger;
+    }
+
     public string Version => AppHelpers.Version;
 
     public bool IsWorking

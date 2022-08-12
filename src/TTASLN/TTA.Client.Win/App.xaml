@@ -1,7 +1,8 @@
 ﻿<Application x:Class="TTA.Client.Win.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="/Pages/MainWindow.xaml">
+             xmlns:helpers="clr-namespace:TTA.Client.Win.Helpers"
+             Startup="OnStartup">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -9,6 +10,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <helpers:HealthApiColorConverter x:Key="healthApiConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

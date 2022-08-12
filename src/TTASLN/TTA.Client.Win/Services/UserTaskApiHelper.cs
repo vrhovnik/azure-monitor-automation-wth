@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Serilog;
 using TTA.Models;
 
 namespace TTA.Client.Win.Services;
@@ -14,5 +15,9 @@ public class UserTaskApiHelper : BaseTaskApiHelper
         
         var usersInJson = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<List<TTAUser>>(usersInJson);
+    }
+
+    public UserTaskApiHelper(ILogger logger) : base(logger)
+    {
     }
 }
