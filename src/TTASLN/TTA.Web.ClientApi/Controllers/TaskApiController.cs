@@ -17,22 +17,25 @@ public class TaskApiController : ControllerBase
 {
     private readonly ILogger<TaskApiController> logger;
     private readonly IWorkTaskRepository workTaskRepository;
+    private readonly IWorkTaskCommentRepository workTaskCommentRepository;
     private readonly IUserRepository userRepository;
     private readonly GeneralWebOptions webOptions;
 
     public TaskApiController(ILogger<TaskApiController> logger,
         IWorkTaskRepository workTaskRepository,
+        IWorkTaskCommentRepository workTaskCommentRepository,
         IUserRepository userRepository,
         IOptions<GeneralWebOptions> webOptionsValue)
     {
         this.logger = logger;
         webOptions = webOptionsValue.Value;
         this.workTaskRepository = workTaskRepository;
+        this.workTaskCommentRepository = workTaskCommentRepository;
         this.userRepository = userRepository;
     }
 
     [HttpGet]
-    [Route("active-tasks/{userId}")]
+    [Route("active/{userId}")]
     [Produces(typeof(IEnumerable<WorkTask>))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,16 +47,24 @@ public class TaskApiController : ControllerBase
             return BadRequest("Specify user identification in order to get items");
         }
 
-        var workTasks = await workTaskRepository.SearchCompletedAsync(1, webOptions.PageCount, string.Empty);
-        var userWorkTasks = workTasks.Where(currentWorkTask => currentWorkTask.User.TTAUserId == userId);
-        logger.LogInformation("Received {NumberOfActiveTasks} active tasks for user {UserId}", userWorkTasks.Count(),
-            userId);
-
-        return Ok(userWorkTasks);
+        try
+        {
+            var workTasks = await workTaskRepository.SearchCompletedAsync(1, webOptions.PageCount, string.Empty);
+            var userWorkTasks = workTasks.Where(currentWorkTask => currentWorkTask.User.TTAUserId == userId);
+            logger.LogInformation("Received {NumberOfActiveTasks} active tasks for user {UserId}",
+                userWorkTasks.Count(),
+                userId);
+            return Ok(userWorkTasks);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return BadRequest($"Data was not retrieved based on {userId}");
+        }
     }
 
     [HttpGet]
-    [Route("search-tasks/{userId}/{query}")]
+    [Route("search/{userId}/{query}")]
     [Produces(typeof(IEnumerable<WorkTask>))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -71,7 +82,7 @@ public class TaskApiController : ControllerBase
         return Ok(workTasks.ToList());
     }
 
-    [Route("download-pdf/{userId}")]
+    [Route("pdf/{userId}")]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -154,11 +165,44 @@ public class TaskApiController : ControllerBase
         return File(generatePdf, "application/pdf");
     }
 
-    [Route("complete-task")]
+    [Route("complete")]
     [HttpPost]
-    public async Task<bool> CompleteTaskAsync([FromBody] string workTaskId)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CompleteTaskAsync([FromBody] string workTaskId)
     {
         logger.LogInformation("Worktask with {WorkTaskId} called at {DateLoaded}", workTaskId, DateTime.Now);
-        return await workTaskRepository.CompleteTaskAsync(workTaskId);
+        try
+        {
+            var completed = await workTaskRepository.CompleteTaskAsync(workTaskId);
+            return Ok(completed);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return BadRequest($"Error has happened with completing task {workTaskId}");
+        }
+    }
+
+    [Route("comment")]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddCommentAsync(WorkTaskComment workTaskComment)
+    {
+        logger.LogInformation("Adding comment to worktask with {WorkTaskId} called at {DateLoaded}",
+            workTaskComment.AssignedTask.WorkTaskId, DateTime.Now);
+        try
+        {
+            workTaskComment.StartDate = DateTime.Now;
+            var taskComment = await workTaskCommentRepository.InsertAsync(workTaskComment);
+            return Ok(taskComment);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return BadRequest(
+                $"Error has happened with adding comment to task {workTaskComment.AssignedTask.WorkTaskId}");
+        }
     }
 }

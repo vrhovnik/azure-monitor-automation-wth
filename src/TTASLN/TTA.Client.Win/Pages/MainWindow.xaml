@@ -3,14 +3,14 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:local="clr-namespace:TTA.Client.Win"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                 xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
                  mc:Ignorable="d"
                  WindowStartupLocation="CenterScreen"
                  TitleAlignment="Center"
                  ShowMaxRestoreButton="False"
-                 Title="Tech tasks for user" Height="450" Width="800">
+                 Title="Tech tasks for user" Height="800" Width="800">
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <Button Command="{Binding OpenGithubPageCommand}"
@@ -23,9 +23,8 @@
     </mah:MetroWindow.LeftWindowCommands>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -33,23 +32,12 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <mah:ProgressRing Foreground="{DynamicResource AccentColorBrush}"
-                          Grid.RowSpan="2" Grid.ColumnSpan="2"
+                          Grid.RowSpan="3" Grid.ColumnSpan="2"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           IsActive="{Binding IsWorking}" />
-        <WrapPanel Margin="5" Grid.ColumnSpan="2">
-            <mah:Tile Title="Get tasks"
-                      TitleFontSize="12"
-                      Margin="4"
-                      mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
-                      Background="Teal"
-                      Width="200"
-                      HorizontalTitleAlignment="Center">
-                <iconPacks:PackIconModern Width="40"
-                                          Height="40"
-                                          Kind="Settings" />
-            </mah:Tile>
-            <mah:Tile Title="Simulate users"
+        <WrapPanel Margin="5" Grid.ColumnSpan="2" Grid.Row="0">
+            <mah:Tile Title="Simulate users by adding random comments to work items"
                       TitleFontSize="12"
                       Margin="4"
                       mah:ControlsHelper.MouseOverBorderBrush="{DynamicResource MahApps.Brushes.ThemeForeground}"
@@ -73,10 +61,54 @@
                                           Kind="Heart" />
             </mah:Tile>
         </WrapPanel>
-        <TextBlock Text="{Binding SimulationData}" Grid.Row="2" Grid.ColumnSpan="2"></TextBlock>
-        <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,3" VerticalAlignment="Bottom"
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Top" Margin="0,5,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBox Text="{Binding Query, Mode=TwoWay}"
+                     KeyUp="KeyUpHandled"
+                     Margin="5"
+                     VerticalContentAlignment="Center"
+                     mah:TextBoxHelper.Watermark="Enter search term to continue and press enter to search through items" />
+            <ListBox Grid.Row="1" Margin="2" ItemsSource="{Binding TaskForUsers}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="200" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding Description, Converter={StaticResource truncateConverter}}"
+                                       FontWeight="DemiBold" />
+                            <TextBlock Grid.Column="1" TextAlignment="Left" Text="{Binding Duration}" />
+                            <Button Grid.Column="2"
+                                    BorderBrush="Transparent"
+                                    Height="32" Width="32">
+                                <b:Interaction.Triggers>
+                                    <b:EventTrigger EventName="Click">
+                                        <b:InvokeCommandAction
+                                            Command="{Binding DataContext.OpenAddCommentWindowCommand, 
+                                RelativeSource={RelativeSource FindAncestor, 
+                                        AncestorType={x:Type ItemsControl}}}"
+                                            CommandParameter="{Binding WorkTaskId}">
+                                        </b:InvokeCommandAction>
+                                    </b:EventTrigger>
+                                </b:Interaction.Triggers>
+                                <Button.Background>
+                                    <ImageBrush ImageSource="../Images/messages.png" />
+                                </Button.Background>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Left" Margin="5,0,0,3" VerticalAlignment="Bottom"
                    Text="{Binding Message}" />
-        <TextBlock Grid.Column="1" Grid.Row="3" HorizontalAlignment="Right" Margin="5,0,5,3" VerticalAlignment="Bottom"
+        <TextBlock Grid.Column="1" Grid.Row="2" HorizontalAlignment="Right" Margin="5,0,5,3" VerticalAlignment="Bottom"
                    Text="{Binding Version}"
                    FontSize="12" />
     </Grid>

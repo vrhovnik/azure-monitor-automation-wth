@@ -13,6 +13,8 @@ builder.Services.AddTransient<IUserRepository, TTAUserRepository>(_ =>
     new TTAUserRepository(sqlOptions.ConnectionString));
 builder.Services.AddTransient<IWorkTaskRepository, WorkTaskRepository>(_ =>
     new WorkTaskRepository(sqlOptions.ConnectionString));
+builder.Services.AddTransient<IWorkTaskCommentRepository, WorkTaskCommentRepository>(_ =>
+    new WorkTaskCommentRepository(sqlOptions.ConnectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();

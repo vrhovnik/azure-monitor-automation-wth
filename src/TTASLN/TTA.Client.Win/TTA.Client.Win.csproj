@@ -6,11 +6,12 @@
         <Nullable>enable</Nullable>
         <Company>Project Stardust</Company>
         <UseWPF>true</UseWPF>
-        <AssemblyVersion>1.0.2.1</AssemblyVersion>
-        <FileVersion>1.0.1.0</FileVersion>
+        <AssemblyVersion>1.0.3.4</AssemblyVersion>
+        <FileVersion>1.0.2.1</FileVersion>
         <ApplicationIcon>Icons\tta-48x48.ico</ApplicationIcon>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="MahApps.Metro" Version="2.4.8" />
         <PackageReference Include="MahApps.Metro.IconPacks" Version="4.10.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
@@ -22,5 +23,11 @@
     <ItemGroup>
       <ProjectReference Include="..\TTA.Core\TTA.Core.csproj" />
       <ProjectReference Include="..\TTA.Models\TTA.Models.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Images\messages.png" />
+      <Resource Include="Images\messages.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 </Project>

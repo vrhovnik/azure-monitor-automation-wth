@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Serilog;
+using TTA.Client.Win.Helpers;
 
 namespace TTA.Client.Win.Services;
 
@@ -13,10 +14,10 @@ public abstract class BaseTaskApiHelper
     protected BaseTaskApiHelper(ILogger logger)
     {
         this.logger = logger;
-        var baseUrl = ConfigurationManager.AppSettings["ClientWebApiUrl"];
+        
         Client = new HttpClient
         {
-            BaseAddress = new Uri(baseUrl, UriKind.RelativeOrAbsolute)
+            BaseAddress = new Uri(AppHelpers.ClientWebApiUrl, UriKind.RelativeOrAbsolute)
         };
     }
 

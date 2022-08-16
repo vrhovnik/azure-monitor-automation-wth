@@ -29,12 +29,20 @@ public class UserApiController : ControllerBase
     [Route("all")]
     [Produces(typeof(IEnumerable<TTAUser>))]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetAllUsersAsync()
     {
-        var ttaUsers = await userRepository.GetAsync();
-        logger.LogInformation("Received {NumberOfUSers} users at {DateCalled}", ttaUsers.Count,
-            DateTime.Now);
-
-        return Ok(ttaUsers);
+        try
+        {
+            var ttaUsers = await userRepository.GetAsync();
+            logger.LogInformation("Received {NumberOfUSers} users at {DateCalled}", ttaUsers.Count,
+                DateTime.Now);
+            return Ok(ttaUsers);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e.Message);
+            return BadRequest("Users could not be retrieved!");
+        }
     }
 }

@@ -1,0 +1,47 @@
+﻿<mah:MetroWindow x:Class="TTA.Client.Win.Pages.AddCommentWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 mc:Ignorable="d"
+                 x:Name="wndAppComment"
+                 ShowInTaskbar="false"
+                 ShowTitleBar="False"
+                 WindowStartupLocation="CenterScreen"
+                 ShowMinButton="False"
+                 ShowCloseButton="False"
+                 ShowMaxRestoreButton="False"
+                 Title="Add comment" Height="450" Width="800">
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="80" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Enter comment" Grid.Row="0" Grid.Column="0" TextAlignment="Right"
+                       Margin="10"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Right" />
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     Margin="10"
+                     TextWrapping="Wrap" AcceptsReturn="True" Height="150"
+                     Text="{Binding TaskComment.Comment}"
+                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" />
+            <Button Grid.Column="3" Grid.Row="3" Content="Close without saving" Margin="0,6,120,6" Height="50"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right" Command="{Binding CloseCommand}"
+                    CommandParameter="{Binding ElementName=wndAppComment}" />
+            <Button Grid.Column="1" Grid.Row="3" Content="Save and close" Margin="6" Height="50"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Right" Command="{Binding SaveAndCloseCommand}"
+                    CommandParameter="{Binding ElementName=wndAppComment}" />
+        </Grid>
+    </Grid>
+</mah:MetroWindow>

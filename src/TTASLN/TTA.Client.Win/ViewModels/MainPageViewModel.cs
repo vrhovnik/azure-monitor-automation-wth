@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Bogus;
 using Microsoft.Xaml.Behaviors.Core;
 using Serilog;
 using TTA.Client.Win.Helpers;
+using TTA.Client.Win.Pages;
 using TTA.Client.Win.Services;
 using TTA.Models;
 
@@ -17,17 +19,39 @@ public class MainPageViewModel : BaseViewModel
     public MainPageViewModel(ILogger logger) : base(logger)
     {
         OpenGithubPageCommand = new ActionCommand(OpenGithubAction);
-        SimulateUserApiConnectivityToTasksCommand = new CommandAsync<object>(StartSimulationActionAsync);
-        CheckWebApiClientHealthCommand = new CommandAsync<object>(CheckWebApiClientHealthActionAsync);
+        SimulateUserApiConnectivityToTasksCommand = new ActionCommand(_ => StartSimulationActionAsync());
+        CheckWebApiClientHealthCommand = new ActionCommand(_ => CheckWebApiClientHealthActionAsync());
+        OpenAddCommentWindowCommand = new ActionCommand(workItemId =>
+        {
+            var addCommentWindow = new AddCommentWindow(logger, workItemId.ToString());
+            addCommentWindow.ShowDialog();
+        });
         UserCount = 1;
+        Query = string.Empty;
         IsWebApiHealthy = false;
         HealthTitleMessage = "Information about web api health unknown.";
+    }
+
+    public async Task GetUserWorkTasksAsync()
+    {
+        IsWorking = true;
+        if (string.IsNullOrEmpty(AppHelpers.LoggedUserId))
+        {
+            MessageBox.Show("Set user identificator in app settings to be able to search for tasks");
+            return;
+        }
+
+        Message = $"Loading tasks with query {Query}.";
+        var workTaskHelper = new WorkTaskApiHelper(logger);
+        TaskForUsers = await workTaskHelper.GetTaskForUsersAsync(AppHelpers.LoggedUserId, Query);
+        Message = $"Loaded {TaskForUsers.Count} items.";
+        IsWorking = false;
     }
 
     public async Task LoadInitialDataAsync()
     {
         IsWorking = true;
-        
+
         var currentMessage = $"Loading data from web api for users and for active tasks at {DateTime.Now}";
         Message = currentMessage;
         logger.Information(currentMessage);
@@ -37,23 +61,63 @@ public class MainPageViewModel : BaseViewModel
         UserCount = users.Count;
         logger.Information("Loaded {UserCount} users from REST call at {DateCalled}", UserCount,
             DateTime.Now.ToShortDateString());
+
         await CheckWebApiClientHealthActionAsync();
-        
+
         IsWorking = false;
     }
 
-    private Task StartSimulationActionAsync(object lockObject)
+    private async Task StartSimulationActionAsync()
     {
-        throw new NotImplementedException();
+        var random = new Random();
+        var workTaskApiHelper = new WorkTaskApiHelper(logger);
+        IsWorking = true;
+        foreach (var user in users)
+        {
+            Message = $"Adding comments to work tasks by user {user.FullName}";
+            var workTasks = await workTaskApiHelper.GetTaskForUsersAsync(user.TTAUserId, string.Empty);
+            foreach (var workTask in workTasks)
+            {
+                var randomComments = random.Next(1, 10);
+                for (var currentCounter = 1; currentCounter <= randomComments; currentCounter++)
+                {
+                    Message =
+                        $"Adding messages {currentCounter} out of {randomComments} to work task {workTask.WorkTaskId} by user {user.FullName}";
+                    await workTaskApiHelper.AddCommentAsync(new WorkTaskComment
+                    {
+                        User = user,
+                        StartDate = DateTime.Now,
+                        AssignedTask = workTask,
+                        Comment = new Faker().Lorem.Sentence(new Random().Next(5, 20))
+                    });
+                    Message =
+                        $"Added message {currentCounter} out of {randomComments} to work task {workTask.WorkTaskId}";
+                }
+            }
+        }
+
+        IsWorking = false;
     }
 
-    private async Task CheckWebApiClientHealthActionAsync(object? lockObject = null)
+    private async Task CheckWebApiClientHealthActionAsync()
     {
         var workTaskApiCaller = new WorkTaskApiHelper(logger);
         IsWorking = true;
         IsWebApiHealthy = await workTaskApiCaller.CheckHealthAsync();
         HealthTitleMessage = IsWebApiHealthy ? "Web Api is connected" : "Web api cannot be reached";
+        Message = healthTitleMessage;
         IsWorking = false;
+    }
+
+    public string Query
+    {
+        get => query;
+        set
+        {
+            if (value == query) return;
+            query = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsWebApiHealthy
@@ -102,22 +166,23 @@ public class MainPageViewModel : BaseViewModel
         }
     }
 
-    public string SimulationData
-    {
-        get => simulationData;
-        set
-        {
-            if (value == simulationData) return;
-            simulationData = value;
-            OnPropertyChanged();
-        }
-    }
-
     private int userCount;
-    private string simulationData;
     private bool isWebApiHealthy;
     private string healthTitleMessage;
     private List<TTAUser> users;
+    private string query;
+    private List<WorkTask> taskForUsers;
+
+    public List<WorkTask> TaskForUsers
+    {
+        get => taskForUsers;
+        set
+        {
+            if (Equals(value, taskForUsers)) return;
+            taskForUsers = value;
+            OnPropertyChanged();
+        }
+    }
 
     private void OpenGithubAction()
     {
@@ -132,4 +197,5 @@ public class MainPageViewModel : BaseViewModel
     public ICommand OpenGithubPageCommand { get; }
     public ICommand CheckWebApiClientHealthCommand { get; }
     public ICommand SimulateUserApiConnectivityToTasksCommand { get; }
+    public ICommand OpenAddCommentWindowCommand { get; }
 }

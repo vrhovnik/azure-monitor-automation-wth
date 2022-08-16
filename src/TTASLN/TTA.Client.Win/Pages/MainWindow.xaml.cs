@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Serilog;
 using TTA.Client.Win.ViewModels;
 
@@ -23,5 +25,14 @@ public partial class MainWindow
         }
 
         Loaded += OnLoaded;
+    }
+
+    private async void KeyUpHandled(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter) return;
+
+        var mainPageViewModel = (MainPageViewModel)DataContext;
+        mainPageViewModel.Query = (sender as TextBox)?.Text;
+        await mainPageViewModel.GetUserWorkTasksAsync();
     }
 }
