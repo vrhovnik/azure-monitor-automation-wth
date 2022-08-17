@@ -13,10 +13,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.DataGenerator.SQL", "TTA.DataGenerator.SQL\TTA.DataGenerator.SQL.csproj", "{E2C39A5C-375C-4D31-BBF5-0B8B1B591880}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{AF98B66A-AB60-4567-A6F7-1704E3CEA545}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\docs\tag.data = ..\..\docs\tag.data
-		..\..\docs\categories.data = ..\..\docs\categories.data
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTA.StatGenerator", "TTA.StatGenerator\TTA.StatGenerator.csproj", "{3829A006-8A6C-4CB2-BAC7-7000425931C9}"
 EndProject

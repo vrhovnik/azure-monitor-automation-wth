@@ -17,23 +17,43 @@ better and to solve common challenges with [automation](https://docs.microsoft.c
 
 Solution has 4 main folders:
 1. **src** - solution source code based on C#, [ASP.NET](https://asp.net) Core, [htmx](https://htmx.org), [Bootstrap](https://getbootstrap.com) and many more.
-2. **docker** - containing docker files for modernization options
-3. **scripts** - PowerShell scripts, ARM templates and Bicep language to automate deployments, multi-tenancy and monitoring
-4. **docs** - documentation, architecture diagrams, videos and many more
+2. **scripts** - PowerShell scripts, ARM templates and Bicep language to automate deployments, multi-tenancy and monitoring
+3. **docs** - documentation, architecture diagrams, videos and many more
+4. **containers** - docker files to generate below applications for modernization options
 
 ## Source code - src folder
 
-TBD
+Solution is built out of 5 main parts:
+
+![source code overview](https://webeudatastorage.blob.core.windows.net/web/tta-src-overview.png)
+
+1. **TTA.Web** - web client to manage tasks, see public open tasks, register into the system, view statistics and work with your tasks
+2. **TTA.Web.ClientApi** - REST api to expose services to get tasks and operate on them
+3. Clients applications
+   - **TTA.Client.Win** - Windows client to check tasks, complete them and add comments and to simulate comments
+   - **TTA.DataGenerator.SQL** - console application to recreate database and populate data
+4. **TTA.StatGenerator** - worker service to calculate stats and populate data daily
+5. **TTA.SQL** - MS SQL data storage implementation
+
+All other projects are meant for helpers and for core infrastructure needs for application to be able to work.
+1. **TTA.Core** - helpful classes to generate password hash, extensions for strings and so more
+2. **TTA.Interfaces** - interfaces to be used in the application 
+3. **TTA.Models** - models representing the solution
+
+To compile and run the code you will need [.NET core installed](https://dot.net). To work with the source code, you have 
+multiple editors available ([Microsoft Visual Studio](https://visualstudio.com), [Microsoft Visual Studio Code with C#](https://code.visualstudio.com) plugin, [Jetbrains Rider](https://jetbrains.com/rider) and more).
 
 ## Containers overview
 
-TBD
+To take advantage of modernization opportunity and make solution to be cloud native aware, below are the container files:
+1. [TTA.Web.dockerfile](containers/TTA.Web.dockerfile) - instructions to compile and build container with web application
+2. [TTA.Web.ClientApi.dockerfile](containers/TTA.Web.ClientApi.dockerfile) - instructions to compile and build container containing REST APIs
+3. [TTA.DataGenerator.SQL.dockerfile](containers/TTA.DataGenerator.SQL.dockerfile) - container with generator to be used with container instances to generate SQL data
+4. [TTA.StatGenerator](containers/TTA.StatGenerator.dockerfile) - background process as container to generate stats based on [cron](https://en.wikipedia.org/wiki/Cron) expression definition
+
+You can leverage [Docker](https://docker.com), [Podman](https://podman.io) or [Azure Container Registry to build](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-tutorial-quick-task) the containers.
 
 ## Scripts overview
-
-TBD
-
-## Documentation provided
 
 TBD
 
@@ -47,6 +67,13 @@ You can read about different techniques and options here:
 5. [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/)
 6. [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/)
 7. [Microsoft Learn](https://docs.microsoft.com/en-us/learn/roles/solutions-architect)
+
+# Credits
+
+1. [Spectre.Console](https://spectreconsole.net/) - Spectre.Console is a .NET Standard 2.0 library that makes it easier to create beautiful console applications.
+2. [MetroApps](https://mahapps.com/) - MahApps.Metro is a framework that allows developers to cobble together a Metro or Modern UI for their own WPF applications with minimal effort.
+3. [HTMX](https://htmx.org) - htmx gives you access to AJAX, CSS Transitions, WebSockets and Server Sent Events directly in HTML, using attributes, so you can build modern user interfaces with the simplicity and power of hypertext.
+4. [QuestPDF](https://github.com/QuestPDF/QuestPDF) - QuestPDF is an open-source .NET library for PDF documents generation.
 
 # Contributing
 
