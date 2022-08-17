@@ -1,4 +1,14 @@
 # Azure monitor automation workshop / What-The-Hack
+<!-- TOC -->
+* [Azure monitor automation workshop / What-The-Hack](#azure-monitor-automation-workshop--what-the-hack)
+  * [Structure](#structure)
+  * [Source code - src folder](#source-code---src-folder)
+  * [Containers overview](#containers-overview)
+  * [Scripts overview](#scripts-overview)
+* [Additional information](#additional-information)
+* [Credits](#credits)
+* [Contributing](#contributing)
+<!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options in [Azure](https://portal.azure.com) through
 different tools and mechanisms solving challenges, which will help them understand their application and workloads even
@@ -52,6 +62,17 @@ To take advantage of modernization opportunity and make solution to be cloud nat
 4. [TTA.StatGenerator](containers/TTA.StatGenerator.dockerfile) - background process as container to generate stats based on [cron](https://en.wikipedia.org/wiki/Cron) expression definition
 
 You can leverage [Docker](https://docker.com), [Podman](https://podman.io) or [Azure Container Registry to build](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-tutorial-quick-task) the containers.
+
+To use Azure Container registry cloud build, you can execute following command from src folder (if you have [az cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed):
+
+`az acr build --image tta/web:1.0 --registry ##yourregistryname## --file ../containers/TTA.Web.dockerfile .`
+
+`az acr build --image tta/webclient:1.0 --registry ##yourregistryname## --file ../containers/TTA.Web.ClientApi.dockerfile .`
+
+`az acr build --image tta/statgen:1.0 --registry ##yourregistryname## --file ../containers/TTA.StatGenerator.dockerfile .`
+
+`az acr build --image tta/datagen:1.0 --registry ##yourregistryname## --file ../containers/TTA.DataGenerator.SQL.dockerfile .`
+
 
 ## Scripts overview
 
