@@ -1,9 +1,9 @@
 name: Deploy to prod
 env:
-  AZURE_WEBAPP_NAME: ttawebpage   
+  AZURE_WEBAPP_NAME: ttaweb   
   WEB_APP_CSPROJ: './src/TTASLN/TTA.Web/TTA.Web.csproj' 
   DOTNET_VERSION: '6.0.x'                 
-  AZURE_WEBAPI_NAME: ttawebapi    
+  AZURE_WEBAPI_NAME: ttaapi    
   WEB_API_CSPROJ: './src/TTASLN/TTA.Web.ClientApi/TTA.Web.ClientApi.csproj'     
 on:
   push:
