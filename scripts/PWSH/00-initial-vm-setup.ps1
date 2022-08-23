@@ -1,14 +1,11 @@
-﻿# 
-.SYNOPSIS
-TTA PowerShell script to setup initial software to be installed on VM
-
-.DESCRIPTION
-installs all neccessary tools to be able to run applicaton on VM
-
-.NOTES
-Author      : Bojan Vrhovnik
-GitHub      : https://github.com/vrhovnik
-Version 0.0.1
+﻿<# 
+# SYNOPSIS 
+# TTA PowerShell script to setup initial software to be installed on VM
+#
+# NOTES:
+# Author      : Bojan Vrhovnik
+# GitHub      : https://github.com/vrhovnik
+# Version 0.2.1
 #>
 
 Set-StrictMode -Version Latest
@@ -21,10 +18,6 @@ If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     Exit
 }
-
-Write-Host "Creating Restore Point in case something bad happens to restore back to original state"
-Enable-ComputerRestore -Drive "C:\"
-Checkpoint-Computer -Description "RestoreBeforeTTA" -RestorePointType "MODIFY_SETTINGS"
 
 Write-Host "Enabling and starting Diagnostics Tracking Service..."
 Set-Service "DiagTrack" -StartupType Automatic
@@ -45,36 +38,38 @@ Write-Host "Grouping svchost.exe processes to be able to see in task manager eas
 $ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
 Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
 
-# installing wget to 
-Write-Host "Checking winget..."
+# installing chocolatey to install additional services 
+Write-Host "Installing chocolatey"
 
-# Check if winget is installed
-if (Test-Path ~\AppData\Local\Microsoft\WindowsApps\winget.exe)
-{
-    'Winget already installed'
-}
-else
-{
-    # Installing winget from the Microsoft Store
-    Write-Host "Winget not found, installing it now from Windows Store."
-    Start-Process "ms-appinstaller:?source=https://aka.ms/getwinget"
-    $nid = (Get-Process AppInstaller).Id
-    Wait-Process -Id $nid
-    Write-Host "Winget Installed"    
-}
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; 
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-Write-Host "Installing  Windows Terminal ...  please wait ..."
-winget install -e Microsoft.WindowsTerminal | Out-Host
-if($?) { Write-Host "Installed New Windows Terminal" }
+Write-Host "Installing  dotnet SDK ... "
+choco install -y dotnet-sdk
 
-Write-Host "Installing Git ... please wait ...."
-winget install -e Git.Git | Out-Host
+Write-Host "Installing Git ... "
+choco install git -y
 
-# installing dotnet core 6
-Write-Host "Installing .NET Core 6 - installing SDK which will install .NET Core 6 runtime as well"
-winget install Microsoft.DotNet.SDK.6
+Write-Host "Install SQL express engine"
+mkdir "$HOME/setup"
+$rootFolder = "$HOME/setup"
+Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkID=866658" -o "$rootFolder/sqlsetup.exe"
 
-## enable IIS
+$setupfilelocation = "$rootFolder/sqlsetup.exe"
+$args = New-Object -TypeName System.Collections.Generic.List[System.String]
+$args.Add("/ACTION=install")
+$args.Add("/Q")
+$args.Add("/IACCEPTSQLSERVERLICENSETERMS")
+$args.Add("/FEATURES=SQLENGINE")
+$args.Add("/INSTANCENAME=SQLEXPRESS")
+$args.Add("/SUPPRESSPRIVACYSTATEMENTNOTICE=True")
+$args.Add("/UPDATEENABLED=FALSE")
+$args.Add("/SKIPRULES=RebootRequiredCheck")
+Write-Host "Installing SQL Express silently..."
+Start-Process -FilePath $setupfilelocation -ArgumentList $args -NoNewWindow -Wait -PassThru
+
+# enable IIS
+Write-Host "Continue with enabling IIS on the machine"
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-CommonHttpFeatures
@@ -106,4 +101,29 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
 
+# ASP.NET core hosting module download
+# DIRECT LINK: https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe
+# GENERAL LINK https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer
+Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
+Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$rootFolder/hosting.exe"
 
+Write-Host "Installing ASP.NET Core hosting"
+$setupfilelocation = "$rootFolder/hosting.exe" 
+$args = New-Object -TypeName System.Collections.Generic.List[System.String]
+$args.Add("/quiet")
+$args.Add("/install")
+$args.Add("/norestart")
+
+$Output = Start-Process -FilePath $setupfilelocation -ArgumentList $args -NoNewWindow -Wait -PassThru
+If($Output.Exitcode -Eq 0)
+{
+    net stop was /y
+    net start w3svc
+}
+else {
+    Write-HError "`t`t Something went wrong with the installation, ASP.NET hosting module not installed. Errorlevel: ${Output.ExitCode}"
+    Exit 1
+}
+
+Write-Host "Restart done, proceeding cleaning up setup files.."
+Remove-Item -Recurse -Force -Path $rootFolder
