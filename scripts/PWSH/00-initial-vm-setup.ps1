@@ -60,11 +60,7 @@ $args = New-Object -TypeName System.Collections.Generic.List[System.String]
 $args.Add("/ACTION=install")
 $args.Add("/Q")
 $args.Add("/IACCEPTSQLSERVERLICENSETERMS")
-$args.Add("/FEATURES=SQLENGINE")
-$args.Add("/INSTANCENAME=SQLEXPRESS")
-$args.Add("/SUPPRESSPRIVACYSTATEMENTNOTICE=True")
-$args.Add("/UPDATEENABLED=FALSE")
-$args.Add("/SKIPRULES=RebootRequiredCheck")
+
 Write-Host "Installing SQL Express silently..."
 Start-Process -FilePath $setupfilelocation -ArgumentList $args -NoNewWindow -Wait -PassThru
 
