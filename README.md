@@ -95,6 +95,7 @@ You can read about different techniques and options here:
 2. [MetroApps](https://mahapps.com/) - MahApps.Metro is a framework that allows developers to cobble together a Metro or Modern UI for their own WPF applications with minimal effort.
 3. [HTMX](https://htmx.org) - htmx gives you access to AJAX, CSS Transitions, WebSockets and Server Sent Events directly in HTML, using attributes, so you can build modern user interfaces with the simplicity and power of hypertext.
 4. [QuestPDF](https://github.com/QuestPDF/QuestPDF) - QuestPDF is an open-source .NET library for PDF documents generation.
+5. [Mermaid.js](https://github.com/mermaid-js/mermaid) - generating dialogs from markdown files - thanks [Adrian](https://github.com/snobu)
 
 # Contributing
 
