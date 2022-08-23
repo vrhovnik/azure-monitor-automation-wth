@@ -5,17 +5,20 @@
 # NOTES:
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.2.1
+# Version 0.2.6
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
 
-# you will be installing tools we need admin access 
-If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator')) 
+Start-Transcript -Path "$HOME/Downloads/Logs/01-software-install.log"
+
+# you will be installing tools - we need admin access 
+If (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]'Administrator'))
 {
-    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    $scriptPath = "$HOME/Downloads/01-software-install-and-configuration.ps1"
+    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs
     Exit
 }
 
@@ -41,14 +44,23 @@ Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSp
 # installing chocolatey to install additional services 
 Write-Host "Installing chocolatey"
 
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; 
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
 Write-Host "Installing  dotnet SDK ... "
 choco install -y dotnet-sdk
 
 Write-Host "Installing Git ... "
-choco install git -y
+choco install -y git
+
+Write-Host "Installing Azure CLI"
+choco install -y azure-cli
+
+Write-Host "Installing PowerShell AZ module"
+choco install -y az.powershell -Force
+
+Write-Host "Installing Sysinternals ZoomIt"
+choco install -y zoomit
 
 Write-Host "Install SQL express engine"
 mkdir "$HOME/setup"
@@ -104,7 +116,7 @@ Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
 Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$rootFolder/hosting.exe"
 
 Write-Host "Installing ASP.NET Core hosting"
-$setupfilelocation = "$rootFolder/hosting.exe" 
+$setupfilelocation = "$rootFolder/hosting.exe"
 $args = New-Object -TypeName System.Collections.Generic.List[System.String]
 $args.Add("/quiet")
 $args.Add("/install")
@@ -123,3 +135,11 @@ else {
 
 Write-Host "Restart done, proceeding cleaning up setup files.."
 Remove-Item -Recurse -Force -Path $rootFolder
+
+Stop-Transcript
+
+# calling next script
+$scriptPath = "$HOME/Downloads/02-web-db-install.ps1"
+Write-Host "Calling next script at $scriptPath"
+Start-Process powershell.exe "-ExecutionPolicy Bypass  -File `"$scriptPath`""
+
