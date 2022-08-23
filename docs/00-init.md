@@ -18,3 +18,44 @@ better and to solve common challenges with [automation](https://docs.microsoft.c
 In order to start with the hackathon, let us check architecture diagram and requirement from the company TTA.
 Your job, if you decide to accept it, is to use best practices from Microsoft to deploy and manage the solution for the TTA company.
 
+We have the following application on-premise: 
+
+![on premise app](https://webeudatastorage.blob.core.windows.net/web/OnPremArchitecture.png)
+
+User can choose from various options to access functionalities, either web browser application or WPF application, which connects to API backend via REST calls.
+
+Flow with web application:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor J as John
+    participant W as Web
+    J->>W: Hi Web, what can I do
+    Note over J,W: John is not signed in.
+    activate W
+    W->>J: Hi John, you are not signed in. You can search for public data.
+    deactivate W
+    J->>W: Hi Web. Can I log in?
+    activate W
+    W->>J: Sure, let me redirect you to login page.
+    deactivate W
+```
+
+Flow with client app:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor J as John
+    participant W as Web Client
+    J->>W: Hi Web Client, I am requesting data from you
+    Note over J,W: app is recognized, retrieving data for the inquiry.
+    activate W
+    W->>J: Hi John, here are your data. Anything else you want me to do?
+    deactivate W
+    J->>W: Hi Web Client, give me for example PDF of my tasks.
+    activate W
+    W->>J: Sure, here is your byte array.
+    deactivate W
+```

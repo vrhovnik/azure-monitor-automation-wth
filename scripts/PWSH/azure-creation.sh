@@ -37,5 +37,5 @@ az deployment group what-if --resource-group TTARG --template-file bootstrap.bic
 # deploy to azure group 
 az deployment group create --resource-group TTARG --template-file bootstrap.bicep --parameters bootstrap.parameters.json 
 
-# copy IP from the console to connect via RDP
+# copy IP from the deployment output to connect via RDP into the newly created VM
 Start-Process "$env:windir\system32\mstsc.exe"
