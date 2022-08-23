@@ -6,10 +6,7 @@
       "value": "ttauser"
     },
     "windowsAdminPassword": {
-      "value": "<your windows admin password>"
-    },    
-    "deployBastion": {
-      "value": false
+      "value": "Passw0rd1!"
     }
   }
 }

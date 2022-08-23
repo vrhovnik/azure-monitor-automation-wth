@@ -4,9 +4,9 @@ param vmName string = 'tta-vm-2022'
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'ttauser'
 
-@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 8 and 123 characters long')
+@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 8 and 40 characters long')
 @minLength(8)
-@maxLength(123)
+@maxLength(40)
 @secure()
 param windowsAdminPassword string
 
@@ -16,45 +16,63 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('Resource Id of the subnet in the virtual network')
-param subnetId string
-
 param resourceTags object = {
-  Description: 'automation-monitor-what-the-hack',
+  Description: 'automation-monitor-what-the-hack'
   Environment: 'POC'
 }
 
-@description('Choice to deploy Bastion to connect to the VM')
-param deployBastion bool = false
-
-var bastionName = 'TTA-VM-Bastion'
-var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
+var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
+var vnetName = '${vmName}-VNET'
 var osDiskType = 'Premium_LRS'
-var PublicIPNoBastion = {
-  id: publicIpAddress.id
+
+var vnetConfig = {
+  vnetprefix: '10.0.0.0/21'
+  subnet: {
+    name: 'front'
+    addressPrefix: '10.0.0.0/24'
+  }
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
-  name: networkInterfaceName
+resource vnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
+  name: vnetName
   location: location
   properties: {
-    ipConfigurations: [
+    addressSpace: {
+      addressPrefixes: [
+        vnetConfig.vnetprefix
+      ]
+    }
+    subnets: [
       {
-        name: 'ipconfig1'
+        name: vnetConfig.subnet.name
         properties: {
-          subnet: {
-            id: subnetId
-          }
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
+          addressPrefix: vnetConfig.subnet.addressPrefix
         }
       }
     ]
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+  name: networkInterfaceName
+  location: location
+  properties: {
+      ipConfigurations: [
+        {
+          name: 'ipconfig1'
+          properties: {
+            subnet: {
+              id: '${vnet.id}/subnets/front'
+            }
+            privateIPAllocationMethod: 'Dynamic'
+          }
+        }
+      ]
+    }
+}
+
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   name: publicIpAddressName
   location: location
   properties: {
@@ -116,7 +134,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
   name: 'Bootstrap'
   location: location
   tags: {
-    Description: 'automation-monitor-what-the-hack',
+    Description: 'automation-monitor-what-the-hack'
     Environment: 'POC'
   }
   properties: {
@@ -126,7 +144,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri('https://l.azuredemos.net/00-install.ps1')
+        uri('https://l.azuredemos.net/','00-install.ps1')
       ]
       commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
     }
@@ -134,4 +152,4 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
 }
 
 output adminUsername string = windowsAdminUsername
-output publicIP string = deployBastion == false ? concat(publicIpAddress.properties.ipAddress) : ''
+output publicIP string = concat(publicIpAddress.properties.ipAddress)
