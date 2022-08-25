@@ -1,5 +1,12 @@
 ﻿# Move to Azure
 
+<!-- TOC -->
+* [Move to Azure](#move-to-azure)
+  * [Required diagram](#required-diagram)
+* [Task requirement](#task-requirement)
+* [Test the functionality](#test-the-functionality)
+<!-- TOC -->
+
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided
 to first move to IaaS (lift and shift) and then do optimizations on top of it. As company wants to include it into
 DevOps, CTO decided to automate everything - from creation of resources in Azure, installing the software, creating web
