@@ -1,12 +1,14 @@
 ﻿# Welcome to the Azure monitor automation workshop / What-The-Hack
 
 <!-- TOC -->
-
 * [Welcome to the Azure monitor automation workshop / What-The-Hack](#welcome-to-the-azure-monitor-automation-workshop--what-the-hack)
-    * [Diagrams overview](#diagrams-overview)
-    * [Flow with web application:](#flow-with-web-application-)
-* [Move to Azure](#move-to-azure)
-
+  * [Minimal requirements](#minimal-requirements)
+  * [Diagrams overview](#diagrams-overview)
+  * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
+  * [Flow with web application](#flow-with-web-application)
+  * [Flow with client app](#flow-with-client-app)
+  * [Run the application](#run-the-application)
+* [Let's start - Move and automatic configuration in IaaS Azure](#lets-start---move-and-automatic-configuration-in-iaas-azure)
 <!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options
@@ -24,6 +26,33 @@ and [monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/overview),
 7. Collect data from monitored resources by using Azure Monitor Metrics.
 8. Investigate change data for routine monitoring or for triaging incidents by using Change Analysis.
 
+## Minimal requirements
+
+In order to follow along you will need:
+
+1. [Dotnet SDK](https://dot.net)
+2. [SQL server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) - LocalDB is sufficient
+3. [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.2)
+    - latest and greatest is the best :)
+3. (Optional)[Database Tools](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) - navigate to bottom ot
+   the page
+4. (Optional)[Tools to work with Json](https://code.visualstudio.com)
+
+**NOTE:**
+
+If you install [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment) (
+f.e [Visual Studio](https://visualstudio.com),[JetBrains Rider](https://jetbrains.com/rider),...) you have all of those
+tools already installed.
+
+To work with Azure, you'll need:
+
+1. [Azure Subscription](https://azure.microsoft.com/en-us/free/)
+2. [AZ CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+Check out
+also [Scott Hanselman blog post about prettifying prompts](https://www.hanselman.com/blog/how-to-make-a-pretty-prompt-in-windows-terminal-with-powerline-nerd-fonts-cascadia-code-wsl-and-ohmyposh)
+to make terminals pretty.
+
 ## Diagrams overview
 
 In order to start with the hackathon, let us check architecture diagram and requirement from the company TTA.
@@ -37,7 +66,42 @@ We have the following application on-premise:
 User can choose from various options to access functionalities, either web browser application or WPF application, which
 connects to API backend via REST calls.
 
-## Flow with web application:
+## Populate data and prepare data backend
+
+To start easier with the solution, development team built SQL generator, which generates database, tables, relationship
+between them and makes sure to populate data.
+
+To give you more options, you got following options as environment variables to control how to generate and populate
+data:
+
+| Parameters            | Description                                                                           | Is mandatory                               |
+|-----------------------|---------------------------------------------------------------------------------------|--------------------------------------------|
+| SQL_CONNECTION_STRING | connection string to the database or data server                                      | NO (it will use LocalDB by default)        |
+| FOLDER_ROOT           | root path to this solution (git clone and give root path)                             | NO (if not provided, you will be prompted) |
+| DROP_DATABASE         | flag true or false to drop database                                                   | NO (if not provided, you will be prompted) |
+| CREATE_TABLES         | flag true or false to create table. You can false, if you want to just populate data. | NO (if not provided, you will be prompted) |
+| DEFAULT_PASSWORD      | define password. Password will be hashed.                                             | NO (if not provided, you will be prompted) |
+| RECORD_NUMBER         | define number of records to be inserted                                               | NO (if not provided, you will be prompted) |
+
+Check [TTA.DataGenerator.SQL](../src/TTASLN/TTA.DataGenerator.SQL/Program.cs) for more details about automatic data
+creation.
+
+![SQL generator sample](https://webeudatastorage.blob.core.windows.net/files/maw-sql-generator.gif "SQL generator sample")
+
+if you want you can download video in better quality, it is
+available [here](https://webeudatastorage.blob.core.windows.net/files/maw-sql-generator.mp4).
+
+To run the solution, navigate to the [folder in terminal](../src/TTASLN/TTA.DataGenerator.SQL/)) and run dotnet run
+
+```
+dotnet run
+```
+
+## Flow with web application
+
+User navigates to the main web page on localhost. He opens preferred web browser, goes to **https://localhost/ttaweb**
+and below
+flow happens:
 
 ```mermaid
 sequenceDiagram
@@ -47,15 +111,40 @@ sequenceDiagram
     J->>W: Hi Web, what can I do
     Note over J,W: John is not signed in.
     activate W
-    W->>J: Hi John, you are not signed in. You can search for public data.
-    deactivate W
-    J->>W: Hi Web. Can I log in?
+    W->>J: Hi John, you are not signed in. You can search for public data - tasks flagged IsPublic=true.
+```
+
+Since John is not logged in, he can see public data - something like this:
+![MAW public access](https://webeudatastorage.blob.core.windows.net/files/maw-public-access.png)
+
+If he is logged in, he can then go to his dashboard, sees his work tasks, comments, search for the, complete them etc.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor J as John
+    participant W as Web
+    J->>W: Hi Web, I want to login to work with my data
+    Note over J,W: John is not signed in.
     activate W
-    W->>J: Sure, let me redirect you to login page.
+    W->>J: Hi John, sure. I don't have your login information, redirecting to login page.
+    deactivate W
+    J->>W: Hi Web. This are my credentials.
+    activate W
+    W->>J: Let me check and if correct, I will redirect you to your requested url or default, if none specified.
     deactivate W
 ```
 
-Flow with client app:
+![MAW private access](https://webeudatastorage.blob.core.windows.net/files/maw-private-access.png)
+
+With clicking on the item details, you can see more information and an option to add comment and download as PDF.
+
+![MAW task detail access](https://webeudatastorage.blob.core.windows.net/files/maw-task-details.png)
+
+## Flow with client app
+
+Client app is already populated with ID in settings. If settings is not entered, then it takes current identity from
+Windows. As we are testing functionalities, we will "fake" use access. Flow goes in many cases like this below:
 
 ```mermaid
 sequenceDiagram
@@ -73,7 +162,44 @@ sequenceDiagram
     deactivate W
 ```
 
-# Move to Azure
+![WPF app](https://webeudatastorage.blob.core.windows.net/files/maw-wpf-app.png)
+
+## Run the application
+
+To run the web application, simply [navigate to web project](../src/TTASLN/TTA.Web) and run the project. To try out
+working environment, you'll need: 
+1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add connection
+   string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
+2. **Client API URL** - you will need to provide url in environment variable **AppOptions__ClientApiUrl** or add
+   connection string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
+
+and then run the app with 
+
+```
+dotnet run
+```
+
+To run the WPF app, navigate to that folder and configure [App.config](../src/TTASLN/TTA.Client.Win/App.config):
+1. **ClientWebApiUrl** - URL to client API 
+2. **LoggedUserId** - user id to mimic username
+
+and then run the app with 
+```
+dotnet run
+```
+
+To run the web api, navigate to that folder and configure [appsettings.json](../src/TTASLN/TTA.Web.ClientApi/appsettings.json):
+1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add connection
+   string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
+
+and the run the app with 
+```
+dotnet run
+```
+
+or run this helper which will provide guided run (if you have [pre-requisites](#minimal-requirements) met).
+
+# Let's start - Move and automatic configuration in IaaS Azure
 
 The company decided to move to the cloud to take advantage of cloud features - scale, geo support and many more. They
 decided to go first with lift and shift approach - in short as is now without any change
