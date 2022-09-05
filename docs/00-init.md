@@ -1,14 +1,16 @@
 ﻿# Welcome to the Azure monitor automation workshop / What-The-Hack
 
 <!-- TOC -->
+
 * [Welcome to the Azure monitor automation workshop / What-The-Hack](#welcome-to-the-azure-monitor-automation-workshop--what-the-hack)
-  * [Minimal requirements](#minimal-requirements)
-  * [Diagrams overview](#diagrams-overview)
-  * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
-  * [Flow with web application](#flow-with-web-application)
-  * [Flow with client app](#flow-with-client-app)
-  * [Run the application](#run-the-application)
+    * [Minimal requirements](#minimal-requirements)
+    * [Diagrams overview](#diagrams-overview)
+    * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
+    * [Flow with web application](#flow-with-web-application)
+    * [Flow with client app](#flow-with-client-app)
+    * [Run the application](#run-the-application)
 * [Let's start - Move and automatic configuration in IaaS Azure](#lets-start---move-and-automatic-configuration-in-iaas-azure)
+
 <!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options
@@ -117,7 +119,8 @@ sequenceDiagram
 Since John is not logged in, he can see public data - something like this:
 ![MAW public access](https://webeudatastorage.blob.core.windows.net/files/maw-public-access.png)
 
-If he is logged in, he can then go to his dashboard, sees his work tasks, comments, search for the, complete them etc.
+If he is logged in, he can then go to his dashboard, see his work tasks, comments, search through items, complete the,
+download them as PDF, etc.
 
 ```mermaid
 sequenceDiagram
@@ -164,45 +167,60 @@ sequenceDiagram
 
 ![WPF app](https://webeudatastorage.blob.core.windows.net/files/maw-wpf-app.png)
 
-## Run the application
+## Run the applications
+
+You need to have [pre-requisites](#minimal-requirements) for it to run properly.
+
+### Web App
 
 To run the web application, simply [navigate to web project](../src/TTASLN/TTA.Web) and run the project. To try out
-working environment, you'll need: 
-1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add connection
+working environment, you'll need:
+
+1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add
+   connection
    string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
 2. **Client API URL** - you will need to provide url in environment variable **AppOptions__ClientApiUrl** or add
    connection string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
 
-and then run the app with 
+and then run the app with
 
 ```
 dotnet run
 ```
 
-To run the WPF app, navigate to that folder and configure [App.config](../src/TTASLN/TTA.Client.Win/App.config):
-1. **ClientWebApiUrl** - URL to client API 
-2. **LoggedUserId** - user id to mimic username
+### Web API
 
-and then run the app with 
-```
-dotnet run
-```
+To run the web api, navigate to that folder and
+configure [appsettings.json](../src/TTASLN/TTA.Web.ClientApi/appsettings.json):
 
-To run the web api, navigate to that folder and configure [appsettings.json](../src/TTASLN/TTA.Web.ClientApi/appsettings.json):
-1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add connection
+1. **SQL connection string** - you will need to provide environment variable **SqlOptions__ConnectionString** or add
+   connection
    string details in [appsettings.json](../src/TTASLN/TTA.Web/appsettings.json).
 
-and the run the app with 
+and the run the app with
+
 ```
 dotnet run
 ```
 
-or run this helper which will provide guided run (if you have [pre-requisites](#minimal-requirements) met).
+### WPF app
+
+To run the WPF app, navigate to that folder and configure [App.config](../src/TTASLN/TTA.Client.Win/App.config):
+
+1. **ClientWebApiUrl** - URL to client API
+2. **LoggedUserId** - user id to mimic username
+
+and then run the app with
+
+```
+dotnet run
+```
+
+You can test the functionality locally. Now to the first task from our CTO.
 
 # Let's start - Move and automatic configuration in IaaS Azure
 
 The company decided to move to the cloud to take advantage of cloud features - scale, geo support and many more. They
-decided to go first with lift and shift approach - in short as is now without any change
-to code and structure.
+decided to go first with lift and shift approach - in short as is now without any change to code and structure.
 
 [1. Step: Move to Azure](./01-move-to-IaaS-Azure.md)

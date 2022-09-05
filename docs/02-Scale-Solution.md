@@ -9,7 +9,7 @@
 <!-- TOC -->
 
 CTO is satisfied with result. After getting many traffic on the solution, he wants to scale out and add resources to
-handle the traffic.
+handle the traffic. He wants for traffic to be equally distributed and data stored in one database.
 
 # Diagram
 
@@ -17,25 +17,28 @@ After discussing with his council, he decided to take it step by step, moving di
 in front of load balancer. To accomodate the need to add resources automatically, he decided to automate the creation of
 adding new resources to the mix.
 
+![load balancer](https://webeudatastorage.blob.core.windows.net/web/ama-LoadBalancer.png)
+
 # Requirements
 
-Based on the diagram above, to support DevOps your job is to create:
+Based on the diagram above, to support automated scripts for deployment or DevOps, your job is to create:
 
 1. resource creation automation
 2. modification and adjusting configuration to support the change
-3. migration of existing data
-4. checking if the solution works after the change
+3. migration of existing data to newly created resource (Azure SQL Basic DTU is enough for the requirement)
+4. Modify changes to the application to use newly created resources
+5. check if the solution works after the change
 
 **Bonus**: create a DevOps pipeline to add stuff via pipeline after doing a change in code.
 
 # Test the functionality
 
-pen a browser and navigate to that website and test functionality.
+Open a browser and navigate to that website and test functionality.
 
 You can also use PowerShell to open webpage with default browser:
 
 ``` powershell
-Start-Process https://[IP]
+Start-Process https://[FQDN]
 ```
 
 ## Modernization
