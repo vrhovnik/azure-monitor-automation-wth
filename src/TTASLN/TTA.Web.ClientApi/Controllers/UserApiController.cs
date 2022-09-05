@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using TTA.Interfaces;
@@ -45,4 +46,11 @@ public class UserApiController : ControllerBase
             return BadRequest("Users could not be retrieved!");
         }
     }
+
+    [HttpGet]
+    [Route("running")]
+    [AllowAnonymous]
+    [Produces(typeof(IEnumerable<TTAUser>))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GetMachineName() => Ok(Environment.MachineName);
 }

@@ -6,6 +6,11 @@
 
 <h1>
     Basic information about the TTA
+    
+    @if (!string.IsNullOrEmpty(Model.ServerName))
+    {
+        <small>- running on @Model.ServerName</small>    
+    }
 </h1>
 <p class="text-info">
     What the hack structure initiative to enable partners to understand automation and monitoring options in <a href="https://portal.azure.com">Azure</a> through
