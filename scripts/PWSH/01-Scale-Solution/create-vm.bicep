@@ -17,9 +17,10 @@ param vmSize string = 'Standard_B4ms'
 @description('Number of virtual machines')
 param numberOfInstances int = 2
 
+@description('Name for the IP')
+param publicIpAddressName string = "tta-public-access"
+
 var availabilitySetName = 'TTAAvSet'
-var storageAccountType = 'Standard_LRS'
-var storageAccountName = uniqueString(resourceGroup().id)
 var virtualNetworkName = 'ttavNet'
 var subnetName = 'backendSubnet'
 var loadBalancerName = 'tta-ilb'
@@ -29,16 +30,6 @@ var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualN
 param resourceTags object = {
   Description: 'automation-monitor-what-the-hack'
   Environment: 'Demo'
-}
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-08-01' = {
-  name: storageAccountName
-  location: location
-  tags: resourceTags
-  sku: {
-    name: storageAccountType
-  }
-  kind: 'StorageV2'
 }
 
 resource availabilitySet 'Microsoft.Compute/availabilitySets@2021-11-01' = {
@@ -103,6 +94,20 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-05-01' = [fo
   ]
 }]
 
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
+  name: publicIpAddressName
+  location: location
+  tags: resourceTags
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Basic'
+  }
+}
+
 resource loadBalancer 'Microsoft.Network/loadBalancers@2021-05-01' = {
   name: loadBalancerName
   location: location
@@ -119,6 +124,9 @@ resource loadBalancer 'Microsoft.Network/loadBalancers@2021-05-01' = {
           }
           privateIPAddress: '10.0.2.6'
           privateIPAllocationMethod: 'Static'
+          publicIPAddress: {
+             id: publicIpAddress.id
+          } 
         }
         name: 'LoadBalancerFrontend'
       }
@@ -198,12 +206,27 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = [for i in range(0, 
           id: networkInterface[i].id
         }
       ]
-    }
-    diagnosticsProfile: {
-      bootDiagnostics: {
-        enabled: true
-        storageUri: storageAccount.properties.primaryEndpoints.blob
-      }
+    }    
+  }
+}
+
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+  parent: vm
+  name: 'Bootstrap'
+  location: location
+  tags: resourceTags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    protectedSettings: {
+      fileUris: [
+        uri('https://go.azuredemos.net/','ama-00-install')
+      ]
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
     }
   }
 }]
+
+output publicIP string = concat(publicIpAddress.properties.ipAddress)

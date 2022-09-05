@@ -1,0 +1,11 @@
+﻿apiVersion: v1
+kind: Service
+metadata:
+  name: ttaweb-service
+  namespace: tta
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: tta-web

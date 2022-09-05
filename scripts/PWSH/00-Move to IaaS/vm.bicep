@@ -16,12 +16,14 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
+@description('Name for the IP')
+param publicIpAddressName string = "tta-public-access"
+
 param resourceTags object = {
   Description: 'automation-monitor-what-the-hack'
   Environment: 'Demo'
 }
 
-var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var networkSecurityGroupName = '${vmName}-NSG'
 var vnetName = '${vmName}-VNET'

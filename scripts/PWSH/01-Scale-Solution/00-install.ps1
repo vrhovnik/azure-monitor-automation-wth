@@ -9,6 +9,7 @@
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
 # Version 0.1.2
+# SHORT CHANGE DESCRIPTION: added transcript to be able to see installation log, if anything wrong
 #>
 
 Start-Transcript -Path "$HOME/Downloads/Logs/bootstrapper.log"

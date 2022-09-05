@@ -8,7 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.2.3
+# Version 0.2.4
+# SHORT CHANGE DESCRIPTION: added transcript to be able to see installation log, if anything wrong
 #>
 
 Set-StrictMode -Version Latest
@@ -86,5 +87,8 @@ Write-Host "Settings changed, restarting IIS"
 net stop was /y
 net start w3svc
 
+Stop-Transcript
+
 Write-Host "Restart done, app is ready on https://localhost/ttaweb"
 Write-Host "and api on https://localhost/ttawebclient"
+

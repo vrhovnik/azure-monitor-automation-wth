@@ -7,6 +7,9 @@
     },
     "windowsAdminPassword": {
       "value": "Passw0rd1!"
-    }
+    },
+    "publicIpAddressName":{
+      "value":"tta-public-access"
+    }            
   }
 }

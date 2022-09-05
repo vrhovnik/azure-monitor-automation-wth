@@ -6,6 +6,7 @@
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
 # Version 0.2.6
+# SHORT CHANGE DESCRIPTION: added transcript to be able to see installation log, if anything wrong
 #>
 
 Set-StrictMode -Version Latest

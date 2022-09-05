@@ -8,7 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.1.2
+# Version 0.1.3
+# SHORT CHANGE DESCRIPTION: path rename to be used with shortener 
 #>
 
 Start-Transcript -Path "$HOME/Downloads/Logs/bootstrapper.log"
