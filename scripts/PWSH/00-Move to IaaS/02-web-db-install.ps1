@@ -87,3 +87,4 @@ net stop was /y
 net start w3svc
 
 Write-Host "Restart done, app is ready on https://localhost/ttaweb"
+Write-Host "and api on https://localhost/ttawebclient"

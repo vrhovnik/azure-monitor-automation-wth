@@ -11,6 +11,7 @@
     * [Web App](#web-app)
     * [Web API](#web-api)
     * [WPF app](#wpf-app)
+* [Helper links](#helper-links)
 * [Let's start - Move and automatic configuration in IaaS Azure](#lets-start---move-and-automatic-configuration-in-iaas-azure)
 <!-- TOC -->
 
@@ -221,9 +222,21 @@ dotnet run
 
 You can test the functionality locally. Now to the first task from our CTO.
 
+# Helper links
+
+To help with installation, few links to check out:
+1. [PowerShell](https://docs.microsoft.com/en-us/powershell/)
+2. [DotNet](https://dot.net)
+3. [AZ CLI](https://docs.microsoft.com/en-us/cli/azure/)
+4. [Visual Studio](https://visualstudio.com)
+5. [Visual Studio Code](https://code.visualstudio.com)
+6. [PowerShell for Visual Studio](https://code.visualstudio.com/docs/languages/powershell)
+7. [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/install)
+
 # Let's start - Move and automatic configuration in IaaS Azure
 
 The company decided to move to the cloud to take advantage of cloud features - scale, geo support and many more. They
 decided to go first with lift and shift approach - in short as is now without any change to code and structure.
 
 [1. Step: Move to Azure](./01-move-to-IaaS-Azure.md)
+

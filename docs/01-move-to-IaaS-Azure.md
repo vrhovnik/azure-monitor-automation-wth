@@ -15,7 +15,7 @@ resources, configuring database and defining connection strings / settings.
 
 ## Required diagram
 
-CTO (together with cloud solution architect) built required simple diagram:
+CTO (together with cloud solution architect) built required simple diagram to mimic what we need to establish:
 
 ![IaaS solution](https://webeudatastorage.blob.core.windows.net/web/AzureIaaS.png)
 
@@ -24,17 +24,17 @@ CTO (together with cloud solution architect) built required simple diagram:
 Your job is to create (without user intervention):
 
 1. resources in Azure defined in upper diagram
-2. install software automatically 
+2. install software automatically
 3. deploy applications to web applications and expose them to internet (port 443 and 80)
 4. configure connection string for application to be working with configured database
-5. prepare and configure FQDN to access the solution 
+5. prepare and configure FQDN to access the solution
 
 # Test the functionality
 
-After creating the resources automatically, you will get FQDN. You can test the solution as well with IP to see, if it
+After creating the resources automatically, you will FQDN. You can test the solution as well with IP to see, if it
 works both ways.
 
-Open a browser and navigate to that website and test functionality.
+Open a browser and navigate to FQDN and test the website and REST client.
 
 You can also use PowerShell to open webpage with default browser:
 
@@ -42,7 +42,7 @@ You can also use PowerShell to open webpage with default browser:
 Start-Process https://[IP]
 ```
 
-or 
+or
 
 ``` powershell
 Start-Process https://[FQDN]

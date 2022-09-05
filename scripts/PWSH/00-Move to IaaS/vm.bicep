@@ -18,7 +18,7 @@ param location string = resourceGroup().location
 
 param resourceTags object = {
   Description: 'automation-monitor-what-the-hack'
-  Environment: 'POC'
+  Environment: 'Demo'
 }
 
 var publicIpAddressName = '${vmName}-PIP'
@@ -37,6 +37,7 @@ var vnetConfig = {
 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
   name: vnetName
+  tags: resourceTags
   location: location
   properties: {
     addressSpace: {
@@ -61,6 +62,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
   location: location
+  tags: resourceTags
   properties: {
     securityRules: [
       {
@@ -83,6 +85,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
   location: location
+  tags: resourceTags
   properties: {
       ipConfigurations: [
         {
@@ -104,6 +107,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   name: publicIpAddressName
   location: location
+  tags: resourceTags
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -158,27 +162,24 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   }
 }
 
-//resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
-//  parent: vm
-//  name: 'Bootstrap'
-//  location: location
-//  tags: {
-//    Description: 'automation-monitor-what-the-hack'
-//    Environment: 'POC'
-//  }
-//  properties: {
-//    publisher: 'Microsoft.Compute'
-//    type: 'CustomScriptExtension'
-//    typeHandlerVersion: '1.10'
-//    autoUpgradeMinorVersion: true
-//    protectedSettings: {
-//      fileUris: [
-//        uri('https://l.azuredemos.net/','00-install')
-//      ]
-//      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
-//    }
-//  }
-//}
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
+  parent: vm
+  name: 'Bootstrap'
+  location: location
+  tags: resourceTags
+  properties: {
+    publisher: 'Microsoft.Compute'
+    type: 'CustomScriptExtension'
+    typeHandlerVersion: '1.10'
+    autoUpgradeMinorVersion: true
+    protectedSettings: {
+      fileUris: [
+        uri('https://go.azuredemos.net/','ama-00-install')
+      ]
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
+    }
+  }
+}
 
 output adminUsername string = windowsAdminUsername
 output publicIP string = concat(publicIpAddress.properties.ipAddress)
