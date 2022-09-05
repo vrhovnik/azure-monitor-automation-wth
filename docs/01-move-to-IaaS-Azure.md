@@ -39,3 +39,7 @@ Start-Process https://[IP]
 ```
 
 [<< Description of the task](./00-init.md) | [Scale out >>](./02-Scale-Solution.md)
+
+# Solution
+
+There are many solutions on how to solve this challenge. One of them available - creation of Azure Resources [here](../scripts/PWSH/azure-creation.sh) and Software install [here](../scripts/PWSH/00-install.ps1).
