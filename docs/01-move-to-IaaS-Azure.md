@@ -1,12 +1,11 @@
 ﻿# Move to Azure
 
 <!-- TOC -->
-
 * [Move to Azure](#move-to-azure)
-    * [Required diagram](#required-diagram)
+  * [Required diagram](#required-diagram)
 * [Task requirement](#task-requirement)
 * [Test the functionality](#test-the-functionality)
-
+* [Help links](#help-links)
 <!-- TOC -->
 
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided

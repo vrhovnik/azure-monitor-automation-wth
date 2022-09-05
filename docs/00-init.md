@@ -1,16 +1,17 @@
 ﻿# Welcome to the Azure monitor automation workshop / What-The-Hack
 
 <!-- TOC -->
-
 * [Welcome to the Azure monitor automation workshop / What-The-Hack](#welcome-to-the-azure-monitor-automation-workshop--what-the-hack)
-    * [Minimal requirements](#minimal-requirements)
-    * [Diagrams overview](#diagrams-overview)
-    * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
-    * [Flow with web application](#flow-with-web-application)
-    * [Flow with client app](#flow-with-client-app)
-    * [Run the application](#run-the-application)
+  * [Minimal requirements](#minimal-requirements)
+  * [Diagrams overview](#diagrams-overview)
+  * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
+  * [Flow with web application](#flow-with-web-application)
+  * [Flow with client app](#flow-with-client-app)
+  * [Run the applications](#run-the-applications)
+    * [Web App](#web-app)
+    * [Web API](#web-api)
+    * [WPF app](#wpf-app)
 * [Let's start - Move and automatic configuration in IaaS Azure](#lets-start---move-and-automatic-configuration-in-iaas-azure)
-
 <!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options
@@ -27,6 +28,8 @@ and [monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/overview),
 6. Create visualizations with Azure dashboards and workbooks.
 7. Collect data from monitored resources by using Azure Monitor Metrics.
 8. Investigate change data for routine monitoring or for triaging incidents by using Change Analysis.
+
+We do recommend to fork the repo and work on it on separate branch.
 
 ## Minimal requirements
 
