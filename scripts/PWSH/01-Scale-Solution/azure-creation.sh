@@ -9,6 +9,7 @@ rgName=""
 az deployment group what-if --resource-group "$rgName" --template-file bootstrap.bicep --parameters bootstrap.parameters.json
 
 # deploy to azure group 
-az deployment group create --resource-group "$rgName" --template-file bootstrap.bicep --parameters bootstrap.parameters.json 
+az deployment group create --resource-group "$rgName" --template-file bootstrap.bicep --parameters bootstrap.parameters.json
+ 
 
 

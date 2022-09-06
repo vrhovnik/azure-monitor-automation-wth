@@ -33,15 +33,6 @@ az deployment group what-if --resource-group "$rgName" --template-file k8s.bicep
 # deploy to azure group 
 data=az deployment group create --resource-group "$rgName" --template-file k8s.bicep --parameters k8s.parameters.json
 
-k8sResourceGroup="MC_$rgName_$(data.name)_$(data.rgLocation)"
-loadBalancer=az resource list --resource-group $k8sResourceGroup --query "[?type=='Microsoft.Network/loadBalancers']"
-#get public IP
-pipId=$(az network lb show --id $loadBalancer.id --query "frontendIpConfigurations | [?loadBalancingRules != null].publicIpAddress.id" -o tsv)
-ip=az network public-ip show --ids $pipId --query "ipAddress" -o tsv
-
-# open solution to see the result
-Start-Process "http://$ip"
-
 #create Azure SQL
 az deployment group what-if --resource-group "$rgName" --template-file sql.bicep --parameters sql.parameters.json
 # deploy to azure group 
@@ -83,7 +74,15 @@ data.spec.template.spec.containers.env[0].value="sqlConn"
 
 Set-Content '$rootPath/scripts/PWSH/03-Modernization/02-web.yaml' -Value data
 
-# set env
-
-# setup deployment
 kubectl apply -f .
+
+# set env
+k8sResourceGroup="MC_$rgName_$(data.name)_$(data.rgLocation)"
+loadBalancer=az resource list --resource-group $k8sResourceGroup --query "[?type=='Microsoft.Network/loadBalancers']"
+#get public IP
+pipId=$(az network lb show --id $loadBalancer.id --query "frontendIpConfigurations | [?loadBalancingRules != null].publicIpAddress.id" -o tsv)
+ip=az network public-ip show --ids $pipId --query "ipAddress" -o tsv
+
+# open solution to see the result
+Start-Process "http://$ip"
+# setup deployment

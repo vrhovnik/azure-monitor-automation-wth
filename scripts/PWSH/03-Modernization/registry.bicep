@@ -14,7 +14,6 @@ param resourceTags object = {
   Environment: 'Demo'
 }
 
-
 resource acrResource 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = {
   name: acrName
   location: location
