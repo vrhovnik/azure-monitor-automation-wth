@@ -1,11 +1,13 @@
 ﻿# Move to Azure
 
 <!-- TOC -->
+
 * [Move to Azure](#move-to-azure)
-  * [Required diagram](#required-diagram)
+    * [Required diagram](#required-diagram)
 * [Task requirement](#task-requirement)
 * [Test the functionality](#test-the-functionality)
 * [Help links](#help-links)
+
 <!-- TOC -->
 
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided
@@ -29,9 +31,21 @@ Your job is to create (without user intervention):
 4. configure connection string for application to be working with configured database
 5. prepare and configure FQDN to access the solution
 
+To ease up the task, DevOps team provided you with script to install all necessary software on newly created machine:
+
+``` powershell
+Invoke-WebRequest https://go.azuredemos.net/ama-01-softwaree-install -o setup.ps1
+```
+
+It is recommended to test the script before execution. Create VM, execute upper line and invoke the script:
+
+``` powershell
+./setup.ps1
+```
+
 # Test the functionality
 
-After creating the resources automatically, you will FQDN. You can test the solution as well with IP to see, if it
+After creating the resources automatically, you will get FQDN. You can test the solution as well with IP to see, if it
 works both ways.
 
 Open a browser and navigate to FQDN and test the website and REST client.

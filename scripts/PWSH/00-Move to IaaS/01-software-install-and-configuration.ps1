@@ -139,8 +139,3 @@ Remove-Item -Recurse -Force -Path $rootFolder
 
 Stop-Transcript
 
-# calling next script
-$scriptPath = "$HOME/Downloads/02-web-db-install.ps1"
-Write-Host "Calling next script at $scriptPath"
-Start-Process powershell.exe "-ExecutionPolicy Bypass  -File `"$scriptPath`""
-
