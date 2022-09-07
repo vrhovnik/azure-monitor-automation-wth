@@ -64,18 +64,15 @@ Write-Host "Installing Sysinternals ZoomIt"
 choco install -y zoomit
 
 Write-Host "Install SQL express engine"
-mkdir "$HOME/setup"
-$rootFolder = "$HOME/setup"
-Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkID=866658" -o "$rootFolder/sqlsetup.exe"
+Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkID=866658" -o "sqlsetup.exe"
 
-$setupfilelocation = "$rootFolder/sqlsetup.exe"
 $args = New-Object -TypeName System.Collections.Generic.List[System.String]
 $args.Add("/ACTION=install")
 $args.Add("/Q")
 $args.Add("/IACCEPTSQLSERVERLICENSETERMS")
 
 Write-Host "Installing SQL Express silently..."
-Start-Process -FilePath $setupfilelocation -ArgumentList $args -NoNewWindow -Wait -PassThru
+Start-Process -FilePath "sqlsetup.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
 
 # enable IIS
 Write-Host "Continue with enabling IIS on the machine"
@@ -114,16 +111,15 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
 # DIRECT LINK: https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe
 # GENERAL LINK https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer
 Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
-Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$rootFolder/hosting.exe"
+Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "hosting.exe"
 
 Write-Host "Installing ASP.NET Core hosting"
-$setupfilelocation = "$rootFolder/hosting.exe"
 $args = New-Object -TypeName System.Collections.Generic.List[System.String]
 $args.Add("/quiet")
 $args.Add("/install")
 $args.Add("/norestart")
 
-$Output = Start-Process -FilePath $setupfilelocation -ArgumentList $args -NoNewWindow -Wait -PassThru
+$Output = Start-Process -FilePath "hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
 If($Output.Exitcode -Eq 0)
 {
     net stop was /y
