@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.3.3
-# SHORT CHANGE DESCRIPTION: added container up
+# Version 0.4.1
+# SHORT CHANGE DESCRIPTION: added az instructions for container up
 #>
 $rgName="TTARG"
 # deploy to azure group 
@@ -49,10 +49,17 @@ New-Item -Path Env:\CREATE_TABLES -Value "true"
 New-Item -Path Env:\DEFAULT_PASSWORD -Value "Password123!"
 New-Item -Path Env:\RECORD_NUMBER -Value "200"
 
+# TODO: call container to populate values in database
 $location="WestEurope"
 $CONTAINERAPPS_ENVIRONMENT="my-tta-environment"
 az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $rgName --location $location
-$fqdn=az containerapp create --name my-container-app --resource-group $rgName --environment $CONTAINERAPPS_ENVIRONMENT --image  --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
+
+$registryServer="$loginName.azurecr.io"
+$imageName="$registryServer/tta/web:1.0"
+$acrPass=az acr credential show -n $loginName --query passwords[0].value
+$containerAppName="tta-container-web"
+$fqdn=az containerapp create --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $CONTAINERAPPS_ENVIRONMENT --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
+
 #open website on that URL
 Start-Process $fqdn
  

@@ -130,9 +130,6 @@ else {
     Exit 1
 }
 
-Write-Host "Restart done, proceeding to cleaning up setup files.."
-Remove-Item -Recurse -Force -Path $rootFolder
-
 Stop-Transcript
 
 # call web install
