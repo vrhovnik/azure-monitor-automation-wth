@@ -176,7 +176,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/01-software-install-and-configuration.ps1',
+        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/01-software-install-and-configuration.ps1'
         'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/02-web-db-install.ps1'
       ]
       commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File 01-software-install-and-configuration.ps1'

@@ -5,8 +5,8 @@
 # NOTES:
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.2.6
-# SHORT CHANGE DESCRIPTION: added transcript to be able to see installation log, if anything wrong
+# Version 0.2.7
+# SHORT CHANGE DESCRIPTION: remove registry hacks for optimizing network and explorer extensions
 #>
 
 Set-StrictMode -Version Latest
@@ -27,20 +27,20 @@ Write-Host "Enabling and starting Diagnostics Tracking Service..."
 Set-Service "DiagTrack" -StartupType Automatic
 Start-Service "DiagTrack"
 
-Write-Host "Hiding Search Box / Button to spare space..."
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -Type DWord -Value 0
+#Write-Host "Hiding Search Box / Button to spare space..."
+#Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "SearchboxTaskbarMode" -Type DWord -Value 0
 
-Write-Host "Showing known file extensions..."
-Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Type DWord -Value 0
+#Write-Host "Showing known file extensions..."
+#Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Type DWord -Value 0
 
 # Network Tweaks
-Write-Host "Optimizing networking for faster download..."
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "IRPStackSize" -Type DWord -Value 20
+#Write-Host "Optimizing networking for faster download..."
+#Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" -Name "IRPStackSize" -Type DWord -Value 20
 
 # Group svchost.exe processes
-Write-Host "Grouping svchost.exe processes to be able to see in task manager easily..."
-$ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
-Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
+#Write-Host "Grouping svchost.exe processes to be able to see in task manager easily..."
+#$ram = (Get-CimInstance -ClassName Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1kb
+#Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "SvcHostSplitThresholdInKB" -Type DWord -Value $ram -Force
 
 # installing chocolatey to install additional services 
 Write-Host "Installing chocolatey"
