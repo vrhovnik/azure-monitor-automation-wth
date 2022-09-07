@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.4.1
-# SHORT CHANGE DESCRIPTION: added az instructions for container up
+# Version 0.4.2
+# SHORT CHANGE DESCRIPTION: adding some output information
 #>
 $rgName="TTARG"
 # deploy to azure group 
@@ -28,9 +28,11 @@ $server=$currentServer.properties.outputs.loginServer.value
 
 #add your current IP to the access rule
 $ip=(Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
+Write-Host "Adding $ip to SQL FW rules"
 az sql server firewall-rule create --server $server --resource-group $rgName --name AllowYourIp --start-ip-address $ip --end-ip-address $ip
 #allow azure services to be able to access
 az sql server firewall-rule create --resource-group $rgName --server $server --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+Write-Host "Adding FW rules for accessing the cluster done"
 
 # get username
 $username=$currentServer.properties.outputs.loginName.value
@@ -41,6 +43,7 @@ $password=$currentServer.properties.outputs.loginPass.value
 $sqlConnection=az sql db show-connection-string --client ado.net --server $server
 $sqlConn=$sqlConnection.replace('<username>',$username)
 $sqlConn=$sqlConnection.replace('<password>',$password)
+Write-Host "ConnectionString has been set to $sqlConnection"
 
 #prepare ENV parameters to run the database creation and continue
 New-Item -Path Env:\SQL_CONNECTION_STRING -Value $sqlConn

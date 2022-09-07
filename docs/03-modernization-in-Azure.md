@@ -4,7 +4,7 @@
 * [Modernization and usage in Azure](#modernization-and-usage-in-azure)
   * [Diagram](#diagram)
   * [Requirements](#requirements)
-* [Enable monitoring to get information](#enable-monitoring-to-get-information)
+* [Putting it all together](#putting-it-all-together)
 <!-- TOC -->
 
 CTO decided to move application to containers and with that we can easily scale components independently.
@@ -16,16 +16,21 @@ on [best practices](https://docs.microsoft.com/en-us/azure/cloud-adoption-framew
 ease of migration and usage in different environments. To easily support the move, developer team
 prepared [dockerfiles](../containers) to prepare the images.
 
+![Required environment](https://webeudatastorage.blob.core.windows.net/web/ama-container-app-basic-info.png)
+
+They also prepared populate SQL image, which you can use to create data. 
+
 ## Requirements
 
 To satisfy the request you need to:
 1. prepare containers and test out the images (dev team prepared [dockerfiles](../containers) to support the preparation)
 2. automate resource deployment / image creation and create an ability to scale quickly
 3. deploy applications based on inputted parameters 
+4. populate database with provided container from database team
 
-# Enable monitoring to get information
+# Putting it all together
 
-Solution is now up and running. Some customers saw challenges with random errors or application not to anything. 
-Go and enable monitoring to understand what is happening with the application and to mitigate the errors.
+Solution is now up and running. We tried out different options, different services. Now we need to make it usable across the company.
+We want to enable people to create environment based on their needs and usage as part of their pipeline.
 
-[<< Scale Solution](./02-Scale-Solution.md) | [ Enable Monitor (COMING SOON) >>](./04-monitoring-basics.md)
+[<< Scale Solution](./02-Scale-Solution.md) | [ Putting it all together >>](./04-putting-in-all-together.md)
