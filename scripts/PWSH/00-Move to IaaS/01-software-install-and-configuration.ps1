@@ -139,3 +139,6 @@ Remove-Item -Recurse -Force -Path $rootFolder
 
 Stop-Transcript
 
+# call web install
+.\02-web-db-install.ps1
+

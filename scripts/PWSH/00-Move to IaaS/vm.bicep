@@ -17,7 +17,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 param location string = resourceGroup().location
 
 @description('Name for the IP')
-param publicIpAddressName string = "tta-public-access"
+param publicIpAddressName string = 'tta-public-access'
 
 param resourceTags object = {
   Description: 'automation-monitor-what-the-hack'
@@ -34,12 +34,12 @@ var vnetConfig = {
   subnet: {
     name: 'front'
     addressPrefix: '10.0.0.0/24'
-  }
+  }  
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
   name: vnetName
-  tags: resourceTags
+  tags: resourceTags  
   location: location
   properties: {
     addressSpace: {
@@ -63,7 +63,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-05-01' = {
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
-  location: location
+  location: location  
   tags: resourceTags
   properties: {
     securityRules: [
@@ -86,7 +86,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
-  location: location
+  location: location  
   tags: resourceTags
   properties: {
       ipConfigurations: [
@@ -108,8 +108,8 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   name: publicIpAddressName
-  location: location
-  tags: resourceTags
+  location: location  
+  tags: resourceTags  
   properties: {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
@@ -122,7 +122,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
 
 resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
-  location: location
+  location: location  
   tags: resourceTags
   properties: {
     hardwareProfile: {
@@ -176,9 +176,10 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri('https://go.azuredemos.net/','ama-00-install')
+        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/01-software-install-and-configuration.ps1',
+        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/02-web-db-install.ps1'
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File 01-software-install-and-configuration.ps1'
     }
   }
 }

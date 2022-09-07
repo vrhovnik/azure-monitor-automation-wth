@@ -28,4 +28,4 @@ To satisfy the request you need to:
 Solution is now up and running. Some customers saw challenges with random errors or application not to anything. 
 Go and enable monitoring to understand what is happening with the application and to mitigate the errors.
 
-[<< Scale Solution](./02-Scale-Solution.md)) | [ Enable Monitor (COMING SOON) >>](./04-monitoring-basics.md)
+[<< Scale Solution](./02-Scale-Solution.md) | [ Enable Monitor (COMING SOON) >>](./04-monitoring-basics.md)

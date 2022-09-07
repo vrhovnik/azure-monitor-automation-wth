@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.1.3
-# SHORT CHANGE DESCRIPTION: path rename to be used with shortener 
+# Version 0.1.4
+# SHORT CHANGE DESCRIPTION: fixed start process argument list  
 #>
 
 Start-Transcript -Path "$HOME/Downloads/Logs/bootstrapper.log"
@@ -28,6 +28,12 @@ Invoke-WebRequest "https://go.azuredemos.net/ama-02-app-and-db-configuration" -o
 
 $scriptPath = "$HOME/Downloads/01-software-install-and-configuration.ps1"
 Write-Host "Calling first script at $scriptPath"
-Start-Process powershell.exe "-ExecutionPolicy Bypass  -File `"$scriptPath`""
+$args = New-Object -TypeName System.Collections.Generic.List[System.String]
+$args.Add("-ExecutionPolicy Unrestricted")
+
+Start-Process powershell.exe -ArgumentList $args -FilePath $scriptPath -NoNewWindow -Wait
+
+$scriptPath = "$HOME/Downloads/02-web-db-install.ps1"
+Start-Process powershell.exe -ArgumentList $args -FilePath $scriptPath -NoNewWindow -Wait
 
 Stop-Transcript
