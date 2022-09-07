@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.3.2
-# SHORT CHANGE DESCRIPTION: added code to construct connection string
+# Version 0.3.3
+# SHORT CHANGE DESCRIPTION: added container up
 #>
 $rgName="TTARG"
 # deploy to azure group 
@@ -48,3 +48,11 @@ New-Item -Path Env:\DROP_DATABASE -Value "false"
 New-Item -Path Env:\CREATE_TABLES -Value "true"
 New-Item -Path Env:\DEFAULT_PASSWORD -Value "Password123!"
 New-Item -Path Env:\RECORD_NUMBER -Value "200"
+
+$location="WestEurope"
+$CONTAINERAPPS_ENVIRONMENT="my-tta-environment"
+az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $rgName --location $location
+$fqdn=az containerapp create --name my-container-app --resource-group $rgName --environment $CONTAINERAPPS_ENVIRONMENT --image  --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
+#open website on that URL
+Start-Process $fqdn
+ 

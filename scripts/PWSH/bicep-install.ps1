@@ -6,6 +6,12 @@ az account list --output table
 az account set -s NAME_OR_ID
 # set default resource group
 az config set defaults.group=$rgName
+
+# add modules to have them installed
+az extension add --name containerapp --upgrade
+az provider register --namespace Microsoft.App
+az provider register --namespace Microsoft.OperationalInsights
+
 # upgrade bicep to latest version
 # if you don't have it installed 
 # Chocolatey
