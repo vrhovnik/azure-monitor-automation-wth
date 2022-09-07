@@ -24,6 +24,9 @@ if (string.IsNullOrEmpty(folderRoot))
             .ValidationErrorMessage(
                 "[red]That's not a valid folder.[/] - check [link=https://https://github.com/vrhovnik/azure-monitor-automation-wth]for more information[/].")
             .Validate(Directory.Exists));
+    //download files to local directory and set the path to current directory
+    // var pathToDownload = "https://https://github.com/vrhovnik/azure-monitor-automation-wth";    
+    // folderRoot = Directory.GetCurrentDirectory();
 }
 
 AnsiConsole.WriteLine("You have defined the following path:");
