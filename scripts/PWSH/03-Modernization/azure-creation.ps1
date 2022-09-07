@@ -1,15 +1,15 @@
 ﻿<# 
 # SYNOPSIS
-# Installs resources with applications and opens remote desktop connection to the resource
+# Installs and compile containers, add them to the mix and prepare the container apps
 #
 # DESCRIPTION
-# installs all neccessary file to be installed on VM with getting back address to be able to access it
+# prepared all neccessary services to host the container images and prepare the 
 #
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.4.2
-# SHORT CHANGE DESCRIPTION: adding some output information
+# Version 0.4.4
+# SHORT CHANGE DESCRIPTION: adding description to the script
 #>
 $rgName="TTARG"
 # deploy to azure group 

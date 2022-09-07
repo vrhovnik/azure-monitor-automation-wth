@@ -222,11 +222,13 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
     autoUpgradeMinorVersion: true
     protectedSettings: {
       fileUris: [
-        uri('https://go.azuredemos.net/','ama-00-install')
+        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/01-software-install-and-configuration.ps1'
+        'https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/02-web-db-install.ps1'
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File 00-install.ps1'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Unrestricted -File 01-software-install-and-configuration.ps1'
     }
   }
-}]
+}
+]
 
 output publicIP string = concat(publicIpAddress.properties.ipAddress)
