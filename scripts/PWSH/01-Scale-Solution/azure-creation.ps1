@@ -3,7 +3,12 @@
 # https://github.com/vrhovnik/azure-monitor-automation-wth/blob/main/docs/01-move-to-IaaS-Azure.md 
 # check it out and create initial resources
 ########################################################################################################################
-$rgName="TT2RG"
+$rgName="SCALERG"
+# FOR EXAMPLE - creating contributor on resources
+# az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+#$appId=""
+#$appClientSecret=""
+#$tenantId=""
 
 $currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
 $server = $currentServer.properties.outputs.loginServer.value
@@ -21,6 +26,10 @@ $username = $currentServer.properties.outputs.loginName.value
 $password = $currentServer.properties.outputs.loginPass.value
 $dbName = $currentServer.properties.outputs.dbName.value
 Write-Host "Getting connection string from $server and using DB $dbName"
+#login to azure via service principal
+
+#Write-Header "Az CLI Login"
+# az login --service-principal --username $appId --password $appClientSecret --tenant $tenantId
 
 # check connectivity to SQL server
 $sqlConnection = az sql db show-connection-string --client ado.net --server $server
@@ -35,7 +44,7 @@ Write-Host "Doing an import of bacpac file"
 az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-09-07T17%3A48%3A00Z&se=2022-09-09T17%3A48%3A47Z&sr=b&sp=r&sig=do3agVkOd8uQp4IJAj9HJNgGZg0HM8ZJX9%2B%2FMulqR2k%3D"
 
 Write-Host "Create load balancer and n machines with correct connection string"
-az deployment group create --resource-group $rgName --template-file bootstrap.bicep --parameters bootstrap.parameters.json
+az deployment group create --resource-group $rgName --template-file create-vm.bicep --parameters create-vm.parameters.json
  
 
 

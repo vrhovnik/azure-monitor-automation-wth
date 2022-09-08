@@ -10,11 +10,19 @@
 #>
 param (
     [string]$adminUsername,
+    [string]$clientId,
+    [string]$clientSecret,
+    [string]$tenantId,
     [string]$scriptPath
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
+
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('clientId', $clientId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('clientSecret', $clientSecret,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 
 ## Turn on transcripting
 $registryPath = @{

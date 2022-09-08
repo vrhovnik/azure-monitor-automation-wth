@@ -12,7 +12,7 @@
       "value": 2
     },
     "publicIpAddressName":{
-      "value":"tta-public-access"
+      "value":"tta-public-access-scale"
     }
   }
 }

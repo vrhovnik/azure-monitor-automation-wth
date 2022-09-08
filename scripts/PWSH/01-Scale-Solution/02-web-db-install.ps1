@@ -80,6 +80,10 @@ New-WebApplication -Site "Default Web Site" -Name "ttawebclient" -PhysicalPath "
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
+Write-Host "Doing an import of bacpac file"
+# key is valid for 1 day - need to refresh it or call 
+az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-09-07T17%3A48%3A00Z&se=2022-09-09T17%3A48%3A47Z&sr=b&sp=r&sig=do3agVkOd8uQp4IJAj9HJNgGZg0HM8ZJX9%2B%2FMulqR2k%3D"
+
 Write-Host "Fix connection string in settings file to point to correct urls"
 $appSettings = Get-Content -Path "$rootPath\Web\appsettings.json" | ConvertFrom-Json
 $previousClientUrl = $appSettings.AppOptions.ClientApiUrl
