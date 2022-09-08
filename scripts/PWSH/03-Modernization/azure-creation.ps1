@@ -11,7 +11,7 @@
 # Version 0.4.6
 # SHORT CHANGE DESCRIPTION: adding import SQL option
 #>
-$rgName = "ConRG"
+$rgName = "ContainerRG"
 Write-Host "Starting registry deploy in $rgName"
 # deploy to azure group 
 $data = az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registry.parameters.json | ConvertFrom-Json
@@ -56,20 +56,25 @@ $sqlConnection = $sqlConnection.replace('<password>', $password)
 $sqlConnection = $sqlConnection.replace('<databasename>', $dbName)
 Write-Host "ConnectionString has been set to $sqlConnection"
 
-Write-Host "Restore database - executing script"
-$commandToExecute = Get-Content "ttadb.sql"
-Write-Host $commandToExecute
-$conn = New-Object System.Data.SqlClient.SqlConnection
-$conn.ConnectionString = $sqlConnection
-$SqlCmd = New-Object System.Data.SqlClient.SqlCommand
-$SqlCmd.CommandText = $commandToExecute
-$SqlCmd.Connection = $conn
-# execute query
-Write-Host "Opening connection to $dbName in $server"
-$conn.Open()
-$recordAffected=$SqlCmd.ExecuteNonQuery()
-$conn.Close()
-Write-Host "Database update successful, affected records $recordAffected"
+Write-Host "Doing an import of bacpac file"
+# key is valid for 1 day - need to refresh it or call 
+# az storage blob generate-sas --account-name nameofstorageaccount -c ama -n TTADB.bacpac --permissions r --expiry 2022-01-01T00:00:00Z
+az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-09-07T17%3A48%3A00Z&se=2022-09-09T17%3A48%3A47Z&sr=b&sp=r&sig=do3agVkOd8uQp4IJAj9HJNgGZg0HM8ZJX9%2B%2FMulqR2k%3D"
+
+#Write-Host "Restore database - executing script"
+#$commandToExecute = Get-Content "ttadb.sql"
+##Write-Host $commandToExecute
+#$conn = New-Object System.Data.SqlClient.SqlConnection
+#$conn.ConnectionString = $sqlConnection
+#$SqlCmd = New-Object System.Data.SqlClient.SqlCommand
+#$SqlCmd.CommandText = $commandToExecute
+#$SqlCmd.Connection = $conn
+## execute query
+#Write-Host "Opening connection to $dbName in $server"
+#$conn.Open()
+#$recordAffected=$SqlCmd.ExecuteNonQuery()
+#$conn.Close()
+#Write-Host "Database update successful, affected records $recordAffected"
 
 $location = "WestEurope"
 $containerappenv = "my-tta-environment"
@@ -87,5 +92,5 @@ $fqdn = az containerapp create --max-replicas 3 --env-vars SqlOptions__Connectio
 Write-Host "Container app running at $fqdn, starting app"
 
 #open website on with given URL - you can change below to whatever browser you'd like
-Start-Process "microsoft-edge:$fqdn"
+Start-Process "microsoft-edge:'$fqdn'"
  
