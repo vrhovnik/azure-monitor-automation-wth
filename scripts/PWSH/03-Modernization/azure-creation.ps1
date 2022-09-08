@@ -11,7 +11,7 @@
 # Version 0.4.6
 # SHORT CHANGE DESCRIPTION: adding import SQL option
 #>
-$rgName = "ContainerRG"
+$rgName = "ConnRG"
 Write-Host "Starting registry deploy in $rgName"
 # deploy to azure group 
 $data = az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registry.parameters.json | ConvertFrom-Json

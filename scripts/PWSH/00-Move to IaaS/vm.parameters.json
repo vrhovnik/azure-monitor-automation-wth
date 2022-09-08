@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {    
     "vmName": {
-      "value": "tta-vm-2022"
+      "value": "tta-vm1-2022"
     }, 
     "windowsAdminUsername": {
       "value": "ttauser"
