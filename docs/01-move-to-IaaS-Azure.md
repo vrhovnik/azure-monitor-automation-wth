@@ -25,7 +25,7 @@ CTO (together with cloud solution architect) built required simple diagram to mi
 Your job is to create (without user intervention):
 
 1. resources in Azure defined in upper diagram
-2. install software automatically (script available here to download)
+2. install software automatically (script available [here](https://go.azuredemos.net/ama-initial-script) to download)
 3. deploy applications to web applications and expose them to internet (port 443 and 80)
 4. configure connection string for application to be working with configured database
 5. prepare and configure FQDN to access the solution

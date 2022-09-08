@@ -16,7 +16,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
 
-Start-Transcript -Path "$HOME/Downloads/Logs/02-app-and-db-condiguration.log"
+Start-Transcript
 
 Write-Host "Getting source code and storing it to $HOME/amaw"
 git clone https://github.com/vrhovnik/azure-monitor-automation-wth.git "$HOME/amaw"

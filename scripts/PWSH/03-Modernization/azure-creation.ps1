@@ -3,22 +3,25 @@
 # Installs and compile containers, add them to the mix and prepare the container apps
 #
 # DESCRIPTION
-# prepared all neccessary services to host the container images and prepare the 
+# prepared all neccessary services to host the container images and prepare the SQL to be used in the container apps environment
 #
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.4.4
-# SHORT CHANGE DESCRIPTION: adding description to the script
+# Version 0.4.6
+# SHORT CHANGE DESCRIPTION: adding import SQL option
 #>
-$rgName = "ContainerRG"
+$rgName = "ConRG"
 Write-Host "Starting registry deploy in $rgName"
 # deploy to azure group 
-$data = az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registry.parameters.json
+$data = az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registry.parameters.json | ConvertFrom-Json
 $loginName = $data.properties.outputs.loginName.value
 Write-Host "registry created, login aquired $loginName"
 
-Write-Host "Building images"
+# get sources - we can get it online if needed (download to local machine) - in devops pipeline you will prepare a step do download source code - for testing purposes you'll "simulate" the environet
+Set-Location "C:\Work\Projects\azure-monitor-automation-wth\"
+
+Write-Host "Building images from provided source code"
 #build images and leverage ACR build engine to build the containers
 az acr build --registry $loginName --image tta/web:1.0 -f 'containers/TTA.Web.dockerfile' 'src/'
 az acr build --registry $loginName --image tta/webclient:1.0 -f 'containers/TTA.Web.ClientApi.dockerfile' 'src/'
@@ -27,8 +30,9 @@ az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.St
 Write-Host "Images built and prepped"
 
 # create SQL server, SQL database and deploy database
+Set-Location "C:\Work\Projects\azure-monitor-automation-wth\scripts\PWSH\03-Modernization"
 Write-Host "Install Azure SQL"
-$currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json
+$currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
 $server = $currentServer.properties.outputs.loginServer.value
 Write-Host "Azure SQL $server installed, adding rules to access it"
 #add your current IP to the access rule
@@ -39,41 +43,49 @@ az sql server firewall-rule create --server $server --resource-group $rgName --n
 az sql server firewall-rule create --resource-group $rgName --server $server --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
 Write-Host "Adding FW rules for accessing the cluster done"
 
-# get username
+# get values to build connection string
 $username = $currentServer.properties.outputs.loginName.value
-#get password
 $password = $currentServer.properties.outputs.loginPass.value
-
-Write-Host "Getting connection string from $server"
+$dbName = $currentServer.properties.outputs.dbName.value
+Write-Host "Getting connection string from $server and using DB $dbName"
 
 # check connectivity to SQL server
 $sqlConnection = az sql db show-connection-string --client ado.net --server $server
-$sqlConn = $sqlConnection.replace('<username>', $username)
-$sqlConn = $sqlConnection.replace('<password>', $password)
+$sqlConnection = $sqlConnection.replace('<username>', $username)
+$sqlConnection = $sqlConnection.replace('<password>', $password)
+$sqlConnection = $sqlConnection.replace('<databasename>', $dbName)
 Write-Host "ConnectionString has been set to $sqlConnection"
 
-#prepare ENV parameters to run the database creation and continue
-New-Item -Path Env:\SQL_CONNECTION_STRING -Value $sqlConn
-New-Item -Path Env:\DROP_DATABASE -Value "false"
-New-Item -Path Env:\CREATE_TABLES -Value "true"
-New-Item -Path Env:\DEFAULT_PASSWORD -Value "Password123!"
-New-Item -Path Env:\RECORD_NUMBER -Value "200"
-
-Write-Host "Populate database"
+Write-Host "Restore database - executing script"
+$commandToExecute = Get-Content "ttadb.sql"
+Write-Host $commandToExecute
+$conn = New-Object System.Data.SqlClient.SqlConnection
+$conn.ConnectionString = $sqlConnection
+$SqlCmd = New-Object System.Data.SqlClient.SqlCommand
+$SqlCmd.CommandText = $commandToExecute
+$SqlCmd.Connection = $conn
+# execute query
+Write-Host "Opening connection to $dbName in $server"
+$conn.Open()
+$recordAffected=$SqlCmd.ExecuteNonQuery()
+$conn.Close()
+Write-Host "Database update successful, affected records $recordAffected"
 
 $location = "WestEurope"
-Write-Host "Create container app environment"
-
-$CONTAINERAPPS_ENVIRONMENT = "my-tta-environment"
-az containerapp env create --name $CONTAINERAPPS_ENVIRONMENT --resource-group $rgName --location $location
-Write-Host "Environment $CONTAINERAPPS_ENVIRONMENT created, going to create container app"
+$containerappenv = "my-tta-environment"
+Write-Host "Create container app environment $containerappenv in $location "
+az containerapp env create --name $containerappenv --resource-group $rgName --location $location
+Write-Host "Environment $containerappenv created, going to create container app"
 $registryServer = "$loginName.azurecr.io"
 $imageName = "$registryServer/tta/web:1.0"
+
+#get ACR pass
 $acrPass = az acr credential show -n $loginName --query passwords[0].value
 $containerAppName = "tta-container-web"
-Write-Host "Using $imageName to generate environment"
-$fqdn = az containerapp create --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $CONTAINERAPPS_ENVIRONMENT --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
+Write-Host "Using $imageName to generate container app in environment $containerappenv"
+$fqdn = az containerapp create --max-replicas 3 --env-vars SqlOptions__ConnectionString=$sqlConnection --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $containerappenv --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
 Write-Host "Container app running at $fqdn, starting app"
-#open website on that URL
-Start-Process $fqdn
+
+#open website on with given URL - you can change below to whatever browser you'd like
+Start-Process "microsoft-edge:$fqdn"
  
