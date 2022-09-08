@@ -18,14 +18,10 @@ $rgName=$data.properties.outputs.rgName.value
 Write-Host "Resource group $rgName has been created"
 $vmSettings=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters vm.parameters.json |ConvertFrom-Json |Select-Object properties
 $myIp=$vmSettings.properties.outputs.publicIP.value
+
 Write-Host "VM created, opening remote desktop to $myIp"
-
-# open website
-Start-Process "http://$($myIp)/ttaweb" 
-
 $args = New-Object -TypeName System.Collections.Generic.List[System.String]
 $args.Add("/v:$($myIp):3389")
 $args.Add("/f")
-
 #open RDP
 Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList $args

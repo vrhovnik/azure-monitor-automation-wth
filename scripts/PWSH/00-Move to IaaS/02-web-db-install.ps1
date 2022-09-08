@@ -18,6 +18,41 @@ $ProgressPreference="SilentlyContinue"
 
 Start-Transcript
 
+Write-Host "Install SQL express engine"
+Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkID=866658" -o "$PWD\sqlsetup.exe"
+
+$args = New-Object -TypeName System.Collections.Generic.List[System.String]
+$args.Add("/ACTION=install")
+$args.Add("/Q")
+$args.Add("/IACCEPTSQLSERVERLICENSETERMS")
+
+Write-Host "Installing SQL Express silently..."
+Start-Process -FilePath "$PWD\sqlsetup.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
+
+# ASP.NET core hosting module download
+# DIRECT LINK: https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe
+# GENERAL LINK https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer
+Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
+Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$PWD\hosting.exe"
+
+Write-Host "Installing ASP.NET Core hosting"
+$args = New-Object -TypeName System.Collections.Generic.List[System.String]
+$args.Add("/quiet")
+$args.Add("/install")
+$args.Add("/norestart")
+
+$Output = Start-Process -FilePath "$PWD\hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
+If($Output.Exitcode -Eq 0)
+{
+    Write-Host "ASP.NET hosting was installed, restarting IIS"
+    net stop was /y
+    net start w3svc
+}
+else {
+    Write-HError "`t`t Something went wrong with the installation, ASP.NET hosting module not installed. Errorlevel: ${Output.ExitCode}"
+    Exit 1
+}
+
 Write-Host "Getting source code and storing it to $HOME/amaw"
 git clone https://github.com/vrhovnik/azure-monitor-automation-wth.git "$HOME/amaw"
 
@@ -56,7 +91,7 @@ New-Item -Path Env:\CREATE_TABLES -Value "true"
 New-Item -Path Env:\DEFAULT_PASSWORD -Value "Password123!"
 New-Item -Path Env:\RECORD_NUMBER -Value "200"
 
-dotnet run --property:Configuration=Release
+dotnet run 
 
 Write-Host "Fix connection string in settings file to point to correct urls"
 $appSettings = Get-Content -Path "$rootPath\Web\appsettings.json" | ConvertFrom-Json

@@ -5,10 +5,13 @@
 # NOTES:
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.2.7
-# SHORT CHANGE DESCRIPTION: remove registry hacks for optimizing network and explorer extensions
+# Version 0.2.8
+# SHORT CHANGE DESCRIPTION: add script at logon
 #>
-
+param (
+    [string]$adminUsername,
+    [string]$scriptPath
+)
 Set-StrictMode -Version Latest
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
@@ -70,17 +73,6 @@ choco install -y az.powershell -Force
 Write-Host "Installing Sysinternals ZoomIt"
 choco install -y zoomit
 
-Write-Host "Install SQL express engine"
-Invoke-WebRequest "https://go.microsoft.com/fwlink/?LinkID=866658" -o "$PWD\sqlsetup.exe"
-
-$args = New-Object -TypeName System.Collections.Generic.List[System.String]
-$args.Add("/ACTION=install")
-$args.Add("/Q")
-$args.Add("/IACCEPTSQLSERVERLICENSETERMS")
-
-Write-Host "Installing SQL Express silently..."
-Start-Process -FilePath "$PWD\sqlsetup.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
-
 # enable IIS
 Write-Host "Continue with enabling IIS on the machine"
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServerRole
@@ -114,29 +106,14 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ISAPIFilter
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-HttpCompressionStatic
 Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
 
-# ASP.NET core hosting module download
-# DIRECT LINK: https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe
-# GENERAL LINK https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer
-Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
-Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$PWD\hosting.exe"
+$Env:ItemsDir="C:\TempInstall"
+New-Item -Path $Env:ItemsDir -ItemType directory -Force
+Invoke-WebRequest $scriptPath -o $Env:ItemsDir\02-web-db-install.ps1
 
-Write-Host "Installing ASP.NET Core hosting"
-$args = New-Object -TypeName System.Collections.Generic.List[System.String]
-$args.Add("/quiet")
-$args.Add("/install")
-$args.Add("/norestart")
-
-$Output = Start-Process -FilePath "$PWD\hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
-If($Output.Exitcode -Eq 0)
-{
-    Write-Host "ASP.NET hosting was installed, restarting IIS"
-    net stop was /y
-    net start w3svc
-}
-else {
-    Write-HError "`t`t Something went wrong with the installation, ASP.NET hosting module not installed. Errorlevel: ${Output.ExitCode}"
-    Exit 1
-}
+#set execution at logon
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ItemsDir\02-web-db-install.ps1
+Register-ScheduledTask -TaskName "MyLogonToMachine" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 Stop-Transcript
 

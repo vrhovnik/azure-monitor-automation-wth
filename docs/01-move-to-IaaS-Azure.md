@@ -64,8 +64,8 @@ Start-Process https://[FQDN]
 # Expected learnings
 
 On this challenge you'll learn along the way about:
-1. different ways to create environments (Terraform, Bicep, ... ) and scope it to appropriate resource level
-2. execute scripts after resources are created to prepare environments
+1. different ways to create environments (Terraform, Bicep, ... ) and scope it to appropriate resource level creation model
+2. execute scripts after resources are created to prepare environments with different techniques: how to load scripts at logon or how to execute them one by one (one master, which then calls other)
 3. leverage bash, PowerShell, Azure CLI to adapt based on installed environment
 4. prepare scripts in a way that can be reusable later
 
