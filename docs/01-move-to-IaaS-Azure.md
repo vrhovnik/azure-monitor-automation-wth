@@ -1,13 +1,12 @@
 ﻿# Move to Azure
 
 <!-- TOC -->
-
 * [Move to Azure](#move-to-azure)
-    * [Required diagram](#required-diagram)
+  * [Required diagram](#required-diagram)
 * [Task requirement](#task-requirement)
 * [Test the functionality](#test-the-functionality)
+* [Expected learnings](#expected-learnings)
 * [Help links](#help-links)
-
 <!-- TOC -->
 
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided
@@ -26,7 +25,7 @@ CTO (together with cloud solution architect) built required simple diagram to mi
 Your job is to create (without user intervention):
 
 1. resources in Azure defined in upper diagram
-2. install software automatically
+2. install software automatically (script available here to download)
 3. deploy applications to web applications and expose them to internet (port 443 and 80)
 4. configure connection string for application to be working with configured database
 5. prepare and configure FQDN to access the solution
@@ -61,6 +60,14 @@ or
 ``` powershell
 Start-Process https://[FQDN]
 ```
+
+# Expected learnings
+
+On this challenge you'll learn along the way about:
+1. different ways to create environments (Terraform, Bicep, ... ) and scope it to appropriate resource level
+2. execute scripts after resources are created to prepare environments
+3. leverage bash, PowerShell, Azure CLI to adapt based on installed environment
+4. prepare scripts in a way that can be reusable later
 
 # Help links
 

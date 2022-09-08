@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "serverName": {
-      "value": "tta-sql-server"
+      "value": "ttasqlserverdemo"
     },
     "sqlDBName": {
       "value": "TTADB"
