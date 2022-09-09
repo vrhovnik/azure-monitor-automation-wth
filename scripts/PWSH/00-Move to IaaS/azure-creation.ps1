@@ -13,8 +13,10 @@
 #>
 $regionToDeploy = "WestEurope"
 Write-Host "Creating resources in $regionToDeploy"
+
 $data = az deployment sub create --location $regionToDeploy --template-file rg.bicep --parameters rg.parameters.json | ConvertFrom-Json | Select-Object properties
 $rgName=$data.properties.outputs.rgName.value
+
 Write-Host "Resource group $rgName has been created"
 $vmSettings=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters vm.parameters.json |ConvertFrom-Json |Select-Object properties
 $myIp=$vmSettings.properties.outputs.publicIP.value

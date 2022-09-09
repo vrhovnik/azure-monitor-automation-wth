@@ -1,4 +1,4 @@
-# Azure monitor automation workshop / What-The-Hack
+# Azure Azure Automation & Monitor / What-The-Hack
 
 <!-- TOC -->
 * [Azure monitor automation workshop / What-The-Hack](#azure-monitor-automation-workshop--what-the-hack)
