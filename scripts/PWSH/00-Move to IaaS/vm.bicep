@@ -79,7 +79,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           destinationAddressPrefix: '*'
           destinationPortRange: '3389'
         }
-      }
+      }      
     ]
   }
 }
