@@ -205,4 +205,9 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
             "UPDATE WorkTasks SET IsCompleted=1 WHERE WorkTaskId=@workTaskId";
         return await connection.ExecuteAsync(sqlQuery, new { workTaskId }) > 0;
     }
+
+    public Task<PaginatedList<WorkTask>> GetTasksFromAsync(DateTime from, DateTime to)
+    {
+        throw new NotImplementedException();
+    }
 }

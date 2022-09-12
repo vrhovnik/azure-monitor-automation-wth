@@ -20,4 +20,6 @@ public interface IWorkTaskRepository : IDataRepository<WorkTask>
         string query = "");
 
     public Task<bool> CompleteTaskAsync(string workTaskId);
+
+    public Task<PaginatedList<WorkTask>> GetTasksFromAsync(DateTime from, DateTime to);
 }
