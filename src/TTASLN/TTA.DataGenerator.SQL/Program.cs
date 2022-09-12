@@ -1,6 +1,8 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Reflection;
 using Bogus;
 using Dapper;
 using Spectre.Console;
@@ -18,15 +20,13 @@ AnsiConsole.WriteLine();
 var folderRoot = Environment.GetEnvironmentVariable("FOLDER_ROOT");
 if (string.IsNullOrEmpty(folderRoot))
 {
-    folderRoot = AnsiConsole.Prompt(
-        new TextPrompt<string>("Enter [green]folder root[/]")
-            .PromptStyle("green")
-            .ValidationErrorMessage(
-                "[red]That's not a valid folder.[/] - check [link=https://https://github.com/vrhovnik/azure-monitor-automation-wth]for more information[/].")
-            .Validate(Directory.Exists));
-    //download files to local directory and set the path to current directory
-    // var pathToDownload = "https://https://github.com/vrhovnik/azure-monitor-automation-wth";    
-    // folderRoot = Directory.GetCurrentDirectory();
+    var pathToDownload = Environment.GetEnvironmentVariable("DOWNLOADURL") ??
+                         "https://github.com/vrhovnik/azure-monitor-automation-wth/archive/refs/heads/main.zip";
+    var httpClient = new HttpClient();
+    var currentZipFile = await httpClient.GetByteArrayAsync(pathToDownload);
+    File.WriteAllBytes("src.zip", currentZipFile);
+    ZipFile.ExtractToDirectory("src.zip", "src",true);
+    folderRoot = "src/azure-monitor-automation-wth-main";
 }
 
 AnsiConsole.WriteLine("You have defined the following path:");
