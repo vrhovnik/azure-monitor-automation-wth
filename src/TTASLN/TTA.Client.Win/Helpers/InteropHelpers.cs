@@ -2,8 +2,6 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows;
-using System.Windows.Interop;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 

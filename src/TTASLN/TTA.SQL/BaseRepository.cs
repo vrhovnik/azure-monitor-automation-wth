@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using Dapper.Contrib.Extensions;
 using TTA.Core;
 using TTA.Interfaces;

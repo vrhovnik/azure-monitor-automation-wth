@@ -2,7 +2,6 @@
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Reflection;
 using Bogus;
 using Dapper;
 using Spectre.Console;
