@@ -6,7 +6,7 @@ param resourceGroupName string = 'TTARG'
 param resourceGroupLocation string = 'WestEurope'
 
 param resourceTags object = {
-  Description: 'automation-monitor-what-the-hack'
+  Description: 'automation-and-monitor-what-the-hack'
   Environment: 'Demo'
 }
 
