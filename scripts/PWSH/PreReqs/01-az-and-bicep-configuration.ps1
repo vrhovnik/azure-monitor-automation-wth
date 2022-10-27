@@ -82,10 +82,10 @@ if ($persist -eq "y")
     }
     
     # add to the profile file
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_APPID -Value " + $spJson.appId)
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value " + $spJson.displayName)
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_PASSWORD -Value " + $spJson.password)
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_TENANTID -Value " + $spJson.tenant)
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_APPID -Value '$spJson.appId'")
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value '$spJson.displayName'" )
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_PASSWORD -Value '$spJson.password'")
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_TENANTID -Value '$spJson.tenant'")
     
     Write-Host "Added to profile to be available on launch"
 }
