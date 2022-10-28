@@ -1,12 +1,14 @@
 ﻿# Move to Azure and configure it effectively
 
 <!-- TOC -->
+
 * [Move to Azure and configure it effectively](#move-to-azure-and-configure-it-effectively)
-  * [Desired Azure deployment result diagram](#desired-azure-deployment-result-diagram)
-  * [Task requirement](#task-requirement)
-  * [Test the functionality](#test-the-functionality)
+    * [Desired Azure deployment result diagram](#desired-azure-deployment-result-diagram)
+    * [Task requirement](#task-requirement)
+    * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
 * [Help links](#help-links)
+
 <!-- TOC -->
 
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided
@@ -35,10 +37,11 @@ Your job is to create (without user intervention) DevOps pipeline to deploy appl
 2. upon VM creation install required software **automatically** with provided
    script [here](https://go.azuredemos.net/ama-initial-script)
 3. deploy workloads and expose them to internet (port 443 and 80) via FQDN prefix **customername-wth-europe**
-4. make sure deployment fires when you push (and approve) to the folder [IaC](../scripts/IaC) - if you update the folder, **ALL** customer
-   needs to be updated. Provide a way to **manually** update specific customer.
+4. make sure deployment fires when you push (and approve) to the folder [IaC](../scripts/IaC) - if you update the
+   folder, **ALL** customer needs to be updated. Provide a way to **manually** update specific customer.
 5. provide a way to deploy solution **ONLY** if validation of resource creation pass.
-6. execute health report to see if the solution is responding with 200 OK (calling get request FQDN/health will give you information about health status)
+6. execute health report to see if the solution is responding with 200 OK (calling get request FQDN/health will give you
+   information about health status)
 
 Script to install the software is available below:
 
@@ -99,4 +102,4 @@ To help with your challenge some helper links below:
 3. [Dotnet Publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
 4. [Start-Process PowerShell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-process?view=powershell-7.2)
 
-[<< Application structure](./00-init.md) | [Scale out >>](./02-Scale-Solution.md)
+[<< Application structure](./00-init.md) | [Modernize the application >>](./03-modernization-in-Azure.md)

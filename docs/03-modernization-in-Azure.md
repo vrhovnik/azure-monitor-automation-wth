@@ -1,56 +1,61 @@
 ﻿# Modernization and usage in Azure
 
 <!-- TOC -->
-
 * [Modernization and usage in Azure](#modernization-and-usage-in-azure)
-    * [Diagram](#diagram)
-    * [Requirements](#requirements)
-* [Putting it all together](#putting-it-all-together)
-
+  * [Diagram](#diagram)
+  * [Task requirements](#task-requirements)
+* [Key takeaways](#key-takeaways)
+* [Govern the application and make sure your SLA meets the goal](#govern-the-application-and-make-sure-your-sla-meets-the-goal)
 <!-- TOC -->
 
 CTO decided to move application to containers to easily scale components independently. Customers are looking for a
 solution to simplify the deployment, versioning and much more. To comply with changes and after review of technology
-trends you decided to go with latest and greatest solutions.
+trends CTO decided to go with latest options in Azure.
 
 ## Diagram
 
 Cloud Solution Architects decided based
 on [best practices](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/) to move to containers to support
-ease of migration and usage in different environments. To easily support the move, developer team
-prepared [dockerfiles](../containers) to prepare the images.
+ease of migration and usage in different environments. Developer team prepared [dockerfiles](../containers) to enable
+workload containerization. For the database the decision was to go with PaaS solution. In this
+case [Azure SQL database](https://azure.microsoft.com/en-us/products/azure-sql/) (DTU edition).
 
 ![Required environment](https://webeudatastorage.blob.core.windows.net/web/ama-container-app-basic-info.png)
 
-They also prepared populate database file (or script), which you can use for database restore to have the latest and greatest data
-available.
+They also prepared populate database file (or script), which you can use for database restore to have the latest and
+greatest data available.
 
-Database file is available [here](../scripts/PWSH/03-Modernization/TTADB.bak) for download or use scripts [here](../scripts/PWSH/03-Modernization/ttadb.sql).
+Database file is available [here](../scripts/PWSH/03-Modernization/TTADB.bak) for download or you can leverage T-SQL
+commands [here](../scripts/PWSH/03-Modernization/ttadb.sql).
 
-## Requirements
+## Task requirements
 
 To satisfy the request you need to:
 
-1. prepare containers and test out the images -- dev team prepared [dockerfiles](../containers) to support the
-   preparation
-2. automate resource deployment / image creation and create an ability to scale quickly - only web is currently required
-   to run. For app to run you will need to configure SQL connection.
-3. deploy applications based on inputted parameters
+1. automate resource deployments and create required resources per customer - for example **rg-customername**,
+   **acr-customername**, **aca-customername** etc. when changes happens in IaC folder. If you do a change, **all**
+   customer resources needs to be updated.
+2. automate building/pushing container images to newly created private registry (**containername:vx** where **x** is **
+   unique** number) and test out the images -- dev team prepared [dockerfiles](../containers) for you to use. Deploy to
+   registry **only if** the image build is successful. When changes to dockerfiles has been done, run the automation.
+3. deploy new version of the application when containers are changed/new version deployed and configure access to
+   external resources and staging area
 4. populate database with provided backup file or scripts from database team
+5. test if application works as expected - after deploy, call **URLPATHTOAPPFORCUSTOMER/health** to get back 200 OK
+   status
 
 # Key takeaways
 
 As you can see there is a little bit more setup to get application working. You experienced:
 
-1. how to create registries, make containers and leverage cloud tools to automatically build the images without you
-   having the tools
-2. automate deployment of resources with adding permissions and access control
-3. prepare script in a way to have as little interaction as possible to include it into 
+1. how to use create registries, make containers and leverage cloud tools to automatically build the images with
+   blue/green techniques
+2. automate deployment of resources
+3. leverage PaaS tools to provide you with common tasks to get up to speed quickly.
 
-# Putting it all together
+# Govern the application and make sure your SLA meets the goal
 
-Solution is now up and running. We tried out different options, different services. Now we need to make it usable across
-the company.
-We want to enable people to create environment based on their needs and usage as part of their pipeline.
+Solution is now up and running. We tried out different options, different services. Now we need to make sure that
+running solution works reliably and resilient.
 
-[<< Scale Solution](./02-Scale-Solution.md) | [ Putting it all together >>](./04-putting-in-all-together.md)
+[<< Scale Solution](./02-Scale-Solution.md) | [ Make SLA great again >>](./05-monitoring-basics.md)
