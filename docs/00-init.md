@@ -1,40 +1,100 @@
-﻿# Welcome to the Azure monitor automation workshop / What-The-Hack
-
-<!-- TOC -->
-* [Welcome to the Azure monitor automation workshop / What-The-Hack](#welcome-to-the-azure-monitor-automation-workshop--what-the-hack)
+﻿<!-- TOC -->
+* [Repository and code structure](#repository-and-code-structure)
+  * [Source code - src folder](#source-code---src-folder)
+  * [Containers overview](#containers-overview)
+  * [Scripts folder overview](#scripts-folder-overview)
   * [Minimal requirements](#minimal-requirements)
-  * [Diagrams overview](#diagrams-overview)
+* [Diagrams overview](#diagrams-overview)
   * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
   * [Flow with web application](#flow-with-web-application)
   * [Flow with client app](#flow-with-client-app)
-  * [Run the applications](#run-the-applications)
+* [[OPTIONAL] Run the applications locally](#optional-run-the-applications-locally)
     * [Web App](#web-app)
     * [Web API](#web-api)
     * [WPF app](#wpf-app)
 * [Helper links](#helper-links)
-* [Let's start - Move and automatic configuration in IaaS Azure](#lets-start---move-and-automatic-configuration-in-iaas-azure)
+* [Let's start with first task - Move and automatic configuration in IaaS Azure](#lets-start-with-first-task---move-and-automatic-configuration-in-iaas-azure)
 <!-- TOC -->
 
-What the hack structure initiative to enable partners to understand automation and monitoring options
-in [Azure](https://portal.azure.com) through
-different tools and mechanisms solving challenges, which will help them understand their application and workloads even
-better and to solve common challenges with [automation](https://docs.microsoft.com/en-us/azure/automation/)
-and [monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/overview), including:
+# Repository and code structure
 
-1. Automating deployments and practicing DevOps principles going from on-premise to the cloud with modernization in mind
-2. Detect and diagnose issues across applications and dependencies with Application Insights.
-3. Correlate infrastructure issues with VM insights and Container insights.
-4. Drill into your monitoring data with Log Analytics for troubleshooting and deep diagnostics.
-5. Support operations at scale with automated actions.
-6. Create visualizations with Azure dashboards and workbooks.
-7. Collect data from monitored resources by using Azure Monitor Metrics.
-8. Investigate change data for routine monitoring or for triaging incidents by using Change Analysis.
+Solution has 4 main folders:
 
-We do recommend to fork the repo and work on it on separate branch.
+1. **src** - solution source code based on C#, [ASP.NET](https://asp.net) Core, [htmx](https://htmx.org)
+   , [Bootstrap](https://getbootstrap.com) and many more.
+2. **scripts** - PowerShell scripts, ARM templates and Bicep language to automate deployments, multi-tenancy and
+   monitoring
+3. **docs** - documentation, architecture diagrams, videos and many more
+4. **containers** - docker files to generate below applications for modernization options
+
+## Source code - src folder
+
+Solution is built out of 5 main parts:
+
+![source code overview](https://webeudatastorage.blob.core.windows.net/web/tta-src-overview.png)
+
+1. **TTA.Web** - web client to manage tasks, see public open tasks, register into the system, view statistics and work
+   with your tasks
+2. **TTA.Web.ClientApi** - REST api to expose services to get tasks and operate on them
+3. Clients applications
+    - **TTA.Client.Win** - Windows client to check tasks, complete them and add comments and to simulate comments
+    - **TTA.DataGenerator.SQL** - console application to recreate database and populate data
+4. **TTA.StatGenerator** - worker service to calculate stats and populate data daily
+5. **TTA.SQL** - MS SQL data storage implementation
+
+All other projects are meant for helpers and for core infrastructure needs for application to be able to work.
+
+1. **TTA.Core** - helpful classes to generate password hash, extensions for strings and so more
+2. **TTA.Interfaces** - interfaces to be used in the application
+3. **TTA.Models** - models representing the solution
+
+To compile and run the code you will need [.NET core installed](https://dot.net). To work with the source code, you have
+multiple editors available ([Microsoft Visual Studio](https://visualstudio.com)
+, [Microsoft Visual Studio Code with C#](https://code.visualstudio.com)
+plugin, [Jetbrains Rider](https://jetbrains.com/rider) and more).
+
+## Containers overview
+
+To take advantage of modernization opportunity and make solution to be cloud native aware, below are the container
+files:
+
+1. [TTA.Web.dockerfile](../containers/TTA.Web.dockerfile) - instructions to compile and build container with web
+   application
+2. [TTA.Web.ClientApi.dockerfile](../containers/TTA.Web.ClientApi.dockerfile) - instructions to compile and build container
+   containing REST APIs
+3. [TTA.DataGenerator.SQL.dockerfile](../containers/TTA.DataGenerator.SQL.dockerfile) - container with generator to be used
+   with container instances to generate SQL data
+4. [TTA.StatGenerator](../containers/TTA.StatGenerator.dockerfile) - background process as container to generate stats
+   based on [cron](https://en.wikipedia.org/wiki/Cron) expression definition
+
+You can leverage [Docker](https://docker.com), [Podman](https://podman.io)
+or [Azure Container Registry to build](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-tutorial-quick-task)
+the containers.
+
+To use Azure Container registry cloud build, you can execute following command from **src** folder (if you
+have [az cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed):
+
+`az acr build --image tta/web:1.0 --registry ##yourregistryname## --file ../containers/TTA.Web.dockerfile .`
+
+`az acr build --image tta/webclient:1.0 --registry ##yourregistryname## --file ../containers/TTA.Web.ClientApi.dockerfile .`
+
+`az acr build --image tta/statgen:1.0 --registry ##yourregistryname## --file ../containers/TTA.StatGenerator.dockerfile .`
+
+`az acr build --image tta/datagen:1.0 --registry ##yourregistryname## --file ../containers/TTA.DataGenerator.SQL.dockerfile .`
+
+## Scripts folder overview
+
+Scripts contains folders with scripts for specific purposes in mixed languages (bash, pwsh, bicep, terraform,...).
+
+For example: SQL folder contains scripts to create all tables or
+separate table - depends on the need in specific.
+
+Keep in mind - there are multiple ways to complete specific task and the idea is to learn new technology, not copy and
+paste solutions.
 
 ## Minimal requirements
 
-In order to follow along you will need:
+In order to deploy the application on your machine you will need:
 
 1. [Dotnet SDK](https://dot.net)
 2. [SQL server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) - LocalDB is sufficient
@@ -50,7 +110,7 @@ If you install [IDE](https://en.wikipedia.org/wiki/Integrated_development_enviro
 f.e [Visual Studio](https://visualstudio.com),[JetBrains Rider](https://jetbrains.com/rider),...) you have all of those
 tools already installed.
 
-To work with Azure, you'll need:
+To work with Azure you'll need:
 
 1. [Azure Subscription](https://azure.microsoft.com/en-us/free/)
 2. [AZ CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -59,9 +119,9 @@ Check out
 also [Scott Hanselman blog post about prettifying prompts](https://www.hanselman.com/blog/how-to-make-a-pretty-prompt-in-windows-terminal-with-powerline-nerd-fonts-cascadia-code-wsl-and-ohmyposh)
 to make terminals pretty.
 
-## Diagrams overview
+# Diagrams overview
 
-In order to start with the hackathon, let us check architecture diagram and requirement from the company TTA.
+In order to understand the workload let us check architecture diagram and requirement from the company TTA.
 Your job, if you decide to accept it, is to use best practices from Microsoft to deploy and manage the solution for the
 TTA company.
 
@@ -171,7 +231,7 @@ sequenceDiagram
 
 ![WPF app](https://webeudatastorage.blob.core.windows.net/files/maw-wpf-app.png)
 
-## Run the applications
+# [OPTIONAL] Run the applications locally 
 
 You need to have [pre-requisites](#minimal-requirements) for it to run properly.
 
@@ -220,7 +280,7 @@ and then run the app with
 dotnet run
 ```
 
-You can test the functionality locally. Now to the first task from our CTO.
+You can play around with workload to see all of the features. 
 
 # Helper links
 
@@ -233,7 +293,7 @@ To help with installation, few links to check out:
 6. [PowerShell for Visual Studio](https://code.visualstudio.com/docs/languages/powershell)
 7. [Windows Terminal](https://docs.microsoft.com/en-us/windows/terminal/install)
 
-# Let's start - Move and automatic configuration in IaaS Azure
+# Let's start with first task - Move and automatic configuration in IaaS Azure
 
 The company decided to move to the cloud to take advantage of cloud features - scale, geo support and many more. They
 decided to go first with lift and shift approach - in short as is now without any change to code and structure.
