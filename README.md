@@ -71,8 +71,7 @@ To successfully participate in this hackathon you will need:
 
 If you will be working on your local machines, you will need to have:
 
-1.
- [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
+1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
 installed
 2. git installed - instructions step by step [here](https://docs.github.com/en/get-started/quickstart/set-up-git)
 3. [.NET](https://dot.net) installed to run the application if you want to run it
@@ -97,7 +96,7 @@ What the hack requires from you basic understanding of:
 
 By completing the hackathon you'll understand how to:
 
-1. use IaC effectively with DevOps principles
+1. use [IaC](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code) effectively with DevOps principles
 2. configure scale and deploy with ease with solid foundation
 3. leverage technologies to deploy native workloads to cloud
 4. effectively react on challenges and take advantage of cloud to build resilient environment for workloads
