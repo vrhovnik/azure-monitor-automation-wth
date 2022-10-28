@@ -32,15 +32,15 @@ Learn and configure:
 7. Collect data from monitored resources by using **Azure Monitor Metrics**.
 8. Investigate change data for routine monitoring or for triaging incidents by using Change Analysis.
 
-We will work on an app for tracking your work tasks (and make some of them public with an ability for users to provide
+We will work with [an app](src) for tracking your work tasks (and make some of them public with an ability for users to
+provide
 feedback) protected by forms authentication (classic approach), backed by Microsoft SQL and exposed through REST API
-services. The code is written in [.NET 6](https://dot.net). We do recommend reading about the
-application [structure](#structure) before starting with challenges.
+services. The code is written in [.NET 6](https://dot.net).
 
 ## Version **TL;DR;**
 
 We want to use latest and greatest techniques to bring the solution from zero to hero using infrastructure as code
-approach with DevOps principles in mind.
+approach with DevOps principles in mind and govern the application by making it resilient and error aware.
 
 Going from this on premise (or in IaaS)
 
@@ -67,31 +67,31 @@ To successfully participate in this hackathon you will need:
    scripts, YAML pipelines and connect to repos to submit changes4.
 5. [OPTIONAL] [Github GUI App](https://desktop.github.com/) for managing changes and work
    on [forked](https://docs.github.com/en/get-started/quickstart/fork-a-repo) repo
-6. [OPTIONAL] Windows Terminal
+6. [OPTIONAL] [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)
 
-If you will be working on your local machines, you will need to:
+If you will be working on your local machines, you will need to have:
 
-1. have [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
+1.
+ [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
 installed
-2. have git installed - instructions step by step [here](https://docs.github.com/en/get-started/quickstart/set-up-git)
+2. git installed - instructions step by step [here](https://docs.github.com/en/get-started/quickstart/set-up-git)
 3. [.NET](https://dot.net) installed to run the application if you want to run it
 4. [SQL server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) to install the database and to populate
    it with data
 5. an editor (besides notepad) to see and work with code, yaml, scripts and
-   more ([Visual Studio Code](https://code.visualstudio.com), but any other editor will work as well)
+   more (for example [Visual Studio Code](https://code.visualstudio.com))
 
 ## Knowledge expected
 
-Some of the components requires from you basic understanding of:
+What the hack requires from you basic understanding of:
 
-1. Azure - learning path is available [here](https://learn.microsoft.com/en-us/training/azure/)
-    - [certifications](https://learn.microsoft.com/en-us/certifications/browse/?resource_type=certification&products=azure%2Csql-server%2Cwindows-server&type=fundamentals%2Crole-based%2Cspecialty&expanded=azure%2Cwindows)
+1. Azure - learning path is available [here](https://learn.microsoft.com/en-us/training/azure/) - [certifications](https://learn.microsoft.com/en-us/certifications/browse/?resource_type=certification&products=azure%2Csql-server%2Cwindows-server&type=fundamentals%2Crole-based%2Cspecialty&expanded=azure%2Cwindows)
       like AZ 900 can help
 2. [Git](https://git-scm.com/book/en/v2) to understand how to clone, fork, branch, merge, rebase, etc.
 3. [scripting](https://en.wikipedia.org/wiki/Scripting_language#Examples) -
    either [PowerShell](https://en.wikipedia.org/wiki/PowerShell)
    or [bash](https://en.wikipedia.org/wiki/Bash_(Unix_shell)) (if you will decide to go this path)
-3. [YAML structure](https://en.wikipedia.org/wiki/YAML) to be able to complete pipelines and workflows
+4. [YAML structure](https://en.wikipedia.org/wiki/YAML) to be able to complete pipelines and workflows
 
 ## Knowledge gains
 
@@ -108,8 +108,6 @@ By completing the hackathon you'll understand how to:
 Too start the mini hackathon click button below:
 
 [![button](https://webeudatastorage.blob.core.windows.net/files/start-challenges.jpg)](./docs/00-init.md)
-
-
 
 # Additional information
 

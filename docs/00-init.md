@@ -1,9 +1,12 @@
-﻿<!-- TOC -->
-* [Repository and code structure](#repository-and-code-structure)
-  * [Source code - src folder](#source-code---src-folder)
-  * [Containers overview](#containers-overview)
-  * [Scripts folder overview](#scripts-folder-overview)
-  * [Minimal requirements](#minimal-requirements)
+﻿# Workload structure and technical details
+
+<!-- TOC -->
+* [Workload structure and technical details](#workload-structure-and-technical-details)
+  * [Repository and code structure](#repository-and-code-structure)
+    * [Source code - src folder](#source-code---src-folder)
+    * [Containers overview](#containers-overview)
+    * [Scripts folder overview](#scripts-folder-overview)
+    * [Minimal requirements](#minimal-requirements)
 * [Diagrams overview](#diagrams-overview)
   * [Populate data and prepare data backend](#populate-data-and-prepare-data-backend)
   * [Flow with web application](#flow-with-web-application)
@@ -16,7 +19,7 @@
 * [Let's start with first task - Move and automatic configuration in IaaS Azure](#lets-start-with-first-task---move-and-automatic-configuration-in-iaas-azure)
 <!-- TOC -->
 
-# Repository and code structure
+## Repository and code structure
 
 Solution has 4 main folders:
 
@@ -27,7 +30,7 @@ Solution has 4 main folders:
 3. **docs** - documentation, architecture diagrams, videos and many more
 4. **containers** - docker files to generate below applications for modernization options
 
-## Source code - src folder
+### Source code - src folder
 
 Solution is built out of 5 main parts:
 
@@ -53,7 +56,7 @@ multiple editors available ([Microsoft Visual Studio](https://visualstudio.com)
 , [Microsoft Visual Studio Code with C#](https://code.visualstudio.com)
 plugin, [Jetbrains Rider](https://jetbrains.com/rider) and more).
 
-## Containers overview
+### Containers overview
 
 To take advantage of modernization opportunity and make solution to be cloud native aware, below are the container
 files:
@@ -82,7 +85,7 @@ have [az cli](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) inst
 
 `az acr build --image tta/datagen:1.0 --registry ##yourregistryname## --file ../containers/TTA.DataGenerator.SQL.dockerfile .`
 
-## Scripts folder overview
+### Scripts folder overview
 
 Scripts contains folders with scripts for specific purposes in mixed languages (bash, pwsh, bicep, terraform,...).
 
@@ -92,7 +95,7 @@ separate table - depends on the need in specific.
 Keep in mind - there are multiple ways to complete specific task and the idea is to learn new technology, not copy and
 paste solutions.
 
-## Minimal requirements
+### Minimal requirements
 
 In order to deploy the application on your machine you will need:
 
