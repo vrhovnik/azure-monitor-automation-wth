@@ -1,21 +1,15 @@
 # Azure Automation & Monitor What The Hack
 
 <!-- TOC -->
-
 * [Azure Automation & Monitor What The Hack](#azure-automation--monitor-what-the-hack)
-    * [Version **TL;DR;**](#version-tldr)
-    * [Tech pre-requisites](#tech-pre-requisites)
-    * [Knowledge expected](#knowledge-expected)
-    * [Knowledge gains](#knowledge-gains)
+  * [Version **TL;DR;**](#version-tldr)
+  * [Tech pre-requisites](#tech-pre-requisites)
+  * [Knowledge expected](#knowledge-expected)
+  * [Knowledge gains](#knowledge-gains)
 * [Start solving challenges to go from zero to hero](#start-solving-challenges-to-go-from-zero-to-hero)
-* [Repository and code structure](#repository-and-code-structure)
-    * [Source code - src folder](#source-code---src-folder)
-    * [Containers overview](#containers-overview)
-    * [Scripts folder overview](#scripts-folder-overview)
 * [Additional information](#additional-information)
 * [Credits](#credits)
 * [Contributing](#contributing)
-
 <!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options
