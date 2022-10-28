@@ -5,6 +5,7 @@
   * [Diagram](#diagram)
   * [Task requirements](#task-requirements)
 * [Key takeaways](#key-takeaways)
+* [Help links](#help-links)
 * [Govern the application and make sure your SLA meets the goal](#govern-the-application-and-make-sure-your-sla-meets-the-goal)
 <!-- TOC -->
 
@@ -53,9 +54,17 @@ As you can see there is a little bit more setup to get application working. You 
 2. automate deployment of resources
 3. leverage PaaS tools to provide you with common tasks to get up to speed quickly.
 
+# Help links
+
+To help with your challenge some helper links below:
+
+1. [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/container-registry-quickstart-task-cli)
+2. [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+3. [Requiring successful dependent jobs](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow#example-requiring-successful-dependent-jobs)
+
 # Govern the application and make sure your SLA meets the goal
 
 Solution is now up and running. We tried out different options, different services. Now we need to make sure that
 running solution works reliably and resilient.
 
-[<< Scale Solution](./02-Scale-Solution.md) | [ Make SLA great again >>](./05-monitoring-basics.md)
+[<< Move to Azure](./01-move-to-IaaS-Azure.md) | [ Make SLA great again >>](./05-monitoring-basics.md)

@@ -1,14 +1,13 @@
 ﻿# Move to Azure and configure it effectively
 
 <!-- TOC -->
-
 * [Move to Azure and configure it effectively](#move-to-azure-and-configure-it-effectively)
-    * [Desired Azure deployment result diagram](#desired-azure-deployment-result-diagram)
-    * [Task requirement](#task-requirement)
-    * [Test the functionality](#test-the-functionality)
+  * [Desired Azure deployment result diagram](#desired-azure-deployment-result-diagram)
+  * [Task requirement](#task-requirement)
+  * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
 * [Help links](#help-links)
-
+* [Modernize the application](#modernize-the-application)
 <!-- TOC -->
 
 To migrate to Azure we need to understand what we have available and how to migrate to the cloud. As company CTO decided
@@ -95,11 +94,16 @@ To help with your challenge some helper links below:
 
 1. [Github Fork Repo](https://docs.github.com/en/get-started/quickstart/fork-a-repo)
 2. [GitHub Branch Protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/managing-a-branch-protection-rule)
-2. [Public IP DNS label](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/public-ip-addresses#dns-name-label)
-2. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/)
-2. [Azure Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep)
-2. [Chocolatey](https://chocolatey.org/)
-3. [Dotnet Publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
-4. [Start-Process PowerShell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-process?view=powershell-7.2)
+3. [Public IP DNS label](https://learn.microsoft.com/en-us/azure/virtual-network/ip-services/public-ip-addresses#dns-name-label)
+4. [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/)
+5. [Azure Bicep](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep)
+6. [Chocolatey](https://chocolatey.org/)
+7. [Dotnet Publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
+8. [Start-Process PowerShell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/start-process?view=powershell-7.2)
+
+# Modernize the application
+
+With rising solution and an ability to run hybrid workloads, you were asked to take advantage of containers and
+modernize the app to embrace cloud native approach.
 
 [<< Application structure](./00-init.md) | [Modernize the application >>](./03-modernization-in-Azure.md)
