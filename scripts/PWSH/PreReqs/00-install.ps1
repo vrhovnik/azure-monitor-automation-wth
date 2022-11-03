@@ -19,4 +19,5 @@ if ($answer -eq "y")
 az login
 #check the subscription
 az account list --output table
-subscriptionId=$(az account show --query id --output tsv)
+# continue with next steps
+Write-Host "Done with login, continue to next step"

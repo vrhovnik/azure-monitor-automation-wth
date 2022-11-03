@@ -27,6 +27,9 @@ builder.Services.AddTransient<IProfileSettingsService, ProfileSettingsService>(_
 builder.Services.AddTransient<IWorkTaskCommentRepository, WorkTaskCommentRepository>(_ =>
     new WorkTaskCommentRepository(sqlOptions.ConnectionString));
 
+//adding other services
+builder.Services.AddScoped<IQuoteService, QuoteOfTheDayService>();
+
 //core system settings
 builder.Services.AddScoped<IUserDataContext, UserDataContext>();
 builder.Services.AddHttpContextAccessor();
