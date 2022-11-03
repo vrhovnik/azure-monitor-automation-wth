@@ -2,10 +2,6 @@
 az login
 # check account 
 az account list --output table
-# Set account, if you have multiple libraries
-az account set -s NAME_OR_ID
-# set default resource group
-az config set defaults.group=$rgName
 
 # add modules to have them installed
 az extension add --name containerapp --upgrade
