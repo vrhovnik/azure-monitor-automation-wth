@@ -80,6 +80,11 @@ installed
 5. an editor (besides notepad) to see and work with code, yaml, scripts and
    more (for example [Visual Studio Code](https://code.visualstudio.com))
 
+To verify if everything is ready to start with tasks, do this 3 things:
+1. use [this script](scripts/PWSH/PreReqs/00-install.ps1) to install cli and get back the subscriptions
+2. configure default subscription, installing bicep (or upgrade to newest version) and defining ENV variables to be used for local development or for DevOps process with example script [here](scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
+3. [fork this repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) (to have all the files) and add secrets (from env variables in step 2) to be used in challenges - you can use example script [here](scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
+
 ## Knowledge expected
 
 What the hack requires from you basic understanding of:

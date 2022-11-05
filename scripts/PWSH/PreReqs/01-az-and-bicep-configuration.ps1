@@ -69,6 +69,7 @@ $spJson = (az ad sp create-for-rbac -n $name --role "Contributor" --scopes /subs
 
 Write-Host "Configuring scripts and applications to use the values for" $name "with ID "$spJson.appId "and setting it to ENV variables"
 
+New-Item -Path Env:\AMA_SP_AZURE_CREDS -Value $spJson
 New-Item -Path Env:\AMA_SP_APPID -Value $spJson.appId
 New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value $spJson.displayName
 New-Item -Path Env:\AMA_SP_PASSWORD -Value $spJson.password
@@ -85,12 +86,13 @@ if ($persist -eq "y")
     }
 
     # add to the profile file
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_AZURE_CREDS -Value '$spJson'")
     Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_APPID -Value '$spJson.appId'")
     Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value '$spJson.displayName'")
     Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_PASSWORD -Value '$spJson.password'")
     Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_TENANTID -Value '$spJson.tenant'")
 
-    Write-Host "Added to profile to be available on launch"
+    Write-Host "Added to profile to be available on launch, checking the ENV"
 }
 Get-ChildItem Env:
 Write-Host "Environment variables set, continue with other scripts..."
