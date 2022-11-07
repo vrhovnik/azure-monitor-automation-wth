@@ -1,0 +1,45 @@
+﻿name: "Deploy Bicep for one customer"
+on:
+  push:
+    branches:
+      - iac
+    paths:
+      - "scripts/iac/VM/**"
+  workflow_dispatch:
+env:
+  WORKDIR: "scripts/iac/VM"
+  DEFAULT_LOCATION: "westeurope"  
+  CUSTOMER_NAME: "ama-cust"  
+defaults:
+  run:
+    working-directory: "scripts/iac/VM/"
+jobs:
+  preview:
+    name: "Preview Changes for one customer"
+    runs-on: ubuntu-latest    
+    steps:      
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}      
+      - name: "What-If Resource Group rg-${{ env.CUSTOMER_NAME }}"
+        uses: Azure/cli@v1        
+        with:
+          inlineScript: |
+            az deployment sub what-if \
+              --name ${{ github.run_id }} \
+              --template-file rg.bicep \
+              --location "${{ env.DEFAULT_LOCATION }}" \
+              --parameters rg.parameters.json
+      - name: "What-If-VM"
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group what-if \
+             --name ${{ github.run_id }} \
+             --template-file vm.bicep \
+             --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
+             --parameters vm.parameters.json            
+  
