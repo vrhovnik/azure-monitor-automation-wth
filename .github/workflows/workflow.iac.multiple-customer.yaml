@@ -1,0 +1,56 @@
+﻿name: "Deploy resources for multiple customers"
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/IaC/VMS/**"
+  workflow_dispatch:
+env:
+  WORKDIR: "scripts/IaC/VMS"
+  DEFAULT_LOCATION: "westeurope"  
+  CUSTOMER_NAME: "ama-cust"
+defaults:
+  run:
+    working-directory: "scripts/IaC/VMS"
+jobs:
+  rg-deployment:
+    name: "Preview changes and deploy RG for one customer"
+    runs-on: ubuntu-latest    
+    steps:      
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'      
+      - name: 'What-If Resource Group rg-${{ env.CUSTOMER_NAME }}'
+        uses: Azure/cli@v1        
+        with:
+          inlineScript: |
+            az deployment sub what-if \
+              --name ${{ github.run_id }} \
+              --template-file "${{ env.WORKDIR }}/rg.bicep" \
+              --location "${{ env.DEFAULT_LOCATION }}" \
+              --parameters "${{ env.WORKDIR }}/rg.parameters.json"                   
+  vm-deployment:
+    name: 'Create VM for one customer'
+    runs-on: ubuntu-latest
+    needs: rg-deployment
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Login to Azure to be able to create VM"
+        uses: Azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: 'Preview VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group what-if \
+             --name "${{ github.run_id }}" \
+             --template-file  "${{ env.WORKDIR }}/vm.bicep" \
+             --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
+             --parameters "${{ env.WORKDIR }}/vm.parameters.json"   
+        
