@@ -58,22 +58,27 @@ if ($name -eq "")
     Write-Host "Default name for service principal is" $name
 }
 $subscriptionId=$subscription.id
-$spJson = (az ad sp create-for-rbac -n $name --role "Contributor" --scopes /subscriptions/$subscriptionId | ConvertFrom-Json)
+$spJson = (az ad sp create-for-rbac -n $name --role "Contributor" --scopes /subscriptions/$subscriptionId --sdk-auth | ConvertFrom-Json)
 # Output should be:
 #{
-#  "appId": "GUID",
-#  "displayName": "RANDOMNAME",
-#  "password": "01n8Z~LkUGIJ0mABCe9v==D4iWwHC8aR_ABC6aqB",
-#  "tenant": "GUID"
+#    "clientId": "1223456-b1c9-XXX-a1c4-XXXX",
+#    "clientSecret": "thH8Q~hhuadasadsdasdsd~BeaUh",
+#    "subscriptionId": "098isa-258d-iijs-XXXX-DASwaAASS",
+#    "tenantId": "778jdas-1234-123-55555-asasasa",
+#    "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+#    "resourceManagerEndpointUrl": "https://management.azure.com/",
+#    "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+#    "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+#    "galleryEndpointUrl": "https://gallery.azure.com/",
+#    "managementEndpointUrl": "https://management.core.windows.net/"
 #}
 
-Write-Host "Configuring scripts and applications to use the values for" $name "with ID "$spJson.appId "and setting it to ENV variables"
+Write-Host "Configuring scripts and applications to use the values for" $name "with ID "$spJson.clientId "and setting it to ENV variables"
 
 New-Item -Path Env:\AMA_SP_AZURE_CREDS -Value $spJson
-New-Item -Path Env:\AMA_SP_APPID -Value $spJson.appId
-New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value $spJson.displayName
-New-Item -Path Env:\AMA_SP_PASSWORD -Value $spJson.password
-New-Item -Path Env:\AMA_SP_TENANTID -Value $spJson.tenant
+New-Item -Path Env:\AMA_SP_APPID -Value $spJson.clientId
+New-Item -Path Env:\AMA_SP_PASSWORD -Value $spJson.clientSecret
+New-Item -Path Env:\AMA_SP_TENANTID -Value $spJson.tenantId
 
 $persist = Read-Host "Env variables set. Do you want to persist values to be stored to ENV variables? (y/n). Default is n."
 if ($persist -eq "y")
@@ -87,10 +92,9 @@ if ($persist -eq "y")
 
     # add to the profile file
     Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_AZURE_CREDS -Value '$spJson'")
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_APPID -Value '$spJson.appId'")
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_DISPLAY_NAME -Value '$spJson.displayName'")
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_PASSWORD -Value '$spJson.password'")
-    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_TENANTID -Value '$spJson.tenant'")
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_APPID -Value '$spJson.clientId'")
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_PASSWORD -Value '$spJson.clientSecret'")
+    Add-Content -Path $PROFILE -Value ("New-Item -Path Env:\AMA_SP_TENANTID -Value '$spJson.tenantId'")
 
     Write-Host "Added to profile to be available on launch, checking the ENV"
 }

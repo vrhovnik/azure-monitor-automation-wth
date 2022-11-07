@@ -12,7 +12,7 @@ env:
   CUSTOMER_NAME: "ama-cust"  
 defaults:
   run:
-    working-directory: "scripts/iac/VM/"
+    working-directory: "./scripts/iac/VM/"
 jobs:
   preview:
     name: "Preview Changes for one customer"
@@ -24,22 +24,22 @@ jobs:
         uses: Azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}      
-      - name: "What-If Resource Group rg-${{ env.CUSTOMER_NAME }}"
+      - name: "What-If Resource Group rg-"${{ env.CUSTOMER_NAME }}
         uses: Azure/cli@v1        
         with:
           inlineScript: |
             az deployment sub what-if \
               --name ${{ github.run_id }} \
-              --template-file rg.bicep \
+              --template-file  ${{ env.WORKDIR }}/rg.bicep \
               --location "${{ env.DEFAULT_LOCATION }}" \
-              --parameters rg.parameters.json
+              --parameters  ${{ env.WORKDIR }}/rg.parameters.json
       - name: "What-If-VM"
         uses: Azure/cli@v1
         with:
           inlineScript: |
             az deployment group what-if \
              --name ${{ github.run_id }} \
-             --template-file vm.bicep \
+             --template-file  ${{ env.WORKDIR }}/vm.bicep \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters vm.parameters.json            
+             --parameters  ${{ env.WORKDIR }}/vm.parameters.json            
   
