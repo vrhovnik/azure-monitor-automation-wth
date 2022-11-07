@@ -9,7 +9,7 @@ on:
 env:
   WORKDIR: "scripts/IaC/Modernization"
   DEFAULT_LOCATION: "westeurope"
-  CUSTOMER_NAME: "ama-cust-containers"
+  CUSTOMER_NAME: "ama-cust-containers-01"
 defaults:
   run:
     working-directory: "scripts/IaC/Modernization"
@@ -28,4 +28,4 @@ jobs:
       - name: 'Run Powershell script to create resources'
         shell: pwsh
         run: |
-          .\azure-creation.ps1 -regionToDeploy ${{ env.DEFAULT_LOCATION }} 
+          .\azure-creation.ps1 -regionToDeploy ${{ env.DEFAULT_LOCATION }} -containerAppName ${{ env.CUSTOMER_NAME }}
