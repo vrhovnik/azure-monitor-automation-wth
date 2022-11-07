@@ -15,7 +15,7 @@ defaults:
     working-directory: "scripts/IaC/VM"
 jobs:
   rg-deployment:
-    name: "Preview Changes for one customer"
+    name: "Preview changes and deploy RG for one customer"
     runs-on: ubuntu-latest    
     steps:      
       - name: Checkout
@@ -37,7 +37,7 @@ jobs:
         uses: Azure/cli@v1
         with:
           inlineScript: |
-            az deployment sub \
+            az deployment sub create \
              --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/vm.bicep" \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
@@ -57,7 +57,7 @@ jobs:
         uses: Azure/cli@v1
         with:
           inlineScript: |
-            az deployment group \
+            az deployment group create \
              --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/vm.bicep" \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
