@@ -15,7 +15,7 @@ defaults:
     working-directory: "scripts/IaC/VMS"
 jobs:
   rg-deployment:
-    name: "Preview changes and deploy RG for one customer"
+    name: "Preview changes and deploy VM for different customers"
     runs-on: ubuntu-latest    
     steps:      
       - name: Checkout
