@@ -1,0 +1,31 @@
+﻿name: "Deploy RG for one customer"
+on:      
+  workflow_dispatch:
+env:
+  WORKDIR: "scripts/IaC/VM"
+  DEFAULT_LOCATION: "westeurope"
+  CUSTOMER_NAME: "ama-cust"
+defaults:
+  run:
+    working-directory: "scripts/IaC/VM"
+jobs:
+  rg-preview-deployment:
+    name: "Preview changes for RG for one customer"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: 'What-If Resource Group rg-${{ env.CUSTOMER_NAME }}'
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group what-if \
+              --name ${{ github.run_id }} \
+              --template-file "${{ env.WORKDIR }}/rg.bicep" \
+              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
+              --parameters "${{ env.WORKDIR }}/rg.parameters.json"
+      

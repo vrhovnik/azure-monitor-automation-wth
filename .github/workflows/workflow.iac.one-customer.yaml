@@ -39,9 +39,9 @@ jobs:
           inlineScript: |
             az deployment sub create \
              --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
-             --template-file  "${{ env.WORKDIR }}/vm.bicep" \
-             --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters "${{ env.WORKDIR }}/vm.parameters.json"             
+             --template-file  "${{ env.WORKDIR }}/rg.bicep" \
+             --location "${{ env.DEFAULT_LOCATION }}" \
+             --parameters "${{ env.WORKDIR }}/rg.parameters.json"             
   vm-deployment:
     name: 'Create VM for one customer'
     runs-on: ubuntu-latest
@@ -53,6 +53,15 @@ jobs:
         uses: Azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: 'Preview VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group what-if \
+             --name "${{ github.run_id }}" \
+             --template-file  "${{ env.WORKDIR }}/vm.bicep" \
+             --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
+             --parameters "${{ env.WORKDIR }}/vm.parameters.json"   
       - name: 'Create VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'
         uses: Azure/cli@v1
         with:
