@@ -52,7 +52,7 @@ As you can see there is a little bit more setup to get application working. You 
 1. how to use create registries, make containers and leverage cloud tools to automatically build the images with
    blue/green techniques
 2. automate deployment of resources
-3. leverage PaaS tools to provide you with common tasks to get up to speed quickly.
+3. leverage PaaS tools to provide you with common tasks to get up to speed quickly
 
 # Help links
 

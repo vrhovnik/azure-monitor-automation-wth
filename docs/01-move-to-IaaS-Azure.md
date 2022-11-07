@@ -29,16 +29,15 @@ DevOps pipeline.
 
 ## Task requirement
 
-Your job is to create (without user intervention) DevOps pipeline to deploy application to desired customer:
+Your job is to create (without user intervention) process to deploy application to desired customer:
 
 1. resources in Azure defined in upper diagram - customer should have his virtual machine with all required software
    deployed to resource group named **rg-customername**
 2. upon VM creation install required software **automatically** with provided
    script [here](https://go.azuredemos.net/ama-initial-script)
 3. deploy workloads and expose them to internet (port 443 and 80) via FQDN prefix **customername-wth-europe**
-4. make sure deployment fires when you push (and approve) to the folder [IaC](../scripts/IaC) - if you update the
-   folder, **ALL** customer needs to be updated. Provide a way to **manually** update specific customer.
-5. provide a way to deploy solution **ONLY** if validation of resource creation pass.
+4. make sure when you change the scripts in folder [IaC](../scripts/IaC) **ALL** customer needs to be updated. Provide as well a way to **manually** update specific customer.
+5. provide a way to deploy solution **ONLY** if validation of resource creation pass as an success.
 6. execute health report to see if the solution is responding with 200 OK (calling get request FQDN/health will give you
    information about health status)
 

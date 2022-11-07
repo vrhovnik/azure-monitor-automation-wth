@@ -44,14 +44,6 @@ services. The code is written in [.NET 6](https://dot.net).
 We want to use latest and greatest techniques to bring the solution from zero to hero using infrastructure as code
 approach with DevOps principles in mind and govern the application by making it resilient and error aware.
 
-Going from this on premise (or in IaaS)
-
-![on premise app](https://webeudatastorage.blob.core.windows.net/web/OnPremArchitecture.png)
-
-to this in the cloud step by step
-
-![Required environment](https://webeudatastorage.blob.core.windows.net/web/ama-container-app-basic-info.png)
-
 ## Tech pre-requisites
 
 To successfully participate in this hackathon you will need:
@@ -124,7 +116,7 @@ By completing the hackathon you'll understand how to:
 
 Too start the mini hackathon click button below:
 
-[![button](https://webeudatastorage.blob.core.windows.net/files/start-challenges.jpg)](./docs/00-init.md)
+[![button](https://webeudatastorage.blob.core.windows.net/files/start-challenges.jpg)](./docs/00-challenges.md)
 
 # Additional information
 
