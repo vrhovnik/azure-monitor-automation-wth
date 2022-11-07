@@ -2,17 +2,14 @@
 on:
   push:
     branches:
-      - iac
+      - main
     paths:
       - "scripts/iac/VM/**"
   workflow_dispatch:
 env:
   WORKDIR: "scripts/iac/VM"
   DEFAULT_LOCATION: "westeurope"  
-  CUSTOMER_NAME: "ama-cust"  
-defaults:
-  run:
-    working-directory: "./scripts/iac/VM/"
+  CUSTOMER_NAME: "ama-cust"
 jobs:
   preview:
     name: "Preview Changes for one customer"
