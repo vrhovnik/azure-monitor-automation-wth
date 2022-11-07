@@ -16,8 +16,7 @@ defaults:
 jobs:
     vm-deployment:
       name: 'Create containers for one customer and publish the results'
-      runs-on: ubuntu-latest
-      needs: rg-deployment
+      runs-on: ubuntu-latest      
       steps:
         - name: Checkout
           uses: actions/checkout@v2
