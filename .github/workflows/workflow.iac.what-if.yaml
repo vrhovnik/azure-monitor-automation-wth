@@ -11,7 +11,7 @@ env:
   DEFAULT_LOCATION: "westeurope"  
   CUSTOMER_NAME: "ama-cust"
 jobs:
-  preview:
+  preview-deployment:
     name: "Preview Changes for one customer"
     runs-on: ubuntu-latest    
     steps:      
@@ -20,8 +20,8 @@ jobs:
       - name: "Login to Azure"
         uses: Azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}      
-      - name: "What-If Resource Group rg-"${{ env.CUSTOMER_NAME }}
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'      
+      - name: 'What-If Resource Group rg-${{ env.CUSTOMER_NAME }}'
         uses: Azure/cli@v1        
         with:
           inlineScript: |
