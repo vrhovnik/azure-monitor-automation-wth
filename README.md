@@ -1,15 +1,17 @@
 # Azure Automation & Monitor What The Hack
 
 <!-- TOC -->
+
 * [Azure Automation & Monitor What The Hack](#azure-automation--monitor-what-the-hack)
-  * [Version **TL;DR;**](#version-tldr)
-  * [Tech pre-requisites](#tech-pre-requisites)
-  * [Knowledge expected](#knowledge-expected)
-  * [Knowledge gains](#knowledge-gains)
+    * [Version **TL;DR;**](#version-tldr)
+    * [Tech pre-requisites](#tech-pre-requisites)
+    * [Knowledge expected](#knowledge-expected)
+    * [Knowledge gains](#knowledge-gains)
 * [Start solving challenges to go from zero to hero](#start-solving-challenges-to-go-from-zero-to-hero)
 * [Additional information](#additional-information)
 * [Credits](#credits)
 * [Contributing](#contributing)
+
 <!-- TOC -->
 
 What the hack structure initiative to enable partners to understand automation and monitoring options
@@ -65,14 +67,15 @@ To successfully participate in this hackathon you will need:
 4. [PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
    installed - we do recommend an editor like [Visual Studio Code](https://code.visualstudio.com) to be able to write
    scripts, YAML pipelines and connect to repos to submit changes4.
-5. [OPTIONAL] [Github GUI App](https://desktop.github.com/) for managing changes and work
+5. [OPTIONAL] GitHub CLI installed to work with GitHub - [how to install](https://cli.github.com/manual/installation)
+6. [OPTIONAL] [Github GUI App](https://desktop.github.com/) for managing changes and work
    on [forked](https://docs.github.com/en/get-started/quickstart/fork-a-repo) repo
-6. [OPTIONAL] [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)
+7. [OPTIONAL] [Windows Terminal](https://learn.microsoft.com/en-us/windows/terminal/install)
 
 If you will be working on your local machines, you will need to have:
 
 1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.2)
-installed
+   installed
 2. git installed - instructions step by step [here](https://docs.github.com/en/get-started/quickstart/set-up-git)
 3. [.NET](https://dot.net) installed to run the application if you want to run it
 4. [SQL server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) to install the database and to populate
@@ -80,17 +83,26 @@ installed
 5. an editor (besides notepad) to see and work with code, yaml, scripts and
    more (for example [Visual Studio Code](https://code.visualstudio.com))
 
+To help you **with installing all of the requirement above**, you can
+use [this example script](scripts/PWSH/PreReqs/00-install-tools.ps1) to install everything and run the application.
+
 To verify if everything is ready to start with tasks, do this 3 things:
-1. use [this script](scripts/PWSH/PreReqs/00-install.ps1) to install cli and get back the subscriptions
-2. configure default subscription, installing bicep (or upgrade to newest version) and defining ENV variables to be used for local development or for DevOps process with example script [here](scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
-3. [fork this repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) (to have all the files) and add secrets (from env variables in step 2) to be used in challenges - you can use example script [here](scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
+
+1. use [this script](scripts/PWSH/PreReqs/00-install.ps1) to install cli and get back the available subscriptions
+2. configure default subscription, installing bicep (or upgrade to newest version) and defining ENV variables to be used
+   for local development or for DevOps process with example
+   script [here](scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
+3. [fork this repository](https://docs.github.com/en/get-started/quickstart/fork-a-repo) (to have all the files
+   available) and add secrets (from env variables in step 2) to be used in challenges - you can use example
+   script [here](scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
 
 ## Knowledge expected
 
 What the hack requires from you basic understanding of:
 
-1. Azure - learning path is available [here](https://learn.microsoft.com/en-us/training/azure/) - [certifications](https://learn.microsoft.com/en-us/certifications/browse/?resource_type=certification&products=azure%2Csql-server%2Cwindows-server&type=fundamentals%2Crole-based%2Cspecialty&expanded=azure%2Cwindows)
-      like AZ 900 can help
+1. Azure - learning path is available [here](https://learn.microsoft.com/en-us/training/azure/)
+   - [certifications](https://learn.microsoft.com/en-us/certifications/browse/?resource_type=certification&products=azure%2Csql-server%2Cwindows-server&type=fundamentals%2Crole-based%2Cspecialty&expanded=azure%2Cwindows)
+   like AZ 900 can help
 2. [Git](https://git-scm.com/book/en/v2) to understand how to clone, fork, branch, merge, rebase, etc.
 3. [scripting](https://en.wikipedia.org/wiki/Scripting_language#Examples) -
    either [PowerShell](https://en.wikipedia.org/wiki/PowerShell)
@@ -101,7 +113,8 @@ What the hack requires from you basic understanding of:
 
 By completing the hackathon you'll understand how to:
 
-1. use [IaC](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code) effectively with DevOps principles
+1. use [IaC](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code) effectively with DevOps
+   principles
 2. configure scale and deploy with ease with solid foundation
 3. leverage technologies to deploy native workloads to cloud
 4. effectively react on challenges and take advantage of cloud to build resilient environment for workloads
@@ -118,13 +131,14 @@ Too start the mini hackathon click button below:
 You can read about different techniques and options here:
 
 1. [What-The-Hack initiative](https://aka.ms/wth)
-2. [Azure Samples](https://github.com/Azure-Samples)
+2. [GitHub and DevOps](https://resources.github.com/devops/)
+3. [Azure Samples](https://github.com/Azure-Samples)
    or [use code browser](https://docs.microsoft.com/en-us/samples/browse/?products=azure)
-3. [Azure Architecture Center](https://docs.microsoft.com/en-us/azure/architecture/)
-4. [Application Architecture Guide](https://docs.microsoft.com/en-us/azure/architecture/guide/)
-5. [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/)
-6. [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/)
-7. [Microsoft Learn](https://docs.microsoft.com/en-us/learn/roles/solutions-architect)
+4. [Azure Architecture Center](https://docs.microsoft.com/en-us/azure/architecture/)
+5. [Application Architecture Guide](https://docs.microsoft.com/en-us/azure/architecture/guide/)
+6. [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/)
+7. [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/)
+8. [Microsoft Learn](https://docs.microsoft.com/en-us/learn/roles/solutions-architect)
 
 # Credits
 
