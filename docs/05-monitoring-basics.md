@@ -1,12 +1,11 @@
 ﻿# Monitoring basics
 
 <!-- TOC -->
-
 * [Monitoring basics](#monitoring-basics)
-    * [Task requirement](#task-requirement)
-    * [Test the functionality](#test-the-functionality)
+  * [Task requirement](#task-requirement)
+  * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
-
+* [Useful links](#useful-links)
 <!-- TOC -->
 
 Solution is now up and running. Some customers saw challenges with random errors or application not to anything.
@@ -48,5 +47,5 @@ If you don't have it deployed or you deleted everything from before, you can use
 3. [jMeter](https://jmeter.apache.org/) 
 3. [Bombardier benchmarking tool](https://github.com/codesenberg/bombardier) 
 
-[<< Enable Monitoring](./03-modernization-in-Azure.md) | [<< Back to the challenges](../README.md)
+[<< Enable Monitoring](./03-modernization-in-Azure.md) | [<< Back to the challenges](./00-challenges.md)
 | [Monitoring previews >>](./06-monitoring-previews.md)  
