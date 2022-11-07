@@ -6,7 +6,7 @@
   * [Task requirement](#task-requirement)
   * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
-* [Help links](#help-links)
+* [Useful links](#useful-links)
 * [Modernize the application](#modernize-the-application)
 <!-- TOC -->
 
@@ -38,7 +38,7 @@ Your job is to create (without user intervention) process to deploy application 
 3. deploy workloads and expose them to internet (port 443 and 80) via FQDN prefix **customername-wth-europe**
 4. make sure when you change the scripts in folder [IaC](../scripts/IaC) **ALL** customer needs to be updated. Provide as well a way to **manually** update specific customer.
 5. provide a way to deploy solution **ONLY** if validation of resource creation pass as an success.
-6. execute health report to see if the solution is responding with 200 OK (calling get request FQDN/health will give you
+6. execute health report check to see if the solution is responding with 200 OK (calling get request FQDN/health will give you
    information about health status)
 
 Script to install the software is available below:
@@ -57,8 +57,7 @@ execute upper line in Windows PowerShell to get the script and invoke the script
 ## Test the functionality
 
 After creating the resources automatically you will get FQDN (prefix **customername-wth-europe**). You can test the
-solution as well with IP to see, if it
-works both ways.
+solution as well with IP to see, if it works both ways. 
 
 Open a browser and navigate to FQDN and test the website and REST client.
 
@@ -87,7 +86,7 @@ On this challenge you'll learn along the way about:
 5. integrate IaC into Devops pipeline and configure environment to have deployable solution available for all or
    specific customer
 
-# Help links
+# Useful links
 
 To help with your challenge some helper links below:
 
@@ -105,4 +104,4 @@ To help with your challenge some helper links below:
 With rising solution and an ability to run hybrid workloads, you were asked to take advantage of containers and
 modernize the app to embrace cloud native approach.
 
-[<< Application structure](./00-init.md) | [Modernize the application >>](./03-modernization-in-Azure.md)
+[<< Application structure](./00-init.md) | [Scale the solution >>](./02-Scale-Solution.md)
