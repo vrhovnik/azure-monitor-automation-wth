@@ -53,7 +53,8 @@ jobs:
         uses: Azure/login@v1
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
-      - name: 'Create VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'       
+      - name: 'Create VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'
+        uses: Azure/cli@v1
         inlineScript: |
             az deployment group \
              --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
