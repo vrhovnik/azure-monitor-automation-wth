@@ -43,7 +43,7 @@ jobs:
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
              --parameters "${{ env.WORKDIR }}/vm.parameters.json"             
   vm-deployment:
-    name: 'Create VM for one customer ${{ env.CUSTOMER_NAME }}'
+    name: 'Create VM for one customer'
     runs-on: ubuntu-latest
     needs: rg-deployment
     steps:
