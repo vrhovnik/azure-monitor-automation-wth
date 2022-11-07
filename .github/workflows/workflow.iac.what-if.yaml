@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - main
+      - iac
     paths:
       - "scripts/iac/VM/**"
   workflow_dispatch:
@@ -41,4 +41,5 @@ jobs:
              --name ${{ github.run_id }} \
              --template-file vm.bicep \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters vm.parameters.json              
+             --parameters vm.parameters.json            
+  
