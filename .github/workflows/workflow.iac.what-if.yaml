@@ -27,16 +27,16 @@ jobs:
           inlineScript: |
             az deployment sub what-if \
               --name ${{ github.run_id }} \
-              --template-file  ${{ env.WORKDIR }}/rg.bicep \
+              --template-file  "${{ env.WORKDIR }}/rg.bicep" \
               --location "${{ env.DEFAULT_LOCATION }}" \
-              --parameters  ${{ env.WORKDIR }}/rg.parameters.json
+              --parameters  "${{ env.WORKDIR }}/rg.parameters.json"
       - name: "What-If-VM"
         uses: Azure/cli@v1
         with:
           inlineScript: |
             az deployment group what-if \
              --name ${{ github.run_id }} \
-             --template-file  ${{ env.WORKDIR }}/vm.bicep \
+             --template-file  "${{ env.WORKDIR }}/vm.bicep" \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters  ${{ env.WORKDIR }}/vm.parameters.json            
+             --parameters "${{ env.WORKDIR }}/vm.parameters.json"            
   
