@@ -11,10 +11,6 @@
 # Version 0.4.6
 # SHORT CHANGE DESCRIPTION: adding import SQL option
 #>
-param(
-    [string]$regionToDeploy = "WestEurope",
-    [string[]]$customers = @("cust-ama-2", "cust-ama-3")
-)
 $rgName = "TTARG"
 Write-Host "Starting registry deploy in $rgName"
 # deploy to azure group 
