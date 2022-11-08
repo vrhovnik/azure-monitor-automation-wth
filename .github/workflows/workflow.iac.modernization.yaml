@@ -11,9 +11,6 @@ env:
   DEFAULT_LOCATION: "westeurope"
   CUSTOMER_NAME: "ama-cust-containers-01"
   REGISTRYNAME: "amaacrregistry"
-defaults:
-  run:
-    working-directory: "scripts/IaC/Modernization"
 jobs:
     container-deployment:
       name: 'Create containers for one customer'
@@ -21,7 +18,7 @@ jobs:
       steps:
         - name: Checkout
           uses: actions/checkout@v2
-        - name: "Login to Azure to be able to create VM"
+        - name: "Login to Azure to be able to create container app environment"
           uses: Azure/login@v1
           with:
             creds: '${{ secrets.AZURE_CREDENTIALS }}'
@@ -43,30 +40,22 @@ jobs:
                --template-file  "${{ env.WORKDIR }}/registry.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
                --parameters acrName="${{ env.REGISTRYNAME }}"               
-        - name: 'Prepare containers in registry acr-${{ env.CUSTOMER_NAME }}'
+        - name: 'Prepare containers in registry ${{ env.REGISTRYNAME }}'
           uses: Azure/cli@v1
           with:
             inlineScript: |
-                az acr build \
-                    --registry "${{ env.REGISTRYNAME }}" \
+                az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/web:${{ github.run_id }}" \
-                    --file "${{ env.GITHUB_WORKSPACE }}/containers/TTA.Web.dockerfile" \
-                    "${{ env.GITHUB_WORKSPACE }}/src"
-                az acr build \
-                    --registry "${{ env.REGISTRYNAME }}" \
+                    --file "/containers/TTA.Web.dockerfile" /src
+                az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/webclient:${{ github.run_id }}" \
-                    --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.Web.ClientApi.dockerfile" \
-                    "${{ env.GITHUB_WORKSPACE }}/src" 
-                az acr build \
-                    --registry "${{ env.REGISTRYNAME }}" \
+                    --file "/containers/TTA.Web.ClientApi.dockerfile" /src 
+                az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/sql:${{ github.run_id }}" \
-                    --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.DataGenerator.SQL.dockerfile" \
-                    "${{ env.GITHUB_WORKSPACE }}/src" 
-                az acr build \
-                    --registry "${{ env.REGISTRYNAME }}" \
+                    --file "/containers/TTA.DataGenerator.SQL.dockerfile" /src 
+                az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/statgen:${{ github.run_id }}" \
-                    --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.StatGenerator.dockerfile" \
-                    "${{ env.GITHUB_WORKSPACE }}/src"                
+                    --file "/containers/TTA.StatGenerator.dockerfile" /src                
         - name: 'Create SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:

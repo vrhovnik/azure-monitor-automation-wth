@@ -15,13 +15,25 @@ param(
     [string]$regionToDeploy="westeurope",
     [string]$rgName="rg-cust-ama-ce-2",
     [string]$workDir="C:\Work\Projects\azure-monitor-automation-wth\",
+    [string]$acrName="acramacustomerlist",
     [string]$containerappenv="ama-cust-env-containers",
     [string]$containerapp="ama-cust-containers-tta-web"
 )
 
+function CreateResourceGroup($workDir,$rgName,$regionToDeploy){
+    Write-host "Setting $workDir as working directory and moving to modernization folder"
+    Set-Location "$workDir\scripts\PWSH\03-Modernization"
+    Write-Host "Creating resource group $rgName in $regionToDeploy"
+    az deployment sub create --location $regionToDeploy --template-file rg.bicep --parameters resourceGroupName=$rgName resourceGroupLocation=$regionToDeploy
+    Write-Host "Resource group $rgName created (or updated)"
+}
+
 function RegistryDeploy($rgName, $regionToDeploy) {
     Write-Host "Creating registry in $regionToDeploy"
-    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName="acr$rgName"
+    if ($acrName -eq $null | $acrName -eq "") {
+        $acrName = "acr$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
+    } 
+    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName=$acrName
     Write-Host "Done with creating registry"
     $loginName = $data.properties.outputs.loginName.value
     return  $loginName
@@ -93,7 +105,8 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     Write-Host "Container app running at $fqdn, starting app"
     return $fqdn
 }
-
+# 0. Create resource group
+CreateResourceGroup -workDir $workDir -rgName $rgName -regionToDeploy $regionToDeploy
 # 1. Deploy registry
 $loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy
 # 2. Build images
