@@ -9,7 +9,7 @@
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
 # Version 0.5.1
-# SHORT CHANGE DESCRIPTION: adding function suport
+# SHORT CHANGE DESCRIPTION: adding function support to prettify the output
 #>
 param(
     [string]$regionToDeploy="westeurope",
@@ -20,9 +20,8 @@ param(
     [string]$containerapp="ama-cust-containers-tta-web"
 )
 
-function CreateResourceGroup($workDir,$rgName,$regionToDeploy){
-    Write-host "Setting $workDir as working directory and moving to modernization folder"
-    Set-Location "$workDir/scripts/IaC/Modernization"
+function CreateResourceGroup($rgName,$regionToDeploy){
+    Write-host "Setting $workDir as working directory and moving to modernization folder"    
     Write-Host "Creating resource group $rgName in $regionToDeploy"
     az deployment sub create --location $regionToDeploy --template-file rg.bicep --parameters resourceGroupName=$rgName resourceGroupLocation=$regionToDeploy
     Write-Host "Resource group $rgName created (or updated)"
@@ -32,11 +31,11 @@ function RegistryDeploy($rgName, $regionToDeploy,$acrName) {
     Write-Host "Creating registry in $regionToDeploy"
     if ($acrName -eq "") {
         $acrName = "acr$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
-    } 
-    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName=$acrName
+    }
+    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters acrName=$acrName
     Write-Host "Done with creating registry"
-    $loginName = $data.properties.outputs.loginName.value
-    return  $loginName
+    $loginName=az acr show --name $acrName --query loginServer --output tsv
+    return $loginName
 }
 
 function BuildAndDeployImages($workDir, $loginName)
@@ -49,12 +48,12 @@ function BuildAndDeployImages($workDir, $loginName)
     az acr build --registry $loginName --image tta/webclient:1.0 -f 'containers/TTA.Web.ClientApi.dockerfile' 'src/'
     az acr build --registry $loginName --image tta/sql:1.0 -f 'containers/TTA.DataGenerator.SQL.dockerfile' 'src/'
     az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.StatGenerator.dockerfile' 'src/'
-    Write-Host "Images built and prepped"
+    Write-Host "Images built and prepped - setting back to script modernization"
+    Set-Location "$workDir/scripts/IaC/Modernization"
 }
 
-function CreateSqlAndAddFwRules($workDir, $rgName)
-{
-    Set-Location "$workDir/scripts/IaC/Modernization"
+function CreateSqlAndAddFwRules($rgName)
+{    
     Write-Host "Install Azure SQL"
     $currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
     $server = $currentServer.properties.outputs.loginServer.value
@@ -74,10 +73,10 @@ function CreateSqlAndAddFwRules($workDir, $rgName)
     $dbName = $currentServer.properties.outputs.dbName.value
     Write-Host "Getting connection string from $server and using DB $dbName"
     # check connectivity to SQL server
-    $sqlConnection = az sql db show-connection-string --client ado.net --server $server
-    $sqlConnection = $sqlConnection.replace('<username>', $username)
-    $sqlConnection = $sqlConnection.replace('<password>', $password)
-    $sqlConnection = $sqlConnection.replace('<databasename>', $dbName)
+    $sqlConnection=az sql db show-connection-string --client ado.net --server $server
+    $sqlConnection=$sqlConnection.replace('<username>', $username)
+    $sqlConnection=$sqlConnection.replace('<password>', $password)
+    $sqlConnection=$sqlConnection.replace('<databasename>', $dbName)
     Write-Host "ConnectionString has been set to $sqlConnection"
     return $sqlConnection
 }
@@ -107,21 +106,18 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
 }
 # write log to Temp file
 Start-Transcript -Path "C:\temp\deploy.log"
+# go to IaC script folder
+Set-Location "$workDir/scripts/IaC/Modernization"
 # 0. Create resource group
-CreateResourceGroup -workDir $workDir -rgName $rgName -regionToDeploy $regionToDeploy
-Set-Location "$workDir"
+CreateResourceGroup -rgName $rgName -regionToDeploy $regionToDeploy
 # 1. Deploy registry
 $loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
-Set-Location "$workDir"
 # 2. Build images
 BuildAndDeployImages -workDir $workDir -loginName $loginName
-Set-Location "$workDir"
 # 3. Create SQL and add FW rules
-$sqlConn = CreateSqlAndAddFwRules -workDir $workDir -rgname $rgName
-Set-Location "$workDir"
+$sqlConn = CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
-Set-Location "$workDir"
 # 5. Create container app env with container app 
 $fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $loginName -sqlConn $sqlConn
 # 6. open website on with given URL and check if the app works

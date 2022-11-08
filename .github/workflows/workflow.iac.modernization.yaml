@@ -46,16 +46,16 @@ jobs:
             inlineScript: |
                 az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/web:${{ github.run_id }}" \
-                    --file "/containers/TTA.Web.dockerfile" "src"
+                    --file "containers/TTA.Web.dockerfile" "src"
                 az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/webclient:${{ github.run_id }}" \
-                    --file "/containers/TTA.Web.ClientApi.dockerfile" "src" 
+                    --file "containers/TTA.Web.ClientApi.dockerfile" "src" 
                 az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/sql:${{ github.run_id }}" \
-                    --file "/containers/TTA.DataGenerator.SQL.dockerfile" "src" 
+                    --file "containers/TTA.DataGenerator.SQL.dockerfile" "src" 
                 az acr build --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/statgen:${{ github.run_id }}" \
-                    --file "/containers/TTA.StatGenerator.dockerfile" "src"                
+                    --file "containers/TTA.StatGenerator.dockerfile" "src"                
         - name: 'Create SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:
