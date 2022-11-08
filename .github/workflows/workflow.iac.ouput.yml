@@ -27,7 +27,7 @@ jobs:
           $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
           echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT          
       - name: "Set registry password"
-        id: connStringStep
+        id: registryStep
         shell: pwsh
         run: |
             $rgPassword = az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
