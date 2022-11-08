@@ -64,7 +64,7 @@ jobs:
                --name "sql-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
                --template-file  "${{ env.WORKDIR }}/sql.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-               --parameters administratorLogin="ttasql" administratorLoginPassword="Sql@news0l1!" serverName="sql-${{ env.CUSTOMER_NAME }}" databaseName="TTADB"
+               --parameters administratorLogin="ttasql" administratorLoginPassword="Sql@news0l1!" serverName="sql-${{ env.CUSTOMER_NAME }}" sqlDBName="TTADB"
         - name: 'Add FW rule to SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:

@@ -56,9 +56,12 @@ function BuildAndDeployImages($workDir, $loginName)
 function CreateSqlAndAddFwRules($rgName)
 {    
     Write-Host "Install Azure SQL"
-    $currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
-    $server = $currentServer.properties.outputs.loginServer.value
-    $Env:AMA_SQLServer_NAME = $server
+    $currentServer=az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
+    # what you put in the parameters file is what you get back
+    $sqlParameters=Get-Content sql.parameters.json | ConvertFrom-Json | Select-Object -ExpandProperty parameters
+    $sqlServerName=$sqlParameters | Select-Object -ExpandProperty serverName
+    Write-Host "SQL Server name is $(sqlServerName.value)"
+    $Env:AMA_SQLServer_NAME = $sqlServerName.value
     Write-Host "Azure SQL $server installed, adding rules to access it"
     #add your current IP to the access rule
     $ip = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
@@ -66,18 +69,18 @@ function CreateSqlAndAddFwRules($rgName)
     az sql server firewall-rule create --server $server --resource-group $rgName --name AllowYourIp --start-ip-address $ip --end-ip-address $ip
     #allow azure services to be able to access
     az sql server firewall-rule create --resource-group $rgName --server $server --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
-    Write-Host "Adding FW rules for accessing the cluster done"
-    $username = $currentServer.properties.outputs.loginName.value
-    $Env:AMA_SQLServer_Username = $username
-    $password = $currentServer.properties.outputs.loginPass.value
-    $Env:AMA_SQLServer_PWD = $password
-    $dbName = $currentServer.properties.outputs.dbName.value
-    Write-Host "Getting connection string from $server and using DB $dbName"
-    # check connectivity to SQL server
-    $sqlConnection=az sql db show-connection-string --client ado.net --server $server
-    $sqlConnection=$sqlConnection.replace('<username>', $username)
-    $sqlConnection=$sqlConnection.replace('<password>', $password)
-    $sqlConnection=$sqlConnection.replace('<databasename>', $dbName)
+    Write-Host "Adding FW rules for accessing the cluster done, setting conn string"
+    $username = $sqlParameters | Select-Object -ExpandProperty administratorLogin
+    $Env:AMA_SQLServer_Username = $username.value
+    $password = $sqlParameters | Select-Object -ExpandProperty administratorLoginPassword
+    $Env:AMA_SQLServer_PWD = $password.value
+    $dbName = $sqlParameters | Select-Object -ExpandProperty sqlDBName
+    Write-Host "Getting connection string from $server and using DB $(dbName.value)"
+    # get connection string from SQL server
+    $sqlConnection=az sql db show-connection-string --client ado.net --server $sqlServerName.value
+    $sqlConnection=$sqlConnection.replace('<username>', $username.value)
+    $sqlConnection=$sqlConnection.replace('<password>', $password.value)
+    $sqlConnection=$sqlConnection.replace('<databasename>', $dbName.value)
     Write-Host "ConnectionString has been set to $sqlConnection"
     return $sqlConnection
 }
