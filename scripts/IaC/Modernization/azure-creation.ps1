@@ -16,7 +16,7 @@ param(
     [string]$rgName="rg-cust-ama-ce-2",
     [string]$workDir="C:/Work/Projects/azure-monitor-automation-wth",
     [string]$acrName="acramacustomerlist",
-    [string]$containerappenv="ama-cust-env-containers",
+    [string]$containerappenv="ama-cust-env",
     [string]$containerapp="ama-cust-containers-tta-web"
 )
 
@@ -65,16 +65,16 @@ function CreateSqlAndAddFwRules($rgName)
     #add your current IP to the access rule
     $ip = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
     Write-Host "Adding $ip to SQL FW rules"
-    az sql server firewall-rule create --server $server --resource-group $rgName --name AllowYourIp --start-ip-address $ip --end-ip-address $ip
+    az sql server firewall-rule create --server $sqlServerName.value --resource-group $rgName --name AllowYourIp --start-ip-address $ip --end-ip-address $ip
     #allow azure services to be able to access
-    az sql server firewall-rule create --resource-group $rgName --server $server --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+    az sql server firewall-rule create --resource-group $rgName --server $sqlServerName.value --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
     Write-Host "Adding FW rules for accessing the cluster done, setting conn string"
     $username = $sqlParameters | Select-Object -ExpandProperty administratorLogin
     $Env:AMA_SQLServer_Username = $username.value
     $password = $sqlParameters | Select-Object -ExpandProperty administratorLoginPassword
     $Env:AMA_SQLServer_PWD = $password.value
     $dbName = $sqlParameters | Select-Object -ExpandProperty sqlDBName
-    Write-Host "Getting connection string from $server and using DB $($dbName.value)"
+    Write-Host "Getting connection string from $($sqlServerName.value) and using DB $($dbName.value)"
     # get connection string from SQL server
     $sqlConnection=az sql db show-connection-string --client ado.net --server $sqlServerName.value
     $sqlConnection=$sqlConnection.replace('<username>', $username.value)
@@ -96,21 +96,21 @@ function ImportDataToSql($rgName)
 
 function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName)
 {
-    Write-Host "Create container app environment $containerappenv in $location "
-    az containerapp env create --name $containerappenv --resource-group $rgName --location $location
-    Write-Host "Environment $containerappenv created, going to create container app"
+    Write-Host "Create container app environment $containerappenv in $regionToDeploy "
+    az containerapp env create --name $containerappenv --resource-group $rgName --location $regionToDeploy
+    Write-Host "Environment $containerappenv created, going to create container app $containerAppName"
     $registryServer = "$loginName.azurecr.io"
     $imageName = "$registryServer/tta/web:1.0"
     $acrPass = az acr credential show -n $loginName --query passwords[0].value
     Write-Host "Using $imageName to generate container app in environment $containerappenv"
-    $sqlConn=$Env:AMA_SQLServerConn
-    Write-Host "Using $sqlConn as connection string"
+    $sqlConn=$Env:AMA_SQLServerConn    
+    Write-Host "Using $sqlConn as connection string for environment variable"
     $fqdn = az containerapp create --max-replicas 3 --env-vars SqlOptions__ConnectionString=$sqlConn --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $containerappenv --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
     Write-Host "Container app running at $fqdn, starting web browser"
-    Start-Process "microsoft-edge:'$fqdn'"
+    Start-Process "$fqdn"
 }
 # write log to Temp file
-Start-Transcript -Path "C:\temp\deploy.log"
+Start-Transcript 
 # go to IaC script folder
 Set-Location "$workDir/scripts/IaC/Modernization"
 # 0. Create resource group
@@ -118,12 +118,13 @@ CreateResourceGroup -rgName $rgName -regionToDeploy $regionToDeploy
 # 1. Deploy registry
 RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
 # 2. Build images
-# BuildAndDeployImages -workDir $workDir -loginName $acrName
+BuildAndDeployImages -workDir $workDir -loginName $acrName
 # 3. Create SQL and add FW rules
 CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
-# ImportDataToSql -rgName $rgName
+ImportDataToSql -rgName $rgName
 # 5. Create container app env with container app and open browser 
-$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerAppName $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
+CreateContainerEnvWithApp -containerappenv $containerappenv -containerAppName $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
 
+# checks logs for any challenges
 Stop-Transcript

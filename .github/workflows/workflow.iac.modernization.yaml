@@ -73,14 +73,14 @@ jobs:
             $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
             $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")
             echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT
-            echo $GITHUB_OUTPUT
+            Get-Content $Env:GITHUB_OUTPUT
         - name: "Set registry password"
           uses: Azure/cli@v1
           with:
             inlineScript: |
-              rgPassword=az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
+              rgPassword = az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
               echo "regPassword=$rgPassword" >> $GITHUB_ENV
-              echo $GITHUB_ENV
+              echo $env:GITHUB_ENV
         - name: 'Create container app environment in resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:
