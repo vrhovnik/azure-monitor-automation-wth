@@ -14,7 +14,7 @@
 param(
     [string]$regionToDeploy="westeurope",
     [string]$rgName="rg-cust-ama-ce-2",
-    [string]$workDir="C:\Work\Projects\azure-monitor-automation-wth\",
+    [string]$workDir="C:/Work/Projects/azure-monitor-automation-wth",
     [string]$acrName="acramacustomerlist",
     [string]$containerappenv="ama-cust-env-containers",
     [string]$containerapp="ama-cust-containers-tta-web"
@@ -22,7 +22,7 @@ param(
 
 function CreateResourceGroup($workDir,$rgName,$regionToDeploy){
     Write-host "Setting $workDir as working directory and moving to modernization folder"
-    Set-Location "$workDir\scripts\PWSH\03-Modernization"
+    Set-Location "$workDir/scripts/IaC/Modernization"
     Write-Host "Creating resource group $rgName in $regionToDeploy"
     az deployment sub create --location $regionToDeploy --template-file rg.bicep --parameters resourceGroupName=$rgName resourceGroupLocation=$regionToDeploy
     Write-Host "Resource group $rgName created (or updated)"
@@ -30,7 +30,7 @@ function CreateResourceGroup($workDir,$rgName,$regionToDeploy){
 
 function RegistryDeploy($rgName, $regionToDeploy) {
     Write-Host "Creating registry in $regionToDeploy"
-    if ($acrName -eq $null | $acrName -eq "") {
+    if ($acrName -eq "") {
         $acrName = "acr$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
     } 
     az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName=$acrName
@@ -54,7 +54,7 @@ function BuildAndDeployImages($workDir, $loginName)
 
 function CreateSqlAndAddFwRules($workDir, $rgName)
 {
-    Set-Location "$workDir\scripts\PWSH\03-Modernization"
+    Set-Location "$workDir/scripts/IaC/Modernization"
     Write-Host "Install Azure SQL"
     $currentServer = az deployment group create --resource-group $rgName --template-file sql.bicep --parameters sql.parameters.json | ConvertFrom-Json
     $server = $currentServer.properties.outputs.loginServer.value
@@ -105,17 +105,26 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     Write-Host "Container app running at $fqdn, starting app"
     return $fqdn
 }
+# write log to Temp file
+Start-Transcript -Path "C:\temp\deploy.log"
 # 0. Create resource group
 CreateResourceGroup -workDir $workDir -rgName $rgName -regionToDeploy $regionToDeploy
+Set-Location $workDir
 # 1. Deploy registry
 $loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy
+Set-Location $workDir
 # 2. Build images
 BuildAndDeployImages -workDir $workDir, -loginName $loginName
+Set-Location $workDir
 # 3. Create SQL and add FW rules
 $sqlConn = CreateSqlAndAddFwRules -workDir $workDir -rgname $rgName
+Set-Location $workDir
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
+Set-Location $workDir
 # 5. Create container app env with container app 
 $fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $loginName -sqlConn $sqlConn
 # 6. open website on with given URL and check if the app works
 Start-Process "microsoft-edge:'$fqdn'"
+
+Stop-Transcript
