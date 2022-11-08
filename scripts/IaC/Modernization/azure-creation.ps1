@@ -28,13 +28,14 @@ function CreateResourceGroup($rgName,$regionToDeploy){
 }
 
 function RegistryDeploy($rgName, $regionToDeploy,$acrName) {
-    Write-Host "Creating registry in $regionToDeploy"
+    Write-Host "Creating registry $acrName in $regionToDeploy"
     if ($acrName -eq "") {
         $acrName = "acr$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
     }
     az deployment group create --resource-group $rgName --template-file registry.bicep --parameters acrName=$acrName
     Write-Host "Done with creating registry"
     $loginName=az acr show --name $acrName --query loginServer --output tsv
+    Write-Host "Registry login name is $loginName"
     return $loginName
 }
 
