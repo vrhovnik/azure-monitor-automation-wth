@@ -33,7 +33,7 @@ resource sqlDB 'Microsoft.Sql/servers/databases@2021-08-01-preview' = {
   }
 }
 
-@description('Output the server and creds')
+@description('Output the server and creds for access')
 output loginServer string = serverName
 output loginName string = administratorLogin
 output loginPass string = administratorLoginPassword

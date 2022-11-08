@@ -31,9 +31,10 @@ function CreateVM($rgName,$vmName,$adminName,$adminPass) {
     if ($vmName -eq "") {
         $vmName = "vm$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
     }
-    $ipName="ip$vmName"
+    $ipName="ip-$vmName"
+    $dnsname="dns-$vmName"
     Write-Host "Creating IP $ipName, deploying VM $vmName"
-    $myIp=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters publicIpAddressName=$ipName vmName=$vmName windowsAdminUsername=$adminName windowsAdminPassword=$adminPass
+    $myIp=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters publicIpAddressName=$ipName dnsNameForIp=$dnsname vmName=$vmName windowsAdminUsername=$adminName windowsAdminPassword=$adminPass
     Write-Host "VM created, opening remote desktop to $myIp"
     $args = New-Object -TypeName System.Collections.Generic.List[System.String]
     $args.Add("/v:$($myIp):3389")

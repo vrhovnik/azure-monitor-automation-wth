@@ -19,6 +19,9 @@ param location string = resourceGroup().location
 @description('Name for the IP')
 param publicIpAddressName string = 'tta-vm-public-access'
 
+@description('DNS name for the IP')
+param dnsNameForIp string = 'tta-vm-web'
+
 param resourceTags object = {
   Description: 'automation-and-monitor-what-the-hack'
   Environment: 'Demo'
@@ -79,7 +82,20 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           destinationAddressPrefix: '*'
           destinationPortRange: '3389'
         }
-      }      
+      }
+      {
+          name: 'allow_port_80'
+          properties: {
+            priority: 1111
+            protocol: 'Tcp'
+            access: 'Allow'
+            direction: 'Inbound'
+            sourceAddressPrefix: '*'
+            sourcePortRange: '*'
+            destinationAddressPrefix: '*'
+            destinationPortRange: '80'
+          }
+       }           
     ]
   }
 }
@@ -114,6 +130,9 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
     publicIPAllocationMethod: 'Static'
     publicIPAddressVersion: 'IPv4'
     idleTimeoutInMinutes: 4
+    dnsSettings: {
+        domainNameLabel: dnsNameForIp         
+    }
   }
   sku: {
     name: 'Basic'

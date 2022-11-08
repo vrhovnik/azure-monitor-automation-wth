@@ -33,7 +33,7 @@ Start-Process -FilePath "$PWD\sqlsetup.exe" -ArgumentList $args -NoNewWindow -Wa
 # DIRECT LINK: https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe
 # GENERAL LINK https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer
 Write-Host "Getting ASP.NET Core hosting module to support .NET Core..."
-Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/c5e0609f-1db5-4741-add0-a37e8371a714/1ad9c59b8a92aeb5d09782e686264537/dotnet-hosting-6.0.8-win.exe" -o "$PWD\hosting.exe"
+Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/8de163f5-5d91-4dc3-9d01-e0b031a03dd9/0170b328d569a49f6f6a080064309161/dotnet-hosting-7.0.0-win.exe" -o "$PWD\hosting.exe"
 
 Write-Host "Installing ASP.NET Core hosting"
 $args = New-Object -TypeName System.Collections.Generic.List[System.String]
@@ -41,17 +41,9 @@ $args.Add("/quiet")
 $args.Add("/install")
 $args.Add("/norestart")
 
-$Output = Start-Process -FilePath "$PWD\hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
-If($Output.Exitcode -Eq 0)
-{
-    Write-Host "ASP.NET hosting was installed, restarting IIS"
-    net stop was /y
-    net start w3svc
-}
-else {
-    Write-HError "`t`t Something went wrong with the installation, ASP.NET hosting module not installed. Errorlevel: ${Output.ExitCode}"
-    Exit 1
-}
+Start-Process -FilePath "$PWD\hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
+net stop was /y
+net start w3svc
 
 Write-Host "Getting source code and storing it to $HOME/amaw"
 git clone https://github.com/vrhovnik/azure-monitor-automation-wth.git "$HOME/amaw"
@@ -98,15 +90,12 @@ $appSettings = Get-Content -Path "$rootPath\Web\appsettings.json" | ConvertFrom-
 $previousClientUrl = $appSettings.AppOptions.ClientApiUrl
 Write-Host "Current path to client $previousClientUrl, changing to new value https://localhost/ttawebclient"
 $appSettings.AppOptions.ClientApiUrl = "https://localhost/ttawebclient/"
-$sqlConn = $appSettings.SqlOptions.ConnectionString
 Write-Host "Path changed, setting SQL connection string $sqlConn to new one for Web page"
 $appSettings.SqlOptions.ConnectionString=$sqlConn
-
 Set-Content -Path "$rootPath\Web\appsettings.json" -Value ($appSettings | ConvertTo-Json)
 
 $appSettings = Get-Content -Path "$rootPath\WebClient\appsettings.json" | ConvertFrom-Json
-$sqlConn = $appSettings.SqlOptions.ConnectionString
-Write-Host "Path changed, setting SQL connection string $sqlConn to new one for Web REST client page"
+Write-Host "Changing settings for clientapp, setting SQL connection string $sqlConn to new one for Web REST client page"
 $appSettings.SqlOptions.ConnectionString=$sqlConn
 Set-Content -Path "$rootPath\WebClient\appsettings.json" -Value ($appSettings | ConvertTo-Json)
 Write-Host "Settings changed, restarting IIS"
@@ -114,7 +103,6 @@ Write-Host "Settings changed, restarting IIS"
 net stop was /y
 net start w3svc
 
-Write-Host "Restart done, app is ready on https://localhost/ttaweb"
-Write-Host "and api on https://localhost/ttawebclient"
+Write-Host "Restart done, app is ready on https://localhost/ttaweb and api on https://localhost/ttawebclient"
 
 Stop-Transcript

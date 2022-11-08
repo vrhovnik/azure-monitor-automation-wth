@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {    
     "vmName": {
-      "value": "tta-vm3-2022"
+      "value": "tta-vm4-2022"
     }, 
     "windowsAdminUsername": {
       "value": "ttauser"
@@ -13,6 +13,9 @@
     },
     "publicIpAddressName":{
       "value":"tta-vm3-public-access"
+    } ,
+    "dnsNameForIp":{
+      "value":"tta-vm-web"
     }           
   }
 }
