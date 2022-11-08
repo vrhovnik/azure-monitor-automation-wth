@@ -17,7 +17,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 param location string = resourceGroup().location
 
 @description('Name for the IP')
-param publicIpAddressName string = 'tta-public-access'
+param publicIpAddressName string = 'tta-vm-public-access'
 
 param resourceTags object = {
   Description: 'automation-and-monitor-what-the-hack'

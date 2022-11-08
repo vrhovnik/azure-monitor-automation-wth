@@ -1,6 +1,6 @@
 ﻿targetScope = 'subscription'
 @description('Resource Group Name')
-param resourceGroupName string = 'TTARG'
+param resourceGroupName string = 'rg-ama-customer'
 
 @description('Resource Group Location')
 param resourceGroupLocation string = 'WestEurope'

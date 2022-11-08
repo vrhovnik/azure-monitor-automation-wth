@@ -1,4 +1,4 @@
-﻿name: "Deploy resources for one customer"
+﻿name: "Deploy VM for one customer"
 on:
   push:
     branches:
