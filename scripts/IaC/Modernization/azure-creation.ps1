@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.4.6
-# SHORT CHANGE DESCRIPTION: adding import SQL option
+# Version 0.5.1
+# SHORT CHANGE DESCRIPTION: adding function suport
 #>
 param(
     [string]$regionToDeploy="westeurope",
@@ -28,7 +28,7 @@ function CreateResourceGroup($workDir,$rgName,$regionToDeploy){
     Write-Host "Resource group $rgName created (or updated)"
 }
 
-function RegistryDeploy($rgName, $regionToDeploy) {
+function RegistryDeploy($rgName, $regionToDeploy,$acrName) {
     Write-Host "Creating registry in $regionToDeploy"
     if ($acrName -eq "") {
         $acrName = "acr$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
@@ -42,7 +42,7 @@ function RegistryDeploy($rgName, $regionToDeploy) {
 function BuildAndDeployImages($workDir, $loginName)
 {
     Write-host "Setting $workDir as working directory"
-    Set-Location $workDir
+    Set-Location "$workDir"
     Write-Host "Building images from provided source code"
     #build images and leverage ACR build engine to build the containers
     az acr build --registry $loginName --image tta/web:1.0 -f 'containers/TTA.Web.dockerfile' 'src/'
@@ -109,19 +109,19 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
 Start-Transcript -Path "C:\temp\deploy.log"
 # 0. Create resource group
 CreateResourceGroup -workDir $workDir -rgName $rgName -regionToDeploy $regionToDeploy
-Set-Location $workDir
+Set-Location "$workDir"
 # 1. Deploy registry
-$loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy
-Set-Location $workDir
+$loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
+Set-Location "$workDir"
 # 2. Build images
-BuildAndDeployImages -workDir $workDir, -loginName $loginName
-Set-Location $workDir
+BuildAndDeployImages -workDir $workDir -loginName $loginName
+Set-Location "$workDir"
 # 3. Create SQL and add FW rules
 $sqlConn = CreateSqlAndAddFwRules -workDir $workDir -rgname $rgName
-Set-Location $workDir
+Set-Location "$workDir"
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
-Set-Location $workDir
+Set-Location "$workDir"
 # 5. Create container app env with container app 
 $fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $loginName -sqlConn $sqlConn
 # 6. open website on with given URL and check if the app works
