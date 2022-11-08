@@ -24,7 +24,19 @@ jobs:
       - name: Use the value
         id: step_two
         run: |
-          echo "${{ env.action_state }}" # This will output 'yellow'
+          echo "${{ env.action_state }}" # This will output 'yellow'      
+      - name: "Set connection string ENV"
+        id: connStringStepENV
+        shell: pwsh
+        run: |
+          $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
+          $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
+          $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
+          $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")                    
+          echo "sqlConn=$sqlConnection" >> $Env:GITHUB_ENV    
+      - name: "Github ENV test"
+        run: |
+          echo "${{ env.sqlConn }}"  
       - name: "Set connection string OUTPUT"
         id: connStringStep
         shell: pwsh
@@ -35,20 +47,9 @@ jobs:
           $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
           Write-Host $sqlConnection 
           echo "sqlConn=$sqlConnection" >> $Env:GITHUB_OUTPUT     
-      - name: "Set connection string ENV"
-        id: connStringStepENV
-        shell: pwsh
-        run: |
-          $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
-          $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
-          $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
-          $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")                    
-          echo "sqlConn=$sqlConnection" >> $Env:GITHUB_ENV      
       - name: "ConnString test"
         run: |
           echo "${{ steps.connStringStep.outputs.sqlConn }}" 
-      - name: "Github ENV test"
-        run: |
-          echo "${{ env.sqlConn }}"  
+     
       
           
