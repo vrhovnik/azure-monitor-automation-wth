@@ -65,9 +65,8 @@ jobs:
             inlineScript: |
               az sql server firewall-rule create --resource-group rg-${{ env.CUSTOMER_NAME }} --server sql-${{ env.CUSTOMER_NAME }} --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0        
         - name: 'Create container app environment in resource Group rg-${{ env.CUSTOMER_NAME }}'
-          uses: Azure/cli@v1
-          with:
-            inlineScript: |
+          shell: pwsh
+          run: |
               $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
               $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
               $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
