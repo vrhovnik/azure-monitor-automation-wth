@@ -11,30 +11,17 @@
 # Version 0.4.6
 # SHORT CHANGE DESCRIPTION: adding import SQL option
 #>
-params(
-    [string]$regionToDeploy = "WestEurope",
-    [string]$rgName = "rg-cust-ama-ce-2",
-    [string]$workDir = "C:\Work\Projects\azure-monitor-automation-wth\",
-    [string]$containerappenv = "ama-cust-env-containers",
-    [string]$containerapp = "ama-cust-containers-tta-web"
+param(
+    [string]$regionToDeploy="westeurope",
+    [string]$rgName="rg-cust-ama-ce-2",
+    [string]$workDir="C:\Work\Projects\azure-monitor-automation-wth\",
+    [string]$containerappenv="ama-cust-env-containers",
+    [string]$containerapp="ama-cust-containers-tta-web"
 )
-
-# 1. Deploy registry
-$loginName = RegistryDeploy($rgName, $regionToDeploy)
-# 2. Build images
-BuildAndDeployImages($workDir, $loginName)
-# 3. Create SQL and add FW rules
-$sqlConn = CreateSqlAndAddFwRules($workDir, $rgName)
-# 4. import data to SQL
-ImportDataToSql($rgName);
-# 5. Create container app env with container app 
-$fqdn = CreateContainerEnvWithApp($containerappenv, $containerapp, $regionToDeploy, $rgName, $loginName, $sqlConn)
-# 6. open website on with given URL and check if the app works
-Start-Process "microsoft-edge:'$fqdn'"
 
 function RegistryDeploy($rgName, $regionToDeploy) {
     Write-Host "Creating registry in $regionToDeploy"
-    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName = "acr$rgName"
+    az deployment group create --resource-group $rgName --template-file registry.bicep --parameters registryName="acr$rgName"
     Write-Host "Done with creating registry"
     $loginName = $data.properties.outputs.loginName.value
     return  $loginName
@@ -42,6 +29,7 @@ function RegistryDeploy($rgName, $regionToDeploy) {
 
 function BuildAndDeployImages($workDir, $loginName)
 {
+    Write-host "Setting $workDir as working directory"
     Set-Location $workDir
     Write-Host "Building images from provided source code"
     #build images and leverage ACR build engine to build the containers
@@ -106,5 +94,15 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     return $fqdn
 }
 
-
- 
+# 1. Deploy registry
+$loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy
+# 2. Build images
+BuildAndDeployImages -workDir $workDir, -loginName $loginName
+# 3. Create SQL and add FW rules
+$sqlConn = CreateSqlAndAddFwRules -workDir $workDir -rgname $rgName
+# 4. import data to SQL
+ImportDataToSql -rgName $rgName
+# 5. Create container app env with container app 
+$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $loginName -sqlConn $sqlConn
+# 6. open website on with given URL and check if the app works
+Start-Process "microsoft-edge:'$fqdn'"

@@ -10,7 +10,7 @@ env:
   WORKDIR: "scripts/IaC/Modernization"
   DEFAULT_LOCATION: "westeurope"
   CUSTOMER_NAME: "ama-cust-containers-01"
-  REGISTRYNAME: "amaregistry"
+  REGISTRYNAME: "amaacrregistry"
 defaults:
   run:
     working-directory: "scripts/IaC/Modernization"
