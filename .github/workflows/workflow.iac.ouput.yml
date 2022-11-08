@@ -34,7 +34,7 @@ jobs:
           $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
           $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
           Write-Host $sqlConnection 
-          echo "sqlConn=$($sqlConnection)" >> $GITHUB_OUTPUT    
+          echo "sqlConn=$sqlConnection" >> $Env:GITHUB_OUTPUT    
       - name: "Set connection string ENV"
         id: connStringStepENV
         shell: pwsh
