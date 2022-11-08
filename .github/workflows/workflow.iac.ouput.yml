@@ -34,14 +34,14 @@ jobs:
           $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
           $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
           Write-Host $sqlConnection 
-          echo ::set-output name=sqlConn::$($sqlConnection)
+          echo "sqlConn=$($sqlConnection)" >> $GITHUB_ENV
       - name: "Set registry password"
         id: registryStep
         shell: pwsh
         run: |
             $rgPassword = az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
             Write-Host $rgPassword
-            echo "rgPassword=$rgPassword" >> $GITHUB_ENV
+            echo "rgPassword=$($rgPassword)" >> $GITHUB_ENV
       - name: "ConnString test"
         run: |
           echo "${{ steps.connStringStep.outputs.sqlConn }}" 
