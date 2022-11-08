@@ -84,12 +84,14 @@ jobs:
             $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
             $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")
             echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT
+            Get-Content $GITHUB_OUTPUT
         - name: "Set registry password"
           uses: Azure/cli@v1
           with:
             inlineScript: |
-              rgPassword= az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
+              rgPassword=az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
               echo "regPassword=$rgPassword" >> $GITHUB_ENV
+              echo $GITHUB_ENV
         - name: 'Create container app environment in resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:
@@ -98,7 +100,7 @@ jobs:
                --name "ce-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
                --template-file  "${{ env.WORKDIR }}/containerapp.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-               --parameters location="${{ env.DEFAULT_LOCATION }}" frontendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/web:${{ github.run_id }}" backendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/webclient:${{ github.run_id }}" sqlConn="${{ env.sqlConn }}" registry="${{ env.REGISTRYNAME }}.azurecr.io" registryUsername="${{ env.REGISTRYNAME }}" registryPassword="registryPassword="${{ steps.connStringStep.outputs.sqlConn }}"       
+               --parameters location="${{ env.DEFAULT_LOCATION }}" frontendContainerImage="${{ env.REGISTRYNAME }}.azurecr.io/tta/web:${{ github.run_id }}" backendContainerImage="${{ env.REGISTRYNAME }}.azurecr.io/tta/webclient:${{ github.run_id }}" sqlConn="${{ steps.connStringStep.outputs.sqlConn }}" registry="${{ env.REGISTRYNAME }}.azurecr.io" registryUsername="${{ env.REGISTRYNAME }}" registryPassword="${{ env.regPassword }}"       
             
   
           

@@ -35,8 +35,7 @@ function RegistryDeploy($rgName, $regionToDeploy,$acrName) {
     az deployment group create --resource-group $rgName --template-file registry.bicep --parameters acrName=$acrName
     Write-Host "Done with creating registry"
     $loginName=az acr show --name $acrName --query loginServer --output tsv
-    Write-Host "Registry login name is $loginName"
-    return $loginName
+    Write-Host "Created registry is $loginName"   
 }
 
 function BuildAndDeployImages($workDir, $loginName)
@@ -82,7 +81,7 @@ function CreateSqlAndAddFwRules($rgName)
     $sqlConnection=$sqlConnection.replace('<password>', $password.value)
     $sqlConnection=$sqlConnection.replace('<databasename>', $dbName.value)
     Write-Host "ConnectionString has been set to $sqlConnection"
-    return $sqlConnection
+    $Env:AMA_SQLServerConn=$sqlConnection
 }
 
 function ImportDataToSql($rgName)
@@ -95,7 +94,7 @@ function ImportDataToSql($rgName)
     az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
 }
 
-function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName, $sqlConn)
+function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName)
 {
     Write-Host "Create container app environment $containerappenv in $location "
     az containerapp env create --name $containerappenv --resource-group $rgName --location $location
@@ -104,9 +103,11 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     $imageName = "$registryServer/tta/web:1.0"
     $acrPass = az acr credential show -n $loginName --query passwords[0].value
     Write-Host "Using $imageName to generate container app in environment $containerappenv"
-    $fqdn = az containerapp create --max-replicas 3 --env-vars SqlOptions__ConnectionString = $sqlConnection --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $containerappenv --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
-    Write-Host "Container app running at $fqdn, starting app"
-    return $fqdn
+    $sqlConn=$Env:AMA_SQLServerConn
+    Write-Host "Using $sqlConn as connection string"
+    $fqdn = az containerapp create --max-replicas 3 --env-vars SqlOptions__ConnectionString=$sqlConn --registry-server $registryServer --registry-username $loginName --registry-password $acrPass --name $containerAppName --resource-group $rgName --environment $containerappenv --image $imageName --target-port 80 --ingress 'external' --query properties.configuration.ingress.fqdn
+    Write-Host "Container app running at $fqdn, starting web browser"
+    Start-Process "microsoft-edge:'$fqdn'"
 }
 # write log to Temp file
 Start-Transcript -Path "C:\temp\deploy.log"
@@ -115,16 +116,14 @@ Set-Location "$workDir/scripts/IaC/Modernization"
 # 0. Create resource group
 CreateResourceGroup -rgName $rgName -regionToDeploy $regionToDeploy
 # 1. Deploy registry
-$loginName = RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
+RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
 # 2. Build images
-BuildAndDeployImages -workDir $workDir -loginName $loginName
+BuildAndDeployImages -workDir $workDir -loginName $acrName
 # 3. Create SQL and add FW rules
-$sqlConn = CreateSqlAndAddFwRules -rgname $rgName
+CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
-# 5. Create container app env with container app 
-$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $loginName -sqlConn $sqlConn
-# 6. open website on with given URL and check if the app works
-Start-Process "microsoft-edge:'$fqdn'"
+# 5. Create container app env with container app and open browser 
+$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
 
 Stop-Transcript
