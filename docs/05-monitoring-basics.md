@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 * [Monitoring basics](#monitoring-basics)
+    * [Deploy VM with solution](#deploy-vm-with-solution)
+    * [Container app deployment](#container-app-deployment)
   * [Task requirement](#task-requirement)
   * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
@@ -12,11 +14,61 @@ Solution is now up and running. Some customers saw challenges with random errors
 Go and enable monitoring to understand what is happening with the application and to mitigate the errors. Customers
 provided few screenshots and information about the errors.
 
-You should have at least 1 VM with solution and 1 container app to see the different. 
+You _should_ have at least 1 VM with solution and 1 container app to see the different options and ways to install. 
+If you want to test out just one, you can proceed with selected option.
 
 If you don't have it deployed or you deleted everything from before, you can use the following scripts to set them up from scratch:
-1. deploy VM with solution: 
-2. deploy container app: 
+1. deploy VM with solution  
+2. deploy container app
+
+### Deploy VM with solution
+
+To deploy the VM, you can leverage the following [script](../scripts/IaC/VM/azure-creation.ps1):
+
+1. Create or update the resource group
+2. Create or update VM
+3. Opens Remote Connection to connect into VM
+
+It takes 6 parameters (or you can use default values where applicable):
+1. **regionToDeploy** -- resource group location (most common is westeurope)
+2. **rgName** -- name of the resource group (it will be created or updated)
+3. **adminName** -- username name for VM to RDP into
+4. **adminPass** -- password for user to RDP into
+5. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
+
+```powershell
+
+.\azure-creation.ps1 -regionToDeploy "westeurope" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -adminName "admin" -adminPass "P@ssw0rd"
+
+``` 
+
+After running the solution, you should see the RDP dialog with (newly) created (or updated) IP connecting to the VM.
+
+### Container app deployment 
+
+Container app can be deployed in the same resource group as the VM. For clean install, define new resource group as a parameter.
+
+To deploy container app this is the [script](../scripts/IaC/Modernization/azure-creation.ps1) which will do the following:
+1. Create or update the resource group
+2. Create or update registry
+3. Builds and deploy container images to registry
+4. Create SQL, adds firewall rules and creates database
+5. Imports existing data to SQL, prepares connection string to be used later
+6. Create or update container app with latest image from registry
+
+It takes 6 parameters (or you can use default values where applicable):
+1. **regionToDeploy** -- resource group location (most common is westeurope)
+2. **rgName** -- name of the resource group (it will be created or updated)
+3. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
+4. **acrName** -- name of the container registry (it will be created or updated)
+5. **containerappenv** -- name of the container environment
+6. **containerapp** -- name of the container environment
+
+_Usage_: 
+
+```powershell
+.\azure-creation.ps1 -regionToDeploy "westeurope" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -acrName "acrautomationwth" -containerappenv "containerappenv" -containerapp "containerapp"
+```
 
 ## Task requirement
 

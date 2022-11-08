@@ -1,0 +1,42 @@
+﻿name: "Pass parameters to Bicep"
+on:  
+  workflow_dispatch:
+env:
+  WORKDIR: "scripts/IaC/Modernization"
+  DEFAULT_LOCATION: "westeurope"
+  CUSTOMER_NAME: "ama-cust-containers-01"
+  REGISTRYNAME: "amaacrregistry"
+jobs:
+  pass-variables:
+    name: 'Login and get variables passed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: "Login to Azure"
+        uses: Azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+      - name: "Set connection string"
+        id: connStringStep
+        shell: pwsh
+        run: |
+          $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
+          $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
+          $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
+          $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
+          echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT          
+      - name: "Set registry password"
+        id: connStringStep
+        shell: pwsh
+        run: |
+            $rgPassword = az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
+            echo "regPassword=$rgPassword" >> $GITHUB_ENV
+      - name: "ConnString test"
+        run: |
+          echo "${{ steps.connStringStep.outputs.sqlConn }}" 
+      - name: "Github ENV test"
+        run: |
+          echo "${{ env.GITHUB_ENV }}"  
+      
+          
