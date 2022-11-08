@@ -25,7 +25,7 @@ jobs:
         id: step_two
         run: |
           echo "${{ env.action_state }}" # This will output 'yellow'
-      - name: "Set connection string"
+      - name: "Set connection string OUTPUT"
         id: connStringStep
         shell: pwsh
         run: |
@@ -34,14 +34,16 @@ jobs:
           $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
           $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")          
           Write-Host $sqlConnection 
-          echo "sqlConn=$($sqlConnection)" >> $GITHUB_ENV
-      - name: "Set registry password"
-        id: registryStep
+          echo "sqlConn=$($sqlConnection)" >> $GITHUB_OUTPUT    
+      - name: "Set connection string ENV"
+        id: connStringStepENV
         shell: pwsh
         run: |
-            $rgPassword = az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
-            Write-Host $rgPassword
-            echo "rgPassword=$($rgPassword)" >> $GITHUB_ENV
+          $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
+          $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
+          $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
+          $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")                    
+          echo "sqlConn=$sqlConnection" >> $Env:GITHUB_ENV      
       - name: "ConnString test"
         run: |
           echo "${{ steps.connStringStep.outputs.sqlConn }}" 
