@@ -10,6 +10,7 @@ env:
   WORKDIR: "scripts/IaC/Modernization"
   DEFAULT_LOCATION: "westeurope"
   CUSTOMER_NAME: "ama-cust-containers-01"
+  REGISTRYNAME: "amaregistry"
 defaults:
   run:
     working-directory: "scripts/IaC/Modernization"
@@ -41,29 +42,28 @@ jobs:
                --name "reg-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
                --template-file  "${{ env.WORKDIR }}/registry.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-               --parameters acrName="acr-${{ env.CUSTOMER_NAME }}"
-                - name: 'Create registry in Resource Group rg-${{ env.CUSTOMER_NAME }}'
+               --parameters acrName="${{ env.REGISTRYNAME }}"               
         - name: 'Prepare containers in registry acr-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:
             inlineScript: |
                 az acr build \
-                    --registry "acr-${{ env.CUSTOMER_NAME }}" \
+                    --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/web:${{ github.run_id }}" \
                     --file "${{ env.GITHUB_WORKSPACE }}/containers/TTA.Web.dockerfile" \
                     "${{ env.GITHUB_WORKSPACE }}/src"
                 az acr build \
-                    --registry "acr-${{ env.CUSTOMER_NAME }}" \
+                    --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/webclient:${{ github.run_id }}" \
                     --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.Web.ClientApi.dockerfile" \
                     "${{ env.GITHUB_WORKSPACE }}/src" 
                 az acr build \
-                    --registry "acr-${{ env.CUSTOMER_NAME }}" \
+                    --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/sql:${{ github.run_id }}" \
                     --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.DataGenerator.SQL.dockerfile" \
                     "${{ env.GITHUB_WORKSPACE }}/src" 
                 az acr build \
-                    --registry "acr-${{ env.CUSTOMER_NAME }}" \
+                    --registry "${{ env.REGISTRYNAME }}" \
                     --image "tta/statgen:${{ github.run_id }}" \
                     --file ""${{ env.GITHUB_WORKSPACE }}/containers/TTA.StatGenerator.dockerfile" \
                     "${{ env.GITHUB_WORKSPACE }}/src"                
@@ -80,20 +80,36 @@ jobs:
           uses: Azure/cli@v1
           with:
             inlineScript: |
-              az sql server firewall-rule create --resource-group rg-${{ env.CUSTOMER_NAME }} --server sql-${{ env.CUSTOMER_NAME }} --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0      
-        - name: 'Create container app environment in resource Group rg-${{ env.CUSTOMER_NAME }}'
+              az sql server firewall-rule create --resource-group rg-${{ env.CUSTOMER_NAME }} --server sql-${{ env.CUSTOMER_NAME }} --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
+        - name: 'Import data to SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
           uses: Azure/cli@v1
           with:
             inlineScript: |
-              $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
-              $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
-              $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
-              $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")
+              az sql db import -s "sql-${{ env.CUSTOMER_NAME }}" -n TTADB --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g "rg-${{ env.CUSTOMER_NAME }}" -p "Sql@news0l1!" -u ttasql --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
+        - name: "Set connection string"
+          id: connStringStep
+          shell: pwsh
+          run: |
+            $sqlConnection = az sql db show-connection-string --client ado.net --server sql-${{ env.CUSTOMER_NAME }}
+            $sqlConnection = $sqlConnection.replace('<username>', "ttasql")
+            $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
+            $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")
+            echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT
+        - name: "Set registry password"
+          uses: Azure/cli@v1
+          with:
+            inlineScript: |
+              rgPassword= az acr credential show -n "${{ env.REGISTRYNAME }}" --query passwords[0].value
+              echo "regPassword=$rgPassword" >> $GITHUB_ENV
+        - name: 'Create container app environment in resource Group rg-${{ env.CUSTOMER_NAME }}'
+          uses: Azure/cli@v1
+          with:
+            inlineScript: |              
               az deployment group create \
                --name "ce-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
                --template-file  "${{ env.WORKDIR }}/containerapp.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-               --parameters location="${{ env.DEFAULT_LOCATION }}" frontendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/web:${{ github.run_id }}" backendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/webclient:${{ github.run_id }}" sqlConn=$sqlConnection      
+               --parameters location="${{ env.DEFAULT_LOCATION }}" frontendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/web:${{ github.run_id }}" backendContainerImage="acr-${{ env.CUSTOMER_NAME }}/tta/webclient:${{ github.run_id }}" sqlConn="${{ env.sqlConn }}" registry="${{ env.REGISTRYNAME }}.azurecr.io" registryUsername="${{ env.REGISTRYNAME }}" registryPassword="registryPassword="${{ steps.connStringStep.outputs.sqlConn }}"       
             
   
           

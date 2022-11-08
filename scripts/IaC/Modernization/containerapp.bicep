@@ -24,6 +24,14 @@ param backendContainerImage string = 'mcr.microsoft.com/dotnet/'
 @description('Connection string for Azure SQL Database')
 param sqlConn string = 'Server=tcp:myserver.database.windows.net,1433;Database=myDataBase;User ID=mylogin@myserver;Password=myPassword;Trusted_Connection=False;Encrypt=True;'
 
+@description('Registry name for Azure Container Registry')
+param registry string
+@description('Registry username for Azure Container Registry')
+param registryUsername string
+@description('Registry password for Azure Container Registry')
+@secure()
+param registryPassword string
+
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
 @maxValue(25)
@@ -62,6 +70,13 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
           }
         ]
       }
+      registries: [
+         {
+            server: registry
+            username: registryUsername
+            password: registryPassword
+         }
+      ]
     }
     template: {
       revisionSuffix: 'firstrevision'
