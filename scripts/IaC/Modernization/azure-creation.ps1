@@ -59,7 +59,7 @@ function CreateSqlAndAddFwRules($rgName)
     # what you put in the parameters file is what you get back
     $sqlParameters=Get-Content sql.parameters.json | ConvertFrom-Json | Select-Object -ExpandProperty parameters
     $sqlServerName=$sqlParameters | Select-Object -ExpandProperty serverName
-    Write-Host "SQL Server name is $(sqlServerName.value)"
+    Write-Host "SQL Server name is $($sqlServerName.value)"
     $Env:AMA_SQLServer_NAME = $sqlServerName.value
     Write-Host "Azure SQL $server installed, adding rules to access it"
     #add your current IP to the access rule
@@ -74,7 +74,7 @@ function CreateSqlAndAddFwRules($rgName)
     $password = $sqlParameters | Select-Object -ExpandProperty administratorLoginPassword
     $Env:AMA_SQLServer_PWD = $password.value
     $dbName = $sqlParameters | Select-Object -ExpandProperty sqlDBName
-    Write-Host "Getting connection string from $server and using DB $(dbName.value)"
+    Write-Host "Getting connection string from $server and using DB $($dbName.value)"
     # get connection string from SQL server
     $sqlConnection=az sql db show-connection-string --client ado.net --server $sqlServerName.value
     $sqlConnection=$sqlConnection.replace('<username>', $username.value)
@@ -118,12 +118,12 @@ CreateResourceGroup -rgName $rgName -regionToDeploy $regionToDeploy
 # 1. Deploy registry
 RegistryDeploy -rgName $rgName -regionToDeploy $regionToDeploy -acrName $acrName
 # 2. Build images
-BuildAndDeployImages -workDir $workDir -loginName $acrName
+# BuildAndDeployImages -workDir $workDir -loginName $acrName
 # 3. Create SQL and add FW rules
 CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
-ImportDataToSql -rgName $rgName
+# ImportDataToSql -rgName $rgName
 # 5. Create container app env with container app and open browser 
-$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerapp $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
+$fqdn = CreateContainerEnvWithApp -containerappenv $containerappenv -containerAppName $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
 
 Stop-Transcript

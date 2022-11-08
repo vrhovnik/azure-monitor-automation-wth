@@ -70,11 +70,6 @@ jobs:
           with:
             inlineScript: |
               az sql server firewall-rule create --resource-group rg-${{ env.CUSTOMER_NAME }} --server sql-${{ env.CUSTOMER_NAME }} --name AllowAzureServices --start-ip-address 0.0.0.0 --end-ip-address 0.0.0.0
-        - name: 'Import data to SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
-          uses: Azure/cli@v1
-          with:
-            inlineScript: |
-              az sql db import -s "sql-${{ env.CUSTOMER_NAME }}" -n TTADB --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g "rg-${{ env.CUSTOMER_NAME }}" -p "Sql@news0l1!" -u ttasql --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
         - name: "Set connection string"
           id: connStringStep
           shell: pwsh

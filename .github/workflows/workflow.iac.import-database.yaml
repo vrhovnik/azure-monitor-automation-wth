@@ -1,0 +1,27 @@
+﻿name: "Import database for one customer"
+on:  
+  workflow_dispatch:
+env:
+  WORKDIR: "scripts/IaC/Modernization"
+  DEFAULT_LOCATION: "westeurope"
+  DBSERVER: "amadatattasqlserver"
+  DBNAME: "TTADB"
+jobs:
+    import-database-deployment:
+      name: 'Import database for one customer'
+      runs-on: ubuntu-latest      
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - name: "Login to Azure to be able to create container app environment"
+          uses: Azure/login@v1
+          with:
+            creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        - name: 'Import data to SQL in Resource Group rg-${{ env.CUSTOMER_NAME }}'
+          uses: Azure/cli@v1
+          with:
+            inlineScript: |
+              az sql db import -s ${{ env.DBSERVER }} -n ${{ env.DBNAME }} --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g "rg-${{ env.CUSTOMER_NAME }}" -p "Sql@news0l1!" -u ttasql --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
+                    
+  
+          
