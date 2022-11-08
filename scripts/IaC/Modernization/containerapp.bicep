@@ -15,11 +15,14 @@ param containerAppLogAnalyticsName string = 'containerapp-log-${uniqueString(res
 ])
 param location string
 
-@description('Specifies the docker container image to deploy.')
+@description('Specifies the docker container image to deploy for web')
 param frontendContainerImage string = 'mcr.microsoft.com/azuredocs/azure-vote-front:v1'
 
-@description('Specifies the docker container image to deploy for the Redis backend.')
+@description('Specifies the docker container image to deploy for the backend.')
 param backendContainerImage string = 'mcr.microsoft.com/dotnet/'
+
+@description('Connection string for Azure SQL Database')
+param sqlConn string = 'Server=tcp:myserver.database.windows.net,1433;Database=myDataBase;User ID=mylogin@myserver;Password=myPassword;Trusted_Connection=False;Encrypt=True;'
 
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
@@ -36,29 +39,9 @@ param resourceTags object = {
   Environment: 'Demo'
 }
 
-resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
-  name: containerAppLogAnalyticsName
-  location: location
-  tags: resourceTags
-  properties: {
-    sku: {
-      name: 'PerGB2018'
-    }
-  }
-}
-
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2022-01-01-preview' = {
   name: containerAppEnvName
-  location: location
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalytics.properties.customerId
-        sharedKey: logAnalytics.listKeys().primarySharedKey
-      }
-    }
-  }
+  location: location  
 }
 
 resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
@@ -88,8 +71,8 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
           image: frontendContainerImage
           env: [
             {
-              name: 'REDIS'
-              value: 'localhost'
+              name: 'SqlOptions__ConnectionString'
+              value: connString
             }
           ]
           resources: {
@@ -98,12 +81,12 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
           }
         }
         {
-          name: 'redis'
+          name: 'webclient'
           image: backendContainerImage
           env: [
             {
-              name: 'ALLOW_EMPTY_PASSWORD'
-              value: 'yes'
+               name: 'SqlOptions__ConnectionString'
+               value: connString
             }
           ]
           resources: {
@@ -111,21 +94,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-01-01-preview' = {
             memory: '.5Gi'
           }
         }
-      ]
-      scale: {
-        minReplicas: minReplica
-        maxReplicas: maxReplica
-        rules: [
-          {
-            name: 'http-requests'
-            http: {
-              metadata: {
-                concurrentRequests: '10'
-              }
-            }
-          }
-        ]
-      }
+      ]      
     }
   }
 }

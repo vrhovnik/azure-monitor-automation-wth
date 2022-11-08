@@ -110,10 +110,12 @@ $Env:ItemsDir="C:\TempInstall"
 New-Item -Path $Env:ItemsDir -ItemType directory -Force
 Invoke-WebRequest $scriptPath -o $Env:ItemsDir\02-web-db-install.ps1
 
+& $Env:ItemsDir\02-web-db-install.ps1
+
 #set execution at logon
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ItemsDir\02-web-db-install.ps1
-Register-ScheduledTask -TaskName "MyLogonToMachine" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+#$Trigger = New-ScheduledTaskTrigger -AtLogOn
+#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ItemsDir\02-web-db-install.ps1
+#Register-ScheduledTask -TaskName "MyLogonToMachine" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 Stop-Transcript
 
