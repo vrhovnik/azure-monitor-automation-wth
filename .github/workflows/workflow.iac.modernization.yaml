@@ -73,7 +73,7 @@ jobs:
             $sqlConnection = $sqlConnection.replace('<password>', "Sql@news0l1!")
             $sqlConnection = $sqlConnection.replace('<databasename>', "TTADB")
             echo "sqlConn=$sqlConnection" >> $GITHUB_OUTPUT
-            Get-Content $GITHUB_OUTPUT
+            echo $GITHUB_OUTPUT
         - name: "Set registry password"
           uses: Azure/cli@v1
           with:
