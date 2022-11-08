@@ -4,7 +4,7 @@ COPY ["TTASLN/TTA.Models/", "TTA.Models/"]
 COPY ["TTASLN/TTA.Interfaces/", "TTA.Interfaces/"]
 COPY ["TTASLN/TTA.Core/", "TTA.Core/"]
 COPY ["TTASLN/TTA.SQL/", "TTA.SQL/"]
-COPY ["TTASLN/TTA.StatGenerator/", "TTA.StatGenerator"]
+COPY ["TTASLN/TTA.DataGenerator.SQL/", "TTA.DataGenerator.SQL/"]
 
 RUN dotnet restore "TTA.Core/TTA.Core.csproj"
 RUN dotnet restore "TTA.Models/TTA.Models.csproj"

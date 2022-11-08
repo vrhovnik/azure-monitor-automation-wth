@@ -43,12 +43,12 @@ function BuildAndDeployImages($workDir, $loginName)
 {
     Write-host "Setting $workDir as working directory"
     Set-Location "$workDir"
-    Write-Host "Building images from provided source code"
+    Write-Host "Building images from provided source code to $loginName"
     #build images and leverage ACR build engine to build the containers
-    az acr build --registry $loginName --image tta/web:1.0 -f 'containers/TTA.Web.dockerfile' 'src/'
-    az acr build --registry $loginName --image tta/webclient:1.0 -f 'containers/TTA.Web.ClientApi.dockerfile' 'src/'
-    az acr build --registry $loginName --image tta/sql:1.0 -f 'containers/TTA.DataGenerator.SQL.dockerfile' 'src/'
-    az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.StatGenerator.dockerfile' 'src/'
+    az acr build --registry $loginName --image tta/web:1.0 -f 'containers/TTA.Web.dockerfile' 'src'
+    az acr build --registry $loginName --image tta/webclient:1.0 -f 'containers/TTA.Web.ClientApi.dockerfile' 'src'
+    az acr build --registry $loginName --image tta/sql:1.0 -f 'containers/TTA.DataGenerator.SQL.dockerfile' 'src'
+    az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.StatGenerator.dockerfile' 'src'
     Write-Host "Images built and prepped - setting back to script modernization"
     Set-Location "$workDir/scripts/IaC/Modernization"
 }
