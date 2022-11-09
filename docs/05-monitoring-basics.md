@@ -87,10 +87,11 @@ _Usage_:
 ## Task requirement
 
 1. Enable monitoring on all of the customer solutions you have in Azure - infrastructure and application 
-2. Provide a script (jMeter, PowerShell, Bash, ...) to generate some load on the application to test out functionality
-3. [OPTIONAL] add script to DevOps process to generate load on the application via CI/CD pipeline after deployment has succeeded with codeowner approval
-4. monitor load and after receiving more than 10% load, scale the affected application by 1 instance automatically
-5. find the errors in the application and create an alert to notify users about the errors by using emails 
+2. Provide a script (jMeter, PowerShell, Bash, ...) or use another tool to generate some load on the application to test out functionality
+3. [OPTIONAL] add script / use tool in DevOps process to generate load on the application via CI/CD pipeline after deployment has succeeded with codeowner approval
+4. monitor load and after receiving more than 50 requests per second, scale the affected application by 1 instance automatically
+5. monitor load and after receiving more than 10% CPU usage in period of 5 mins, scale the affected application by 1 instance automatically
+6. find the errors in the application and create an alert to notify users about the errors by using emails 
 
 ## Test the functionality
 
@@ -105,13 +106,17 @@ _Usage_:
 3. Understand how to use Azure Monitor to monitor the infrastructure 
 4. Use mechanisms from Azure Monitor to notify and react to the errors 
 5. Leverage built-in mechanisms to scale the application automatically 
+6. Understand Kusto Query to get information you need
 
 # Useful links
 
 1. [Azure Monitor overview](https://learn.microsoft.com/en-us/azure/azure-monitor/monitor-reference)
 2. [Azure Load Testing](https://learn.microsoft.com/en-us/azure/load-testing/overview-what-is-azure-load-testing)
 3. [jMeter](https://jmeter.apache.org/) 
-3. [Bombardier benchmarking tool](https://github.com/codesenberg/bombardier) 
+4. [Bombardier benchmarking tool](https://github.com/codesenberg/bombardier)
+5. [Kusto Query](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/) and [Azure Monitor Log Analytics API](https://dev.loganalytics.io/)
+6. [Azure Container App Observability](https://learn.microsoft.com/en-us/azure/container-apps/observability)
+7. [Azure REST API](https://learn.microsoft.com/en-us/rest/api/azure/)
 
 [<< Enable Monitoring](./03-modernization-in-Azure.md) | [<< Back to the challenges](./00-challenges.md)
 | [Monitoring previews >>](./06-monitoring-previews.md)  
