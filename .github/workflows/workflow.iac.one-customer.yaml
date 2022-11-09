@@ -14,7 +14,7 @@ defaults:
   run:
     working-directory: "scripts/IaC/VM"
 jobs:
-  rg-deployment:
+  rg-deployment-and-checks:
     name: "Preview changes and deploy RG for one customer"
     runs-on: ubuntu-latest    
     steps:      
@@ -29,20 +29,20 @@ jobs:
         with:
           inlineScript: |
             az deployment sub what-if \
-              --name ${{ github.run_id }} \
+              --name "test-deploy-${{ github.run_id }}" \
               --template-file "${{ env.WORKDIR }}/rg.bicep" \
               --location "${{ env.DEFAULT_LOCATION }}" \
-              --parameters "${{ env.WORKDIR }}/rg.parameters.json"
+              --parameters resourceGroupName="rg-${{ env.CUSTOMER_NAME }}" resourceGroupLocation="${{ env.DEFAULT_LOCATION }}" 
       - name: 'Create resource group rg-${{ env.CUSTOMER_NAME }}'
         uses: Azure/cli@v1
         with:
           inlineScript: |
             az deployment sub create \
-             --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
+             --name "deploy-rg-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/rg.bicep" \
              --location "${{ env.DEFAULT_LOCATION }}" \
-             --parameters "${{ env.WORKDIR }}/rg.parameters.json"             
-  vm-deployment:
+             --parameters --parameters resourceGroupName="rg-${{ env.CUSTOMER_NAME }}" resourceGroupLocation="${{ env.DEFAULT_LOCATION }}"             
+  vm-deployment-and-checks:
     name: 'Create VM for one customer'
     runs-on: ubuntu-latest
     needs: rg-deployment
@@ -58,16 +58,16 @@ jobs:
         with:
           inlineScript: |
             az deployment group what-if \
-             --name "${{ github.run_id }}" \
+             --name "test-deploy-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/vm.bicep" \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters "${{ env.WORKDIR }}/vm.parameters.json"   
+             --parameters vmName="vm-${{ env.CUSTOMER_NAME }}" windowsAdminUsername="ttauser" windowsAdminPassword="TTAP@ssw0rd1!" publicIpAddressName="vm-${{ env.CUSTOMER_NAME }}-ip" dnsNameForIp="vm-${{ env.CUSTOMER_NAME }}-web" 
       - name: 'Create VM in Resource Group rg-${{ env.CUSTOMER_NAME }}'
         uses: Azure/cli@v1
         with:
           inlineScript: |
             az deployment group create \
-             --name "${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
+             --name "deployment-vm-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/vm.bicep" \
              --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-             --parameters "${{ env.WORKDIR }}/vm.parameters.json"   
+             --parameters vmName="vm-${{ env.CUSTOMER_NAME }}" windowsAdminUsername="ttauser" windowsAdminPassword="TTAP@ssw0rd1!" publicIpAddressName="vm-${{ env.CUSTOMER_NAME }}-ip" dnsNameForIp="vm-${{ env.CUSTOMER_NAME }}-web"   
