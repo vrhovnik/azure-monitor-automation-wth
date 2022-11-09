@@ -41,7 +41,7 @@ jobs:
              --name "deploy-rg-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
              --template-file  "${{ env.WORKDIR }}/rg.bicep" \
              --location "${{ env.DEFAULT_LOCATION }}" \
-             --parameters --parameters resourceGroupName="rg-${{ env.CUSTOMER_NAME }}" resourceGroupLocation="${{ env.DEFAULT_LOCATION }}"             
+             --parameters resourceGroupName="rg-${{ env.CUSTOMER_NAME }}" resourceGroupLocation="${{ env.DEFAULT_LOCATION }}"             
   vm-deployment-and-checks:
     name: 'Create VM for one customer'
     runs-on: ubuntu-latest
