@@ -9,8 +9,8 @@ on:
 env:
   WORKDIR: "scripts/IaC/Modernization"
   DEFAULT_LOCATION: "westeurope"
-  CUSTOMER_NAME: "ama-cust-containers-01"
-  REGISTRYNAME: "amaacrregistry"
+  CUSTOMER_NAME: "ama-cust-containers-02"
+  REGISTRYNAME: "amaacrregistry2"
 jobs:
     container-deployment:
       name: 'Create containers for one customer'
@@ -80,7 +80,7 @@ jobs:
                --name "ce-${{ env.CUSTOMER_NAME }}-${{ github.run_id }}" \
                --template-file  "${{ env.WORKDIR }}/containerapp.bicep" \
                --resource-group "rg-${{ env.CUSTOMER_NAME }}" \
-               --parameters location="${{ env.DEFAULT_LOCATION }}" containerImage="${{ env.REGISTRYNAME }}.azurecr.io/tta/web:${{ github.run_id }}" sqlConn=${{ env.sqlConn }} containerRegistryName=="${{ env.REGISTRYNAME }}"        
+               --parameters location="${{ env.DEFAULT_LOCATION }}" containerImage="${{ env.REGISTRYNAME }}.azurecr.io/tta/web:${{ github.run_id }}" sqlConn=${{ env.sqlConn }} containerRegistryName="${{ env.REGISTRYNAME }}"        
             
   
           
