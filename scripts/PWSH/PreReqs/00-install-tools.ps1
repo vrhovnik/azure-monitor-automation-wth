@@ -75,16 +75,8 @@ $args.Add("/install")
 $args.Add("/norestart")
 
 $Output = Start-Process -FilePath "$PWD\hosting.exe" -ArgumentList $args -NoNewWindow -Wait -PassThru
-If($Output.Exitcode -Eq 0)
-{
-    Write-Host "ASP.NET hosting was installed, restarting IIS"
-    net stop was /y
-    net start w3svc
-}
-else {
-    Write-HError "`t`t Something went wrong with the installation, ASP.NET hosting module not installed. Errorlevel: ${Output.ExitCode}"
-    Exit 1
-}
+net stop was /y
+net start w3svc
 
 Write-Host "Getting source code and storing it to $HOME/amaw"
 git clone https://github.com/vrhovnik/azure-monitor-automation-wth.git "$HOME/amaw"
@@ -131,7 +123,6 @@ $appSettings = Get-Content -Path "$rootPath\Web\appsettings.json" | ConvertFrom-
 $previousClientUrl = $appSettings.AppOptions.ClientApiUrl
 Write-Host "Current path to client $previousClientUrl, changing to new value https://localhost/ttawebclient"
 $appSettings.AppOptions.ClientApiUrl = "https://localhost/ttawebclient/"
-$sqlConn = $appSettings.SqlOptions.ConnectionString
 Write-Host "Path changed, setting SQL connection string $sqlConn to new one for Web page"
 $appSettings.SqlOptions.ConnectionString=$sqlConn
 

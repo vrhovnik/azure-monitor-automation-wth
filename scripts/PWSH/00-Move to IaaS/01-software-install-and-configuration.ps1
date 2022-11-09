@@ -109,7 +109,8 @@ Enable-WindowsOptionalFeature -Online -FeatureName IIS-ASPNET45
 $Env:ItemsDir="C:\TempInstall"
 New-Item -Path $Env:ItemsDir -ItemType directory -Force
 Invoke-WebRequest $scriptPath -o $Env:ItemsDir\02-web-db-install.ps1
-
+# reload shell
+Invoke-Command { & "powershell.exe" } -NoNewScope
 & $Env:ItemsDir\02-web-db-install.ps1
 
 #set execution at logon
