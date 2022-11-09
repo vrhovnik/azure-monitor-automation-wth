@@ -2,6 +2,7 @@
 
 <!-- TOC -->
 * [Monitoring basics](#monitoring-basics)
+  * [Pre-requisites](#pre-requisites)
     * [Deploy VM with solution](#deploy-vm-with-solution)
     * [Container app deployment](#container-app-deployment)
   * [Task requirement](#task-requirement)
@@ -14,12 +15,25 @@ Solution is now up and running. Some customers saw challenges with random errors
 Go and enable monitoring to understand what is happening with the application and to mitigate the errors. Customers
 provided few screenshots and information about the errors.
 
-You _should_ have at least 1 VM with solution and 1 container app to see the different options and ways to install. 
-If you want to test out just one, you can proceed with selected option.
+## Pre-requisites
+
+By finishing first two challenges you _should_ have at least 1 VM with solution and 1 container app up and running. 
+If you see the skipped them, you can deploy them now by using selected option. 
 
 If you don't have it deployed or you deleted everything from before, you can use the following scripts to set them up from scratch:
-1. deploy VM with solution  
-2. deploy container app
+1. deploy VM with solution and SQL server on VM  
+2. deploy container app with SQL, images and registry
+
+If you don't have all the tools on your machine installed, you can use the following script to install them:
+1. install az cli and login - [here](../scripts/PWSH/PreReqs/00-install.ps1)
+2. install all of the tools and configure IIS via chocolatey - [here](../scripts/PWSH/PreReqs/00-install-tools.ps1)
+3. install bicep, configure subscription (add providers, extensions,...), create access and store them to env variables -  - [here](../scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
+4. fork and clone repo and store secrets to GitHub to have it available for the DevOps cycle - [here](../scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
+
+or use [Azure Shell](https://shell.azure.com). You will need to clone the repo (**git clone https://github.com/vrhovnik/azure-monitor-automation-wth**) to access all of the artifacts.
+
+When cloned, navigate to folder (ROOT/scripts/IaC). VM folder contains bicep files and scripts to deploy VM with solution. 
+Modernization folder contains bicep files and scripts to deploy container app with SQL, images and registry, container app.
 
 ### Deploy VM with solution
 
@@ -72,9 +86,9 @@ _Usage_:
 
 ## Task requirement
 
-1. Enable monitoring automatically on all of the customer solutions you have in Azure - infrastructure and application
-2. Provide a script (jMeter, PowerShell, Bash, ...) to generate some load on the application
-3. [OPTIONAL] add script to DevOps process to generate load on the application via CI/CD pipeline after deployment has succeeded
+1. Enable monitoring on all of the customer solutions you have in Azure - infrastructure and application 
+2. Provide a script (jMeter, PowerShell, Bash, ...) to generate some load on the application to test out functionality
+3. [OPTIONAL] add script to DevOps process to generate load on the application via CI/CD pipeline after deployment has succeeded with codeowner approval
 4. monitor load and after receiving more than 10% load, scale the affected application by 1 instance automatically
 5. find the errors in the application and create an alert to notify users about the errors by using emails 
 
@@ -82,7 +96,7 @@ _Usage_:
 
 1. Generate load on the application and monitor via Azure Monitor how the application is performing
 2. Scale the application automatically when load is more than 10% - going up
-3. When error occurs, demonstrate how the alert is triggered and how the notification is sent
+3. When error occurs, demonstrate how the alert is triggered and how the notification is sent to appropriate users
 
 # Expected learnings
 

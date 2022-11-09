@@ -109,6 +109,17 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     Write-Host "Container app running at $fqdn, starting web browser"
     Start-Process "$fqdn"
 }
+
+function CreateContainerEnvWithBicep($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName){
+    Write-Host "Create container app environment $containerappenv in $regionToDeploy"
+    $sqlConnection=$Env:AMA_SQLServerConn
+    $imageName = "$registryServer/tta/web:1.0"
+    $fqdn=az deployment group create --template-file "containerapp.bicep" --resource-group $rgName --parameters location=$regionToDeploy containerImage=$imageName sqlConn=$sqlConnection containerRegistryName=$loginName
+    $createdFQDN=$fqdn.properties.outputs.containerAppFQDN.value
+    Write-Host "Container app running at $createdFQDN, starting web browser"
+    Start-Process "$createdFQDN"
+}
+
 # write log to Temp file
 Start-Transcript 
 # go to IaC script folder
