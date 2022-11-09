@@ -9,8 +9,8 @@ on:
 env:
   WORKDIR: "scripts/IaC/Modernization"
   DEFAULT_LOCATION: "westeurope"
-  CUSTOMER_NAME: "ama-cust-containers-01"
-  REGISTRYNAME: "amaacrregistry"
+  CUSTOMER_NAME: "ama-cust-containers-02"
+  REGISTRYNAME: "amaacrregistry2"
 jobs:
     container-deployment:
       name: 'Create containers for one customer'
