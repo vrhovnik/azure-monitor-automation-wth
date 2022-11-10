@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 using TTA.Interfaces;
 
 namespace TTA.SQL;
@@ -11,7 +12,8 @@ public class QuoteOfTheDayService : IQuoteService
 
     public async Task<string> GetQOTDAsync()
     {
-        const string url = "http://quotes.rest/qod.json";
+        const string url = "https://quotes.rest/qod?language=en";
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         var responseString = await httpClient.GetStringAsync(url);
         var qod = JObject.Parse(responseString);
 

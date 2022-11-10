@@ -5,7 +5,7 @@
 # NOTES:
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.2.8
+# Version 0.3.2
 # SHORT CHANGE DESCRIPTION: add script at logon
 #>
 param (
