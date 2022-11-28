@@ -55,11 +55,8 @@ function ImportDataToSql($rgName)
     az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
 }
 
-function CreateVMMS($rgName,$vmName,$adminName,$adminPass,$numberOfNodes) {
-    Write-Host "Creating VM $vmName in $rgName"
-    if ($vmName -eq "") {
-        $vmName = "vm$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
-    }
+function CreateVMMS($rgName,$adminName,$adminPass,$numberOfNodes) {
+    Write-Host "Starting with deploy"
     az deployment group create --resource-group $rgName --template-file vm.bicep --parameters adminUsername=$adminName adminPassword=$adminPass -numberOfInstances=$numberOfNodes
     Write-Host "Done with VMSS creation"
 }
@@ -75,6 +72,6 @@ CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
 # 5. Create container app env with container app and open browser 
-CreateVMMS -rgName $rgName -vmName $vmName -adminName $adminName -adminPass $adminPass -numberOfNodes 2
+CreateVMMS -rgName $rgName -adminName $adminName -adminPass $adminPass -numberOfNodes 2
 # checks logs for any challenges
 Stop-Transcript
