@@ -12,6 +12,7 @@
     <script data-auto-replace-svg="nest"
             src="https://use.fontawesome.com/releases/v6.1.1/js/all.js"></script>
     @await RenderSectionAsync("Head", required: false)
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
 <header>

@@ -8,8 +8,8 @@
 # NOTES
 # Author      : Bojan Vrhovnik
 # GitHub      : https://github.com/vrhovnik
-# Version 0.6.1
-# SHORT CHANGE DESCRIPTION: adding function support to prettify the output
+# Version 0.6.2
+# SHORT CHANGE DESCRIPTION: adding function support to prettify the output and set the location to correct folder
 #>
 param(
     [string]$regionToDeploy="westeurope",
@@ -42,7 +42,8 @@ function CreateVM($rgName,$vmName,$adminName,$adminPass) {
     #open RDP
     Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList $args
 }
-
+# 0. set the location
+Set-Location "$workDir/scripts/IaC/VM"
 # 1. deploy or update resource group
 CreateResourceGroup -rgName $rgName -regionToDeploy $regionToDeploy
 # 2. deploy VM
