@@ -13,12 +13,14 @@
 #>
 
 param (
-    [string]$sqlConnectionString    
+    [string]$sqlConnectionString=""    
 )
 
 if ($sqlConnectionString -eq $null) {
     Write-Host "No SQL connection string provided, reading from ENV string"
     $sqlConnectionString=$Env:AMA_SQLServerConn
+    Write-Host "Conn string set to: $sqlConnectionString - we do recommend using Azure KeyVault for secure access"
+    ## az keyvault secret show --name "ExamplePassword" --vault-name "<your-unique-keyvault-name>" --query "value"
 }
 
 Set-StrictMode -Version Latest
@@ -28,10 +30,14 @@ $ProgressPreference="SilentlyContinue"
 Start-Transcript
 
 Write-Host "Getting source code and storing it to $HOME/amaw"
-git clone https://github.com/vrhovnik/azure-monitor-automation-wth.git "$HOME/amaw"
+$zipPath="https://github.com/vrhovnik/azure-monitor-automation-wth/archive/refs/heads/main.zip"
+Set-Location $HOME
+Invoke-WebRequest -Uri $zipPath -OutFile "$HOME\amaw.zip"
+#extract to amaw folder
+Expand-Archive -Path "$HOME\amaw.zip" -DestinationPath "$HOME\amaw" -Force
 
-Write-Host "Changed location to $HOME/amaw/src/TTASLN/TTA.Web"
-Set-Location "$HOME/amaw/src/TTASLN/TTA.Web"
+Write-Host "Changed location to $HOME/amaw/azure-monitor-automation-wth-main/src/TTASLN/TTA.Web"
+Set-Location "$HOME/amaw/azure-monitor-automation-wth-main/src/TTASLN/TTA.Web"
 
 $rootPath = "C:\Inetpub\wwwroot\"
 Write-Host "Creating Folder Web and publishing solution Web to wwwroot"
@@ -40,7 +46,7 @@ dotnet publish --configuration Release -o "$rootPath\Web"
 
 Write-Host "DotNet publish for Web done, doing same for API"
 Write-Host "Changed location to $HOME/amaw/src/TTASLN/TTA.Web.ClientAPI"
-Set-Location "$HOME/amaw/src/TTASLN/TTA.Web.ClientAPI"
+Set-Location "$HOME/amaw/azure-monitor-automation-wth-main/src/TTASLN/TTA.Web.ClientAPI"
 
 Write-Host "Creating Folder WebClient and publishing solution Client to wwwroot"
 mkdir "$rootPath\WebClient"

@@ -9,8 +9,7 @@
 <!-- TOC -->
 
 Solution is now up and running, basic monitoring is prepared and ready to use. CEO approached the team and asked to
-prepare a demo for the next board meeting. CEO wants to show how the
-solution is performing and demonstrate by customer how they are using the app.
+prepare a demo for the next board meeting. CEO wants to show how the solution is performing and demonstrate by customer how they are using the app.
 
 ## Task requirement
 

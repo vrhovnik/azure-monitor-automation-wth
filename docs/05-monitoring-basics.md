@@ -1,16 +1,14 @@
 ﻿# Monitoring basics
 
 <!-- TOC -->
-
 * [Monitoring basics](#monitoring-basics)
-    * [Pre-requisites](#pre-requisites)
-        * [Deploy VM with solution](#deploy-vm-with-solution)
-        * [Container app deployment](#container-app-deployment)
-    * [Task requirement](#task-requirement)
-    * [Test the functionality](#test-the-functionality)
+  * [Pre-requisites](#pre-requisites)
+    * [Deploy VM with solution](#deploy-vm-with-solution)
+    * [Container app deployment](#container-app-deployment)
+  * [Task requirement](#task-requirement)
+  * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
 * [Useful links](#useful-links)
-
 <!-- TOC -->
 
 Solution is now up and running. Some customers saw challenges with random errors or application not to anything.
@@ -19,7 +17,7 @@ provided few screenshots and information about the errors.
 
 ## Pre-requisites
 
-By finishing first two challenges you _should_ have at least 1 VM with solution and 1 container app up and running.
+By finishing first two challenges you _should_ have at least 1 VM with solution or 1 VMSS with load balancer in front and 1 container app up and running.
 If you see the skipped them, you can deploy them now by using selected option.
 
 If you don't have it deployed or you deleted everything from before, you can use the following scripts to set them up
@@ -33,10 +31,9 @@ If you don't have all the tools on your machine installed, you can use the follo
 1. install az cli and login - [here](../scripts/PWSH/PreReqs/00-install.ps1)
 2. install all of the tools and configure IIS via chocolatey - [here](../scripts/PWSH/PreReqs/00-install-tools.ps1)
 3. install bicep, configure subscription (add providers, extensions,...), create access and store them to env variables
-    -
-        - [here](../scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
+   - [here](../scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
 4. fork and clone repo and store secrets to GitHub to have it available for the DevOps cycle
-    - [here](../scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
+   - [here](../scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
 
 or use [Azure Shell](https://shell.azure.com). You will need to clone the repo (**git
 clone https://github.com/vrhovnik/azure-monitor-automation-wth**) to access all of the artifacts.
@@ -102,17 +99,17 @@ _Usage_:
 
 ## Task requirement
 
-1. Enable monitoring on all of the customer solutions you have in Azure without modifying the code - infrastructure and application - and make sure
-   all new solutions will be automatically onboarded to monitoring solution.
+1. Enable monitoring (infrastructure and application) on all of the customer solutions you have in Azure without modifying the application code and make sure all new solutions will be automatically onboarded to monitoring solution.
 2. Provide a script (jMeter, PowerShell, Bash, ...) or use another tool to generate some load on the application to test
    out functionality
 3. [OPTIONAL] add script / use tool in DevOps process to generate load on the application via CI/CD pipeline after
    deployment has succeeded with codeowner approval.
 4. Monitor load and after receiving more than 50 requests per second, scale the affected application by 1 instance
-   automatically
+   automatically or if not possible, upscale the VM by higher possibility
 5. Monitor load and after receiving more than 10% CPU usage in period of 5 mins, scale the affected application by 1
    instance automatically
-6. Find the errors in the application and define ONE report to see groups of errors by server name and error message0
+6. Find the errors in the application and define ONE report with timeline option to see groups of errors by server name and by how many
+   errors there are.
 7. Create an alert to notify users about the errors by using emails send group for users with role "Owner"
 
 ## Test the functionality
@@ -136,7 +133,8 @@ _Usage_:
 # Useful links
 
 1. [Azure Monitor overview](https://learn.microsoft.com/en-us/azure/azure-monitor/monitor-reference)
-2. [Azure Load Testing](https://learn.microsoft.com/en-us/azure/load-testing/overview-what-is-azure-load-testing) or [jMeter](https://jmeter.apache.org/) or [Bombardier benchmarking tool](https://github.com/codesenberg/bombardier)
+2. [Azure Load Testing](https://learn.microsoft.com/en-us/azure/load-testing/overview-what-is-azure-load-testing)
+   or [jMeter](https://jmeter.apache.org/) or [Bombardier benchmarking tool](https://github.com/codesenberg/bombardier)
 3. [Azure Monitor policies](https://learn.microsoft.com/en-us/azure/azure-monitor/policy-reference)
    and [Policy effects](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effects)
 4. [Application Insights overview](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
