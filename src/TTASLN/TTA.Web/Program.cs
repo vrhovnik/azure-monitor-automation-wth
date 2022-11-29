@@ -44,7 +44,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
     options.Conventions.AddPageRoute("/Info/Index", ""));
 
-// builder.Services.AddApplicationInsightsTelemetry();
+builder.Services.AddApplicationInsightsTelemetry();
 // builder.Services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, _) =>
 // {
 //     module.EnableSqlCommandTextInstrumentation = true;

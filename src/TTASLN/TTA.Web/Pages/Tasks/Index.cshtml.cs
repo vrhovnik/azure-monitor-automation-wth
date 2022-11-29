@@ -35,6 +35,8 @@ public class IndexPageModel : BasePageModel
         logger.LogInformation("Loaded {ItemCount} out of {AllCount} with {Query}", WorkTasks.Count,
             WorkTasks.TotalPages, Query);
 
+        await Task.Delay(2000); //delaying result to prepare the environment
+        
         if (!Request.IsHtmx()) return Page();
         
         //Response.Htmx(h => h.Push(Request.GetEncodedUrl()));

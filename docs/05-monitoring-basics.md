@@ -6,7 +6,10 @@
     * [Deploy VM with solution](#deploy-vm-with-solution)
     * [Container app deployment](#container-app-deployment)
   * [Task requirement](#task-requirement)
-  * [Test the functionality](#test-the-functionality)
+    * [General](#general)
+    * [System monitoring](#system-monitoring)
+    * [App monitoring](#app-monitoring)
+  * [Test the functionality and success criteria](#test-the-functionality-and-success-criteria)
 * [Expected learnings](#expected-learnings)
 * [Useful links](#useful-links)
 <!-- TOC -->
@@ -17,7 +20,8 @@ provided few screenshots and information about the errors.
 
 ## Pre-requisites
 
-By finishing first two challenges you _should_ have at least 1 VM with solution or 1 VMSS with load balancer in front and 1 container app up and running.
+By finishing first two challenges you _should_ have at least 1 VM with solution (or 1 VMSS with load balancer in
+front) **and** 1 container app up and running.
 If you see the skipped them, you can deploy them now by using selected option.
 
 If you don't have it deployed or you deleted everything from before, you can use the following scripts to set them up
@@ -31,9 +35,9 @@ If you don't have all the tools on your machine installed, you can use the follo
 1. install az cli and login - [here](../scripts/PWSH/PreReqs/00-install.ps1)
 2. install all of the tools and configure IIS via chocolatey - [here](../scripts/PWSH/PreReqs/00-install-tools.ps1)
 3. install bicep, configure subscription (add providers, extensions,...), create access and store them to env variables
-   - [here](../scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
+    - [here](../scripts/PWSH/PreReqs/01-az-and-bicep-configuration.ps1)
 4. fork and clone repo and store secrets to GitHub to have it available for the DevOps cycle
-   - [here](../scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
+    - [here](../scripts/PWSH/PreReqs/02-set-gh-secrets.ps1)
 
 or use [Azure Shell](https://shell.azure.com). You will need to clone the repo (**git
 clone https://github.com/vrhovnik/azure-monitor-automation-wth**) to access all of the artifacts.
@@ -99,27 +103,49 @@ _Usage_:
 
 ## Task requirement
 
-1. Enable monitoring (infrastructure and application) on all of the customer solutions you have in Azure without modifying the application code and make sure all new solutions will be automatically onboarded to monitoring solution.
+### General
+
+1. Enable monitoring (infrastructure and application) on all of the customer solutions you have in Azure without
+   modifying the application code and make sure all new solutions on VMs will be automatically onboarded to Azure Monitor.   
 2. Provide a script (jMeter, PowerShell, Bash, ...) or use another tool to generate some load on the application to test
-   out functionality
+   out functionality - you can test base url and virtual url Tasks.
 3. [OPTIONAL] add script / use tool in DevOps process to generate load on the application via CI/CD pipeline after
    deployment has succeeded with codeowner approval.
-4. Monitor load and after receiving more than 50 requests per second, scale the affected application by 1 instance
-   automatically or if not possible, upscale the VM by higher possibility
-5. Monitor load and after receiving more than 10% CPU usage in period of 5 mins, scale the affected application by 1
-   instance automatically
-6. Find the errors in the application and define ONE report with timeline option to see groups of errors by server name and by how many
-   errors there are.
-7. Create an alert to notify users about the errors by using emails send group for users with role "Owner"
 
-## Test the functionality
+### System monitoring
+
+1. Monitor load in containers and if received more than 50 requests per second in a container, scale the affected
+   application by 1 instance automatically.
+2. Create alerts for VM and notify user by your choice via email:
+   - if percentage CPU is greater than 80% by defining  critical severity
+   - if data disk IOPS consumed percentage is greater than 90% with verbose severity
+   - if network in total is greater than 800 GB with information severity
+3. Monitor load in VM and if received more than 150mb of RAM allocated to the process (in which app resides), restart the
+   VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating Azure
+   Function (with consumption plan) and echoing the result.
+
+### App monitoring
+
+1. Provide basic information about the application itself - how is it working, live feed when running the test, user
+   connections, funnels, browser information in one place for application from VM and from container. Provide an unified dashboard in Azure to
+   have an overview of the application performance.
+2. Find the errors in the application by defining **ONE** report for the application by providing: 
+   - timeline option to be able to provide range in query 
+   - to see exceptions by the name, request duration, method, error message, instance where it happened, called url by providing time range 
+   - showcase the data in Excell
+3. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding more than 10s.
+   
+## Test the functionality and success criteria
 
 1. Describe the coach how to enable monitoring on all of the solutions (pros and cons) - infrastructure and application
-    - VM and container app
-2. Generate load on the application and monitor via Azure Monitor how the application is performing - provide to coach
-   the information about how the app is performing, how many users are connecting, etc.
-3. Scale the application automatically when load is more than 5% - you should run the load test and monitor results
-4. When error occurs, demonstrate how the alert is triggered and how the notification is sent to appropriate users
+   for VM (VMSS) and container app
+    - explain what needs to be done in order to make it happen
+    - how should you consolidate data from different sources to have the overall view of the system
+    - how should you monitor the application itself without changing the code of the application
+2. Generate load on the application and monitor via possible solutions in Azure how the application is performing -
+   provide to coach the information about how the app is performing, how many users are connecting, etc.
+3. demonstrate rich exception details to the coach by using Microsoft Excell
+4. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to appropriate users.
 
 # Expected learnings
 

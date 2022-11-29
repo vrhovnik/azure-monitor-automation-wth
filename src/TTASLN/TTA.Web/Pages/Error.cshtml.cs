@@ -14,11 +14,8 @@ public class ErrorPageModel : PageModel
 
     private readonly ILogger<ErrorPageModel> logger;
 
-    public ErrorPageModel(ILogger<ErrorPageModel> logger)
-    {
-        this.logger = logger;
-    }
+    public ErrorPageModel(ILogger<ErrorPageModel> logger) => this.logger = logger;
 
-    public void OnGet() => logger.LogInformation("Error page was loaded at {CurrentDateTime} with {RequestId}",
+    public void OnGet() => logger.LogError("Error page was loaded at {CurrentDateTime} with {RequestId}",
         DateTime.Now, RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier);
 }
