@@ -2,49 +2,78 @@
 
 <!-- TOC -->
 * [Monitoring previews](#monitoring-previews)
-  * [Task requirement](#task-requirement)
+  * [Task requirements](#task-requirements)
   * [Test the functionality](#test-the-functionality)
 * [Expected learnings](#expected-learnings)
 * [Useful links](#useful-links)
 <!-- TOC -->
 
 Solution is now up and running, basic monitoring is prepared and ready to use. CEO approached the team and asked to
-prepare a demo for the next board meeting. CEO wants to show how the solution is performing and demonstrate by customer how they are using the app.
+prepare status report. Team wants to have interactive dashboards to be able to show the status of the system and to
+drill down into specifics and details if needed.
 
-## Task requirement
+You can use native solutions to create monitoring options or use third party tools like Managed Grafana
+to provide this information to the end user.
 
-Your job is to prepare the overview for the CEO:
+## Task requirements
+
+Your job is to prepare the overview for your team:
 
 1. create rich graphics and dashboards to preview the solution overall health and performance:
-    - create a dashboard with the following metrics:
-        - CPU and memory usage
-        - Network usage and number of requests
-        - server response time
-        - availability over time
-    - create a dashboard with the following metrics:
-        - number of users - active and per country
-        - number of errors and most common error
-2. provide an ability to connect to external systems like PowerBI or Grafana to preview the data
+    - create a dashbard by having providing (if you are using native solution, you can
+      use [this template](https://webeudatastorage.blob.core.windows.net/web/appInsightStarterTemplate.json) as a
+      starter)
+        - app insights and Azure Monitor alerts, dashboard, workbooks, url tests, smart detection rules
+        - overall overview of application statistics
+        - interactive tab to show active results in your subscriptions and all defined workbooks and alerting resources
+    - create an Azure dashboard dashboard and fill it in with following metrics:
+        - Average CPU usage and available memory
+        - Average availability and server response time
+        - Unique sessions and users
+        - Failed requests
+        - Average page load time breakdown
+    - create an Azure dashboard as a link to interactive reports:
+        - Performance analysis of the app (clicking on operation gives you additional information) and link to sample
+          end-to-end transaction
+        - Exception overview with trend graph
+2. provide an ability to download data and connect to external systems like Excell or PowerBI
 
 ## Test the functionality
 
-Showcase the dashboard to the CEO and the customer. Examples of monitoring below.
+Showcase the dashboard to the coach and the team by providing rich examples of data from task requirements and explaing
+what it does.
+
+Examples of monitoring below:
+
+![Common dashboard](https://webeudatastorage.blob.core.windows.net/web/app-insight-example.png)
+
+or
+
+![exception list information](https://webeudatastorage.blob.core.windows.net/web/app-insight-exception-list.png)
+
+or
+
+![Interactive tabs](https://webeudatastorage.blob.core.windows.net/web/app-insight-interactive-tab.png)
+
+or
+
+![Managed Grafana Overview](https://webeudatastorage.blob.core.windows.net/web/app-insight-grafana.png)
 
 # Expected learnings
 
-1. Understand how to leverage Azure Monitor workbooks to prepare the app overview
-2. Understand how to connect Azure Monitor to other solutions to create rich graphical overview3.
-3. Understand how to use Azure Monitor to monitor the application and infrastructure together
-4. Demonstrate from Azure Monitor to notify and react to the errors
-5. Showcase how you can use the result in an external system like PowerBI or Grafana - pick which you would like to
-   explore and demonstrate the chart in that tool
+1. Understand how to leverage Azure Monitor / Application Insights workbooks to prepare the app overview
+2. Understand how to connect Azure Monitor to other solutions to create rich graphical overview
+3. Understand how to use Azure Monitor and queries to monitor the application and infrastructure together
+4. Showcase how you can use the result in an external system like Excell or Teams or PowerBI or Grafana
 
 # Useful links
 
 1. [Log Queries in Azure Monitor](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-query-overview)
 2. [Kusto Query](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
-2. [Azure Workbooks](https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview)
-2. [Grafana](https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/grafana-plugin)
-3. [PowerBI](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-powerbi)
+3. [Azure Workbooks](https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview) - tutorial how
+   to [create Azure Workbook](https://learn.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-create-workbook)
+   - starter template [here](https://webeudatastorage.blob.core.windows.net/web/appInsightStarterTemplate.json)
+4. [Azure Managed Grafana](https://learn.microsoft.com/en-us/azure/managed-grafana/overview)
+5. [PowerBI](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/log-powerbi)
 
 [<< Enable Monitoring](./05-monitoring-basics.md) | [<< Back to the challenges](./00-challenges.md)

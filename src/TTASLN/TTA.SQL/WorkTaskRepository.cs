@@ -31,6 +31,9 @@ public class WorkTaskRepository : BaseRepository<WorkTask>, IWorkTaskRepository
         workTask.Tags = (await result.ReadAsync<Tag>()).ToList();
         workTask.Comments = (await result.ReadAsync<WorkTaskComment>()).ToList();
 
+        if (workTask.Comments.Count == 0)
+            throw new ApplicationException("Commenting is required to be added into the system.");
+
         return workTask;
     }
 
