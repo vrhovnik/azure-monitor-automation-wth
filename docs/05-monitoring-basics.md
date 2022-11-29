@@ -133,18 +133,18 @@ _Usage_:
    - timeline option to be able to provide range in query 
    - to see exceptions by the name, request duration, method, error message, instance where it happened, called url by providing time range 
    - showcase the data in Excell
-3. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding more than 10s.
+3. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding more than 3s.
    
 ## Test the functionality and success criteria
 
 1. Describe the coach how to enable monitoring on all of the solutions (pros and cons) - infrastructure and application
-   for VM (VMSS) and container app
+   for VM (or VMSS) and container app
     - explain what needs to be done in order to make it happen
     - how should you consolidate data from different sources to have the overall view of the system
     - how should you monitor the application itself without changing the code of the application
 2. Generate load on the application and monitor via possible solutions in Azure how the application is performing -
    provide to coach the information about how the app is performing, how many users are connecting, etc.
-3. demonstrate rich exception details to the coach by using Microsoft Excell
+3. Demonstrate rich exception details to the coach by using Microsoft Excell
 4. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to appropriate users.
 
 # Expected learnings
@@ -152,9 +152,9 @@ _Usage_:
 1. Understand how to enable monitoring in Azure for different type of solutions
 2. Understand how to use Azure Monitor to monitor the application
 3. Understand how to use Azure Monitor to monitor the infrastructure
-4. Use mechanisms from Azure Monitor to notify and react to the errors
-5. Leverage built-in mechanisms to scale the application automatically
-6. Understand Kusto Query to get information you need across all of the solutions
+4. Use mechanisms from Azure Monitor and Application Insights to notify and react to the metrics changes and log requirements
+5. Leverage built-in mechanisms to scale the application automatically or use custom option to react on changes
+6. Understand and modify Kusto Query to get information you need across all of the solutions
 
 # Useful links
 
