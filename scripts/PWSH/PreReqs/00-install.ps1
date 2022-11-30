@@ -19,5 +19,9 @@ if ($answer -eq "y")
 az login
 #check the subscription
 az account list --output table
+
+#set the installation of extensions without prompt
+az config set extension.use_dynamic_install=yes_without_prompt
+
 # continue with next steps
-Write-Host "Done with login, continue to next step"
+Write-Host "Done with login and initial step, continue to next step"

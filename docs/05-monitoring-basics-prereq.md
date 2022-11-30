@@ -1,18 +1,19 @@
 ﻿# Monitoring pre-requisites
 
 <!-- TOC -->
+
 * [Monitoring pre-requisites](#monitoring-pre-requisites)
-  * [Deploy VM with solution](#deploy-vm-with-solution)
-  * [Container app deployment](#container-app-deployment)
-    * [Deploy container app with private registry](#deploy-container-app-with-private-registry)
-    * [Deploy container apps with public registry](#deploy-container-apps-with-public-registry)
+    * [Deploy VM with solution](#deploy-vm-with-solution)
+    * [Container app deployment](#container-app-deployment)
+        * [Deploy container app with private registry](#deploy-container-app-with-private-registry)
+        * [Deploy container apps with public registry](#deploy-container-apps-with-public-registry)
 * [Additional information and links](#additional-information-and-links)
 * [Navigate back to main page](#navigate-back-to-main-page)
+
 <!-- TOC -->
 
 If you don't have VM and container deployed or you deleted everything from before, you can use the following scripts to
-set them up
-from scratch:
+set them up from scratch:
 
 1. deploy VM with solution and SQL server on VM - [Deploy VM with solution](#deploy-vm-with-solution)
 2. deploy container app with SQL, images and registry - [Container app deployment](#container-app-deployment)
@@ -24,6 +25,13 @@ When cloned, navigate to folder (**ROOT/scripts/IaC**). VM folder contains bicep
 solution. Modernization folder contains bicep files and scripts to deploy container app with SQL, images and registry,
 container
 app.
+
+To ease up with applying the extensions for az cli (if you don't have it installed, confirm installation without
+prompt):
+
+```powershell
+az config set extension.use_dynamic_install = yes_without_prompt
+```
 
 To install all of the tools on the machine (doing it from local machine), you can use the following script below step by
 step:
@@ -48,17 +56,30 @@ It takes 6 parameters (or you can use default values where applicable):
 
 1. **regionToDeploy** -- resource group location (most common is westeurope)
 2. **rgName** -- name of the resource group (it will be created or updated)
+3. **vmName** -- name of the VM (it will be created or updated)
 3. **adminName** -- username name for VM to RDP into
 4. **adminPass** -- password for user to RDP into
 5. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
 
 ```powershell
 
-.\azure-creation.ps1 -regionToDeploy "westeurope" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -adminName "admin" -adminPass "P@ssw0rd"
+.\azure-creation.ps1 -regionToDeploy "westeurope" -vmName "vm-ama-customer" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -adminName "admin" -adminPass "P@ssw0rd"
 
 ``` 
 
 After running the solution, you should see the RDP dialog with (newly) created (or updated) IP connecting to the VM.
+
+Connect to machine with provided username and password. You should see installation process to kick (script is
+available [here](https://raw.githubusercontent.com/vrhovnik/azure-monitor-automation-wth/main/scripts/PWSH/00-Move%20to%20IaaS/02-web-db-install.ps1))
+in and preparing the environment:
+
+1. installing SQL Express on the VM
+2. downloading source code, creating IIS site and configuring it
+3. creating database and tables and populate it with data
+4. configure connection string for the application and updating application settings automatically
+
+Test out the solution by navigating to the **http://localhost/ttaweb/Tasks** inside virtual machine. If you see the
+application running (), close the RDP and connect via FQDN or IP via browser by appending ttaweb virtual url.
 
 ## Container app deployment
 
@@ -72,11 +93,12 @@ which will do the
 following:
 
 1. Create or update the resource group
-2. Create or update registry
+2. Create or update Azure Container Registry
 3. Builds and deploy container images to registry
 4. Create SQL, adds firewall rules and creates database
-5. Imports existing data to SQL, prepares connection string to be used later
-6. Create or update container app with latest image from registry
+5. Imports existing data to SQL, prepares connection string for the application to be used later
+6. creates (or updates) application insights, prepares connection strings for the app
+7. Create container app with latest image from registry
 
 It takes 6 parameters (or you can use default values where applicable):
 
@@ -84,16 +106,20 @@ It takes 6 parameters (or you can use default values where applicable):
 2. **rgName** -- name of the resource group (it will be created or updated)
 3. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
 4. **acrName** -- name of the container registry (it will be created or updated)
-5. **containerappenv** -- name of the container environment
-6. **containerapp** -- name of the container environment
-
-Don't forget to edit parameters (XXXX.parameters.json where XXXX is the service name) files with your own names to reflect the environment.
+5. **sqlServerName** -- name of the SQL server (it will be created or updated)
+6. **sqlServerUsername** - username for SQL server
+7. **sqlServerPwd** - password for SQL server
+8. **containerappenv** -- name of the container environment
+9. **containerapp** -- name of the container environment
 
 _Usage_:
 
 ```powershell
-.\azure-creation.ps1 -regionToDeploy "westeurope" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -acrName "acrautomationwth" -containerappenv "containerappenv" -containerapp "containerapp"
+.\azure-creation.ps1 -regionToDeploy "westeurope" -rgName "rg-automation-wth" -workDir "C:/Work/Projects/azure-monitor-automation-wth" -acrName "acrautomationwth" -containerappenv "containerappenv" -containerapp "containerapp" -sqlServerName "sqlserver" -sqlServerUsername "ttadmin" -sqlServerPwd "P@ssw0rd"
 ```
+
+Don't worry if you will get any exceptions. We will monitor them later on in the hack to get information about what is
+happening.
 
 ### Deploy container apps with public registry
 

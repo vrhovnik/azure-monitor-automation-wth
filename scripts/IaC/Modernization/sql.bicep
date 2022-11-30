@@ -14,8 +14,14 @@ param administratorLogin string='ttauser'
 @secure()
 param administratorLoginPassword string
 
+param resourceTags object = {
+  Description: 'automation-and-monitor-what-the-hack'
+  Environment: 'Demo'
+}
+
 resource sqlServer 'Microsoft.Sql/servers@2021-08-01-preview' = {
   name: serverName
+  tags: resourceTags 
   location: location
   properties: {
     administratorLogin: administratorLogin
@@ -26,6 +32,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-08-01-preview' = {
 resource sqlDB 'Microsoft.Sql/servers/databases@2021-08-01-preview' = {
   parent: sqlServer
   name: sqlDBName
+  tags: resourceTags 
   location: location
   sku: {
     name: 'Standard'

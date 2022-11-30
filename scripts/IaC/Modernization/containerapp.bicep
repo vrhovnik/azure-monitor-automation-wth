@@ -5,7 +5,7 @@ param containerAppName string = 'app-${uniqueString(resourceGroup().id)}'
 param containerAppEnvName string = 'env-${uniqueString(resourceGroup().id)}'
 
 @description('Specifies the name of the log analytics workspace.')
-param containerAppLogAnalyticsName string = 'containerapp-log-${uniqueString(resourceGroup().id)}'
+param containerAppLogAnalyticsName string = 'ama-law-${uniqueString(resourceGroup().id)}'
 
 @description('Specifies the name of the container registry.')
 param containerRegistryName string = 'cr${uniqueString(resourceGroup().id)}'
@@ -23,6 +23,9 @@ param containerImage string = 'mcr.microsoft.com/azuredocs/containerapps-hellowo
 
 @description('Specifies the SQL conn.')
 param sqlConn string = 'Server=tcp:xxxxx.database.windows.net,1433;Database=TTADB;User ID=ttasql;Encrypt=true;Connection Timeout=30;'
+
+@description('Application Insights connection string')
+param aiConn string = 'InstrumentationKey=00000000-0000-0000-0000-000000000000;EndpointSuffix=ai.contoso.com;'
 
 @description('Minimum number of replicas that will be deployed')
 @minValue(0)
@@ -124,6 +127,10 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
                  {
                    name: 'SqlOptions__ConnectionString'
                    value: sqlConn
+                 }
+                 {
+                   name: 'ApplicationInsights__ConnectionString'
+                   value: aiConn
                  }
           ]
           resources: {

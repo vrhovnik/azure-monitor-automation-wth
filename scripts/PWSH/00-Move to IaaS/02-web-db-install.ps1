@@ -108,4 +108,7 @@ net start w3svc
 
 Write-Host "Restart done, app is ready on https://localhost/ttaweb and api on https://localhost/ttawebclient"
 
+#stop scheduled task for it no to be running every time user logs in
+Stop-ScheduledTask -TaskName "MyLogonToMachine"
+
 Stop-Transcript

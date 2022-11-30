@@ -14,6 +14,7 @@
 param(
     [string]$regionToDeploy="westeurope",
     [string]$rgName="rg-cust-ama-ce-2",
+    [string]$vmName="vm-customer-ama",
     [string]$adminName="ttadmin",
     [string]$adminPass="Complic4tedP@ssw0rd1!",
     [string]$workDir="C:/Work/Projects/azure-monitor-automation-wth"    
@@ -30,14 +31,16 @@ function CreateVM($rgName,$vmName,$adminName,$adminPass) {
     Write-Host "Creating VM $vmName in $rgName"
     if ($vmName -eq "") {
         $vmName = "vm$(-join ((65..90) + (97..122) | Get-Random -Count 5 | % {[char]$_}))"
+        Write-Host "Defining new VM name $vmName automatically"
     }
     $ipName="ip-$vmName"
     $dnsname="dns-$vmName"
     Write-Host "Creating IP $ipName, deploying VM $vmName"
-    $myIp=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters publicIpAddressName=$ipName dnsNameForIp=$dnsname vmName=$vmName windowsAdminUsername=$adminName windowsAdminPassword=$adminPass
-    Write-Host "VM created, opening remote desktop to $myIp"
+    $myIp=az deployment group create --resource-group $rgName --template-file vm.bicep --parameters publicIpAddressName=$ipName dnsNameForIp=$dnsname vmName=$vmName windowsAdminUsername=$adminName windowsAdminPassword=$adminPass | ConvertFrom-Json
+    $createdVm=$myIp.properties.outputs.publicIP.value
+    Write-Host "VM created, opening remote desktop to $createdVm"
     $args = New-Object -TypeName System.Collections.Generic.List[System.String]
-    $args.Add("/v:$($myIp):3389")
+    $args.Add("/v:$($createdVm):3389")
     $args.Add("/f")
     #open RDP
     Start-Process "$env:windir\system32\mstsc.exe" -ArgumentList $args
