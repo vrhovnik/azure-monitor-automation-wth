@@ -17,7 +17,7 @@ param(
     [string]$workDir = "C:/Work/Projects/azure-monitor-automation-wth",
     [string]$sqlServerName = "amadatattasqlserver",
     [string]$sqlServerUsername = "ttauser",
-    [string]$sqlServerPwd = "ttauser123!",
+    [string]$sqlServerPwd = "TTAPa$$$wd1!",
     [string]$acrName = "acramacustomerlist",
     [string]$containerappenv = "ama-cust-env",
     [string]$containerapp = "ama-cust-containers-tta-web"
@@ -52,8 +52,8 @@ function BuildAndDeployImages($workDir, $loginName)
     #build images and leverage ACR build engine to build the containers
     az acr build --registry $loginName --image tta/web:1.0 -f 'containers/TTA.Web.dockerfile' 'src'
     az acr build --registry $loginName --image tta/webclient:1.0 -f 'containers/TTA.Web.ClientApi.dockerfile' 'src'
-    az acr build --registry $loginName --image tta/sql:1.0 -f 'containers/TTA.DataGenerator.SQL.dockerfile' 'src'
-    az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.StatGenerator.dockerfile' 'src'
+    # az acr build --registry $loginName --image tta/sql:1.0 -f 'containers/TTA.DataGenerator.SQL.dockerfile' 'src'
+    # az acr build --registry $loginName --image tta/statgen:1.0 -f 'containers/TTA.StatGenerator.dockerfile' 'src'
     Write-Host "Images built and prepped - setting back folder to script modernization"
     Set-Location "$workDir/scripts/IaC/Modernization"
 }
@@ -76,7 +76,7 @@ function CreateSqlAndAddFwRules($rgName,$sqlName,$sqlUsername,$sqlPassword)
     $Env:AMA_SQLServer_PWD = $sqlPassword
     Write-Host "Getting connection string from $sqlName and using TTADB"
     # get connection string from SQL server
-    $sqlConnection = az sql db show-connection-string --client ado.net --server $sqlServerName.value
+    $sqlConnection = az sql db show-connection-string --client ado.net --server $sqlName
     $sqlConnection = $sqlConnection.replace('<username>', $sqlUsername)
     $sqlConnection = $sqlConnection.replace('<password>', $sqlPassword)
     $sqlConnection = $sqlConnection.replace('<databasename>', 'TTADB')

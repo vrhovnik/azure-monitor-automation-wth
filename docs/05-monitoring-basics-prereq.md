@@ -1,15 +1,13 @@
 ﻿# Monitoring pre-requisites
 
 <!-- TOC -->
-
 * [Monitoring pre-requisites](#monitoring-pre-requisites)
-    * [Deploy VM with solution](#deploy-vm-with-solution)
-    * [Container app deployment](#container-app-deployment)
-        * [Deploy container app with private registry](#deploy-container-app-with-private-registry)
-        * [Deploy container apps with public registry](#deploy-container-apps-with-public-registry)
+  * [Deploy VM with solution](#deploy-vm-with-solution)
+  * [Container app deployment](#container-app-deployment)
+    * [Deploy container app with private registry](#deploy-container-app-with-private-registry)
+    * [Deploy container apps with public registry](#deploy-container-apps-with-public-registry)
 * [Additional information and links](#additional-information-and-links)
 * [Navigate back to main page](#navigate-back-to-main-page)
-
 <!-- TOC -->
 
 If you don't have VM and container deployed or you deleted everything from before, you can use the following scripts to
@@ -23,8 +21,7 @@ of the artifacts. The easiest way is to use [Azure Shell](https://shell.azure.co
 
 When cloned, navigate to folder (**ROOT/scripts/IaC**). VM folder contains bicep files and scripts to deploy VM with
 solution. Modernization folder contains bicep files and scripts to deploy container app with SQL, images and registry,
-container
-app.
+container app.
 
 To ease up with applying the extensions for az cli (if you don't have it installed, confirm installation without
 prompt):
