@@ -47,13 +47,15 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
     - if data disk IOPS consumed percentage is greater than 90% with verbose severity
     - if network in total is greater than 800 GB with information severity
 3. Monitor load in VM and if received more than 150mb of RAM allocated to the process (in which app resides), restart
-   the
-   VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating Azure
+   the VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating
+   Azure
    Function (with consumption plan) and echoing the result.
+4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place for
+   application to monitor performance, transactions, failures, maps, etc.
 
 ### App monitoring
 
-1. Find the errors in the application by defining **ONE** table with data for the application by providing:
+1. Find the errors in the applications by defining **ONE** table with data for the application by providing:
     - timeline option to be able to provide range in query
     - to see exceptions by the name, request duration, method, error message, instance where it happened, called url by
       providing time range
@@ -71,8 +73,16 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
     - how should you monitor the application itself without changing the code of the application
 2. Generate load on the application and monitor via possible solutions in Azure how the application is performing -
    provide to coach the information about how the app is performing, how many users are connecting, etc.
-3. Demonstrate exception details to the coach by using Microsoft Excell with the respond option.
-4. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to
+3. Replace connection string for web application in VM - simple instructions below:
+    - connect to the VM via RDP
+    - replace connection string in the appsettings.json file (section SQLOptions, property ConnectionString) with
+      connection string from Azure SQL
+    - restart the application (Windows + R, inetmgr (Enter), select default application pool, right click, select
+      recycle)
+    - open http://localhost/ttaweb/tasks in the browser
+    - repeat load test, navigate to app insights and check application map, live metrics and explain what changed
+4. Demonstrate exception details to the coach by using Microsoft Excell with the respond option.
+5. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to
    appropriate users.
 
 # Expected learnings
