@@ -1,5 +1,13 @@
 ﻿# Monitoring pre-requisites
 
+<!-- TOC -->
+* [Monitoring pre-requisites](#monitoring-pre-requisites)
+  * [Deploy VM with solution](#deploy-vm-with-solution)
+  * [Container app deployment](#container-app-deployment)
+* [Additional information and links](#additional-information-and-links)
+* [Navigate back to main page](#navigate-back-to-main-page)
+<!-- TOC -->
+
 If you don't have VM and container deployed or you deleted everything from before, you can use the following scripts to set them up
 from scratch:
 
@@ -80,3 +88,8 @@ _Usage_:
 2. [Azure Container Registry](https://learn.microsoft.com/en-us/azure/container-registry/)
 3. [Create VM with IIS](https://learn.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-cli)
 4. [Azure Container Apps](https://learn.microsoft.com/en-us/azure/container-apps/overview)
+
+
+# Navigate back to [main page](../README.md)
+
+[Back to Enable Monitoring](./03-modernization-in-Azure.md) | [Back to the challenges](./00-challenges.md)
