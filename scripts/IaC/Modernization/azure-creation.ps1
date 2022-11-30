@@ -88,10 +88,10 @@ function ImportDataToSql($rgName)
 {
     Write-Host "Doing an import of bacpac file"
     $server = $Env:AMA_SQLServer_NAME
-    $password = $Env:AMA_SQLServer_Username
-    $username = $Env:AMA_SQLServer_NAME
+    $password = $Env:AMA_SQLServer_PWD
+    $username = $Env:AMA_SQLServer_Username
     # az storage blob generate-sas --account-name nameofstorageaccount -c ama -n TTADB.bacpac --permissions r --expiry 2022-01-01T00:00:00Z
-    az sql db import -s $server -n $dbName --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
+    az sql db import -s $server -n TTADB --storage-key-type SharedAccessKey --storage-uri "https://webeudatastorage.blob.core.windows.net/ama/TTADB.bacpac" -g $rgName -p $password -u $username --storage-key "?sv=2021-04-10&st=2022-11-07T07%3A57%3A00Z&se=2023-01-01T07%3A57%3A00Z&sr=b&sp=r&sig=MvPfn1rNRdzX2sESe23f5H2R0IpUTKgs79B8%2FRarzSY%3D"
 }
 
 function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName)
@@ -110,14 +110,16 @@ function CreateContainerEnvWithApp($containerappenv, $containerAppName, $regionT
     Start-Process "$fqdn"
 }
 
-function CreateContainerEnvWithBicep($containerappenv, $containerAppName, $regionToDeploy, $rgName, $loginName){
+function CreateContainerEnvWithBicep($containerappenv, $containerAppName, $regionToDeploy, $rgName, $registryName){
     Write-Host "Create container app environment $containerappenv in $regionToDeploy"
     $sqlConnection=$Env:AMA_SQLServerConn
+    $registryServer = "$registryName.azurecr.io"
     $imageName = "$registryServer/tta/web:1.0"
-    $fqdn=az deployment group create --template-file "containerapp.bicep" --resource-group $rgName --parameters location=$regionToDeploy containerImage=$imageName sqlConn=$sqlConnection containerRegistryName=$loginName
+    Write-Host "using $imageName to generate container app in environment $containerappenv"
+    $fqdn=az deployment group create --template-file "containerapp.bicep" --resource-group $rgName --parameters containerAppName=$containerAppName containerAppEnvName=$containerappenv location=$regionToDeploy containerImage=$imageName sqlConn=$sqlConnection containerRegistryName=$registryName | ConvertFrom-Json
     $createdFQDN=$fqdn.properties.outputs.containerAppFQDN.value
     Write-Host "Container app running at $createdFQDN, starting web browser"
-    Start-Process "$createdFQDN"
+    Start-Process "msedge.exe" -ArgumentList $createdFQDN
 }
 
 # write log to Temp file
@@ -135,7 +137,6 @@ CreateSqlAndAddFwRules -rgname $rgName
 # 4. import data to SQL
 ImportDataToSql -rgName $rgName
 # 5. Create container app env with container app and open browser 
-CreateContainerEnvWithApp -containerappenv $containerappenv -containerAppName $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -loginName $acrName
-
+CreateContainerEnvWithBicep -containerappenv $containerappenv -containerAppName $containerapp -regionToDeploy $regionToDeploy -rgName $rgName -registryName $acrName 
 # checks logs for any challenges
 Stop-Transcript

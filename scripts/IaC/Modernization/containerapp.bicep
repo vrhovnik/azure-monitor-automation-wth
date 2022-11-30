@@ -137,13 +137,15 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
         maxReplicas: maxReplica
         rules: [
           {
-            name: 'http-requests'
-            http: {
-              metadata: {
-                concurrentRequests: '10'
-              }
-            }
-          }
+           name: 'cpu-scaling-rule'
+           custom: {
+             type: 'cpu'
+             metadata: {
+               type: 'Utilization'
+               value: '10'
+               }
+             }
+           }
         ]
       }
     }

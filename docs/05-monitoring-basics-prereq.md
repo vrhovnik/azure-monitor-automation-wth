@@ -87,6 +87,8 @@ It takes 6 parameters (or you can use default values where applicable):
 5. **containerappenv** -- name of the container environment
 6. **containerapp** -- name of the container environment
 
+Don't forget to edit parameters (XXXX.parameters.json where XXXX is the service name) files with your own names to reflect the environment.
+
 _Usage_:
 
 ```powershell
