@@ -1,5 +1,7 @@
 using System.IO.Compression;
+using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DependencyCollector;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -44,11 +46,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
     options.Conventions.AddPageRoute("/Info/Index", ""));
 
+builder.Services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, _) =>
+{
+    module.EnableSqlCommandTextInstrumentation = true;
+});
 builder.Services.AddApplicationInsightsTelemetry();
-// builder.Services.ConfigureTelemetryModule<DependencyTrackingTelemetryModule>((module, _) =>
-// {
-//     module.EnableSqlCommandTextInstrumentation = true;
-// });
 
 var app = builder.Build();
 
