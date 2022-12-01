@@ -35,9 +35,9 @@ Your job is to prepare the overview for your team:
         - Unique sessions and users
         - Failed requests
         - Average page load time breakdown
-    - pin to Azure dashboard deep link to interactive reports:
-        - Performance analysis of the app (clicking on blade gives you in depth information) and link to sample
-          end-to-end transaction
+    - pin to Azure dashboard deep links to interactive reports (clicking on blade gives you in depth information):
+        - [Apdex Performance analysis](https://www.apdex.org/) of the application
+        - link to sample end-to-end transaction with an ability to modify query on Azure Dashboard
         - Exception overview with trend graph
 2. provide an ability to download data and connect to external systems like Excell or PowerBI
 
