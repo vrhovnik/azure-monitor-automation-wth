@@ -24,7 +24,6 @@ front) **and** 1 container app up and running.
 If you skipped the challenges you can deploy them now by using selected option. It will take around 15 min max to have
 them up and running. You were provided with one database as a service to rule them all.
 
-
 Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
 
 ## Task requirement
@@ -49,7 +48,7 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
     - if network in total is greater than 800 GB with information severity
 3. Monitor load in VM and if received more than 150mb of RAM allocated to the process (in which app resides - in short **private bytes for the IIS process w3wp.exe**), restart
    the VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating Azure Function (with consumption plan) and echoing the result.
-4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place for application to monitor performance, transactions, failures, maps, etc.
+4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place for applications to monitor performance, transactions, failures, maps, etc.
 
 ### App monitoring
 

@@ -138,23 +138,7 @@ resource containerApp 'Microsoft.App/containerApps@2022-06-01-preview' = {
             memory: '.5Gi'
           }
         }
-      ]
-      scale: {
-        minReplicas: minReplica
-        maxReplicas: maxReplica
-        rules: [
-          {
-           name: 'cpu-scaling-rule'
-           custom: {
-             type: 'cpu'
-             metadata: {
-               type: 'Utilization'
-               value: '10'
-               }
-             }
-           }
-        ]
-      }
+      ]      
     }
   }
 }
