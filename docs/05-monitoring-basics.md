@@ -93,7 +93,7 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
    on username to navigate to dashboard. Repeat a few times. Search for a transaction "UserProfile" and explain to the
    coach what are you seeing (code implemention is available [here](https://github.com/vrhovnik/azure-monitor-automation-wth/blob/main/src/TTASLN/TTA.Web/Pages/User/Dashboard.cshtml.cs#L50)).
 3. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding
-   more than 3s and we want for product manager to be aware. if you don't have email options, simulate by creating Azure
+   more than 2s and we want for product manager to be aware. if you don't have email options, simulate by creating Azure
    Function (consumption plan).
 
 ## Test the functionality and success criteria

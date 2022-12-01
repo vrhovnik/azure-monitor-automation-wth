@@ -20,20 +20,23 @@ to provide this information to the end user.
 Your job is to prepare the overview for your team:
 
 1. create rich graphics and dashboards to preview the solution overall health and performance:
-    - create a dashbard by having providing (if you are using native solution, you can
-      use [this template](https://webeudatastorage.blob.core.windows.net/web/appInsightStarterTemplate.json) as a
+    - create simple dashboard for your team by providing (if you are using native solution, you can use [this template](https://webeudatastorage.blob.core.windows.net/web/appInsightStarterTemplate.json) as a
       starter)
-        - app insights and Azure Monitor alerts, dashboard, workbooks, url tests, smart detection rules
-        - overall overview of application statistics
-        - interactive tab to show active results in your subscriptions and all defined workbooks and alerting resources
-    - create an Azure dashboard dashboard and fill it in with following metrics:
+        - App insights and Azure Monitor alerts overview -how many dashboard, how many workbooks, if there are any url tests, defined smart detection rules
+        - overall overview of application statistics (custom metrics, traces, performanceCounters, requests, dependencies, availability results, exceptions, pageViews, browserTimings)
+        - interactive tab to show results in your subscriptions 
+          - all defined workbooks 
+          - alerting resources by providing table with resource group name, alert status, alert state, alert time, severity, deep details link
+          - workbook overview by type, location, resource group, enabled, type and deep details link
+        - Exception list with query from previous task
+    - create master Azure dashboard dashboard and fill it in with following metrics:
         - Average CPU usage and available memory
         - Average availability and server response time
         - Unique sessions and users
         - Failed requests
         - Average page load time breakdown
-    - create an Azure dashboard as a link to interactive reports:
-        - Performance analysis of the app (clicking on operation gives you additional information) and link to sample
+    - pin to Azure dashboard deep link to interactive reports:
+        - Performance analysis of the app (clicking on blade gives you in depth information) and link to sample
           end-to-end transaction
         - Exception overview with trend graph
 2. provide an ability to download data and connect to external systems like Excell or PowerBI
@@ -43,7 +46,7 @@ Your job is to prepare the overview for your team:
 Showcase the dashboard to the coach and the team by providing rich examples of data from task requirements and explaing
 what it does.
 
-Examples of monitoring below:
+Examples of how monitoring should be done:
 
 ![Common dashboard](https://webeudatastorage.blob.core.windows.net/web/app-insight-example.png)
 
