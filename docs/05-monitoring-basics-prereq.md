@@ -99,12 +99,11 @@ open it in a browser.
 
 ## Deploy VM with solution
 
-To deploy the VM, you can leverage the following [script](../scripts/IaC/VM/azure-creation.ps1) which does the
-following:
+To deploy the VM, you can leverage the following [script](../scripts/IaC/VM/azure-creation.ps1) which:
 
-1. Create or update the resource group
-2. Create or update VM
-3. Opens Remote Connection to connect into VM
+1. Creates or update the resource group
+2. Creates or update VM
+3. Opens Remote Desktop Connection to connect into that VM
 
 **Note:** you will find the script in **ROOT/scripts/IaC/VM** folder. Navigate to that folder.
 
@@ -146,15 +145,15 @@ Container app should be deployed in the same resource group as the VM. For clean
 parameter. The same resource group will enable you to delete everything in one go.
 
 To deploy container app with private registry, this is the [script](../scripts/IaC/Modernization/azure-creation.ps1)
-which will do the following:
+which will:
 
 1. Create or update the resource group
 2. Create or update Azure Container Registry
-3. Builds and deploy container images to registry
+3. Build and deploy container images to registry
 4. Create SQL, adds firewall rules and creates database
-5. Imports existing data to SQL, prepares connection string for the application to be used later
-6. Creates (or updates) application insights, prepares connection strings for the app
-7. Create container app with latest image from registry
+5. Import existing data to SQL, prepares connection string for the application to be used later
+6. Create (or updates) application insights, prepares connection strings for the app
+7. Create container app with latest built image from registry
 
 **Note:** you will find the script in **ROOT/scripts/IaC/Modernization** folder. Navigate to that folder and then
 execute script below.
