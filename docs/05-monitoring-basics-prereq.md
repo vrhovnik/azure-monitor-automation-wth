@@ -111,7 +111,7 @@ It takes 6 parameters (or you can use default values where applicable):
 
 1. **regionToDeploy** -- resource group location (most common is westeurope)
 2. **rgName** -- name of the resource group (it will be created or updated)
-3. **vmName** -- name of the VM (it will be created or updated)
+3. **vmName** -- uniqu name of the VM (it will be created or updated)
 3. **adminName** -- username name for VM to RDP into
 4. **adminPass** -- password for user to RDP into
 5. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
@@ -163,11 +163,11 @@ It takes 6 parameters (or you can use default values where applicable):
 1. **regionToDeploy** -- resource group location (most common is westeurope)
 2. **rgName** -- name of the resource group (it will be created or updated)
 3. **workDir** - directory where you cloned your solution f.e. "C:/Work/Projects/azure-monitor-automation-wth",
-4. **acrName** -- name of the container registry (it will be created or updated)
-5. **sqlServerName** -- name of the SQL server (it will be created or updated)
+4. **acrName** -- unique name of the container registry (it will be created or updated)
+5. **sqlServerName** -- unique name of the SQL server (it will be created or updated)
 6. **sqlServerUsername** - username for SQL server
 7. **sqlServerPwd** - password for SQL server
-8. **containerappenv** -- name of the container environment
+8. **containerappenv** -- unique name of the container environment
 9. **containerapp** -- name of the container environment
 
 _Usage_:
