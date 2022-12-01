@@ -53,25 +53,46 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
 
 #### VMs
 
-1. Monitor load in VM and check out the percentage usage of CPU usage in that VM (CPU credits is not what we are looking for).
-2. Monitor load in VM and if received **more** than 10mb of RAM allocated to specific process w3wp (in which app resides - in
-   short **private bytes for the IIS process w3wp.exe**), restart the VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating
+1. Monitor load in VM and check out the percentage usage of CPU usage in that VM (CPU credits is not what we are looking
+   for).
+2. Monitor load in VM and if received **more** than 100 mb of RAM allocated to specific process w3wp (in which app
+   resides - in
+   short **private bytes for the IIS process w3wp.exe**), restart the VM to free the allocated memory and notify owner
+   via email. If you don't have email setup, simulate by creating
    Azure Function (with consumption plan) and echoing the result.
 3. Create alerts for VM and notify user by your choice via email:
     - if percentage CPU is greater than 80% by defining critical severity
     - if data disk IOPS consumed percentage is greater than 90% with verbose severity
     - if network in total is greater than 800 GB with information severity
-4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place
+4. Enable on VM to use application insights to monitor the application (without changing the application configuration
+   settings - discuss with coach what options do they have if they need to change the settings in code) and send logs to
+   it to be able to have one place
    for applications to monitor performance, transactions, failures, maps, etc.
+5. Replace connection string for web application in VM - simple instructions below:
+    - connect to the VM via RDP
+    - replace connection string in the **appsettings.json** file (section **SQLOptions**, property **ConnectionString**)
+      with connection string from Azure SQL
+    - replace connection string in the **appsettings.json** file (section **ApplicationInsights**,
+      property **ConnectionString**) with connection string from Application Insights
+    - restart the application (**Windows + R**, **inetmgr** (Enter), select **default application pool**, right click,
+      select **recycle**) or via
+      PowerShell (**[Restart-WebAppPool](https://learn.microsoft.com/en-us/powershell/module/webadministration/restart-webapppool?view=windowsserver2022-ps)**)
+      or via CLI commands (net stop was /y and then
+      net start w3svc)
+    - open http://localhost/ttaweb/tasks in the browser
+    - repeat load test, navigate to app insights and check application map, live metrics and explain what changed
 
 ### App monitoring
 
-1. Find the errors in the applications by defining **ONE** table with data for the application by providing:
+1. Find the errors in the applications by defining **ONE** query with data for the application by providing:
     - timeline option to be able to provide range in query
     - to see exceptions by the name, request duration, method, error message, instance where it happened, called url by
       providing time range
     - showcase the data in Excell
-2. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding
+2. Create an accoutn on container app instance (URL/User/Register). Create an account and add few records (tasks). Click
+   on username to navigate to dashboard. Repeat a few times. Search for a transaction "UserProfile" and explain to the
+   coach what are you seeing (code implemention is available [here](https://github.com/vrhovnik/azure-monitor-automation-wth/blob/main/src/TTASLN/TTA.Web/Pages/User/Dashboard.cshtml.cs#L50)).
+3. Notify application users (IAM role owner) when you see that pages are slow to respond. Defition of slow is responding
    more than 3s and we want for product manager to be aware. if you don't have email options, simulate by creating Azure
    Function (consumption plan).
 
@@ -83,19 +104,10 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
     - how should you consolidate data from different sources to have the overall view of the system
     - how should you monitor the application itself without changing the code of the application
 2. Generate load on the application and monitor via possible solutions in Azure how the application is performing -
-   provide to coach the information about how the app is performing, how many users are connecting, etc.
-3. Replace connection string for web application in VM - simple instructions below:
-    - connect to the VM via RDP
-    - replace connection string in the **appsettings.json** file (section **SQLOptions**, property **ConnectionString**)
-      with
-      connection string from Azure SQL
-    - restart the application (**Windows + R**, **inetmgr** (Enter), select **default application pool**, right click,
-      select
-      **recycle**)
-    - open http://localhost/ttaweb/tasks in the browser
-    - repeat load test, navigate to app insights and check application map, live metrics and explain what changed
-4. Demonstrate exception details to the coach by using Microsoft Excell with the respond option.
-5. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to
+   provide to coach the information about how the app is performing, how many users are connecting, trace of the
+   request, etc.
+3. Demonstrate exception details to the coach by using Microsoft Excell with the respond option.
+4. When error occurs and pages become slow, demonstrate how the alert is triggered and how the notification is sent to
    appropriate users.
 
 # Expected learnings
