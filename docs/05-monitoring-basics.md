@@ -6,6 +6,8 @@
   * [Task requirement](#task-requirement)
     * [General](#general)
     * [System monitoring](#system-monitoring)
+      * [Containers](#containers)
+      * [VMs](#vms)
     * [App monitoring](#app-monitoring)
   * [Test the functionality and success criteria](#test-the-functionality-and-success-criteria)
 * [Expected learnings](#expected-learnings)
@@ -40,15 +42,27 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
 
 ### System monitoring
 
+#### Containers
+
 1. Monitor load in containers and if received more than 50 requests per second in a container, scale the affected
    application by 1 instance automatically.
-2. Create alerts for VM and notify user by your choice via email:
+2. Monitor load in containers and if CPU consumed goes over 10%, scale the application by 1 instance.
+3. Create an alert if the threshold goes over 100 requests and if CPU goes over 1 core over period of 5 mins, but only
+   for successful requests. Notify users by your own choice (email, SMS, ...). If you don't have email option, create
+   Azure Function and echo the message.
+
+#### VMs
+
+1. Monitor load in VM and check out the percentage usage of CPU usage in that VM (CPU credits is not what we are looking for).
+2. Monitor load in VM and if received **more** than 10mb of RAM allocated to specific process w3wp (in which app resides - in
+   short **private bytes for the IIS process w3wp.exe**), restart the VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating
+   Azure Function (with consumption plan) and echoing the result.
+3. Create alerts for VM and notify user by your choice via email:
     - if percentage CPU is greater than 80% by defining critical severity
     - if data disk IOPS consumed percentage is greater than 90% with verbose severity
     - if network in total is greater than 800 GB with information severity
-3. Monitor load in VM and if received more than 150mb of RAM allocated to the process (in which app resides - in short **private bytes for the IIS process w3wp.exe**), restart
-   the VM to free the allocated memory and notify owner via email. If you don't have email setup, simulate by creating Azure Function (with consumption plan) and echoing the result.
-4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place for applications to monitor performance, transactions, failures, maps, etc.
+4. Enable on VM to use application insights to monitor the application and send logs to it to be able to have one place
+   for applications to monitor performance, transactions, failures, maps, etc.
 
 ### App monitoring
 
@@ -72,9 +86,11 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
    provide to coach the information about how the app is performing, how many users are connecting, etc.
 3. Replace connection string for web application in VM - simple instructions below:
     - connect to the VM via RDP
-    - replace connection string in the **appsettings.json** file (section **SQLOptions**, property **ConnectionString**) with
+    - replace connection string in the **appsettings.json** file (section **SQLOptions**, property **ConnectionString**)
+      with
       connection string from Azure SQL
-    - restart the application (**Windows + R**, **inetmgr** (Enter), select **default application pool**, right click, select
+    - restart the application (**Windows + R**, **inetmgr** (Enter), select **default application pool**, right click,
+      select
       **recycle**)
     - open http://localhost/ttaweb/tasks in the browser
     - repeat load test, navigate to app insights and check application map, live metrics and explain what changed
@@ -101,10 +117,11 @@ Instruction how to do that are available [here](05-monitoring-basics-prereq.md).
    and [Policy effects](https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effects)
 4. [Application Insights overview](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview)
 5. [Application insights on VM](https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-vm-vmss-apps?tabs=core)
-6. [Azure Container App Observability](https://learn.microsoft.com/en-us/azure/container-apps/observability)
-7. [Kusto Query](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
+6. [Azure Logic Apps](https://learn.microsoft.com/en-us/azure/logic-apps/quickstart-create-first-logic-app-workflow)
+7. [Azure Container App Observability](https://learn.microsoft.com/en-us/azure/container-apps/observability)
+8. [Kusto Query](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)
    and [Azure Monitor Log Analytics API](https://dev.loganalytics.io/)
-8. [Azure REST API](https://learn.microsoft.com/en-us/rest/api/azure/)
+9. [Azure REST API](https://learn.microsoft.com/en-us/rest/api/azure/)
 
 [<< Enable Monitoring](./03-modernization-in-Azure.md) | [<< Back to the challenges](./00-challenges.md)
 | [Monitoring previews >>](./06-monitoring-previews.md)  
